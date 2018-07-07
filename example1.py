@@ -3,6 +3,10 @@
 
 import numpy as np
 
+def x(x, deltat, w):
+    return (1 - .05 * deltat) * x + .04 * deltat * x**2 + w
+def y(x, v):
+    return x**2 * x**3 + v
 def A(x, deltat):
     return 1 - .05 * deltat + .08 * deltat * x
 def C(x):
