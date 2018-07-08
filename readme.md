@@ -1,14 +1,11 @@
-# distributions
+
+## distributions
 
 of uncertainty, confidence, knowledge
 
-their evolution over time
+their evolution over time as various processes take place
 
-as various processes take place
-
-including acquisition of new information
-
-# decisions
+## decisions
 
 and risk
 
