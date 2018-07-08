@@ -3,11 +3,11 @@
 
 of uncertainty, confidence, knowledge
 
-their evolution over time as various processes take place
+their evolution with processes
 
 ## decisions
 
-and risk
+risk
 
 the cost of errors
 
