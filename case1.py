@@ -34,10 +34,10 @@ yhatts = np.zeros_like(tts)
 ytillts = np.zeros_like(tts)
 xtilts = np.zeros_like(tts)
 
-xts[0] = 2. + wts[0]
+xts[0] = 2.
 yts[0] = y(xts[0], vts[0])
 xrefts[0] = 2.
-xhatts[0] = 2.0
+xhatts[0] = 2.
 Ptilts[0] = .01
 Reets[0] = 0
 Kts[0] = 0
