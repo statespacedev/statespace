@@ -15,11 +15,11 @@ the cost of errors
 
 ## studies
 
-1a - jazwinski, linearized processor
+[1a - linearized processor](./study1a.py)
 
-1b - jazwinski, extended processor
+[1b - extended processor](./study1b.py)
 
-1c - jazwinski, sigma-point sampling processor
+[1c - sampling processor](./study1c.py)
 
 ## references
 
