@@ -1,4 +1,3 @@
-
 # linear bayesian processor, linear kalman filter
 
 import numpy as np
@@ -11,6 +10,12 @@ def x(x, w):
 
 def y(x, v):
     return x**2 + x**3 + v
+
+def A(x):
+    return 1 - .05 * deltat + .08 * deltat * x
+
+def C(x):
+    return 2 * x + 3 * x**2
 
 tts = np.arange(0, n * deltat, deltat)
 Rvv = .09**2
@@ -36,7 +41,7 @@ xhatts[0] = 2.3
 Ptilts[0] = .01
 Reets[0] = 0
 Kts[0] = 0
-yhatts[0] = (xrefts[0]**2 + xrefts[0]**3) + (2 * xrefts[0] + 3 * xrefts[0]**2) * (xhatts[0] - xrefts[0])
+yhatts[0] = (xrefts[0]**2 + xrefts[0]**3) + C(xrefts[0]) * (xhatts[0] - xrefts[0])
 ets[0] = 0
 xtilts[0] = xhatts[0] - xts[0]
 
@@ -45,21 +50,21 @@ for tk in range(1, n):
     yts[tk] = y(xts[tk], vts[tk])
 
     xrefts[tk] = 2. + .067 * tts[tk]
-    xhatts[tk] = (1 - .05 * deltat) * xrefts[tk-1] + (1 - .05 * deltat + .08 * deltat * xrefts[tk-1]) * (xhatts[tk-1] - xrefts[tk-1])
-    Ptilts[tk] = (1 - .05 * deltat + .08 * deltat * xrefts[tk-1])**2 * Ptilts[tk-1]
+    xhatts[tk] = (1 - .05 * deltat) * xrefts[tk-1] + A(xrefts[tk-1]) * (xhatts[tk-1] - xrefts[tk-1])
+    Ptilts[tk] = A(xrefts[tk-1])**2 * Ptilts[tk-1]
 
-    Reets[tk] = (2 * xhatts[tk] + 3 * xhatts[tk]**2)**2 * Ptilts[tk] + .09
-    Kts[tk] = util.div0( Ptilts[tk] * (2 * xrefts[tk] + 3 * xrefts[tk]**2) , Reets[tk] )
+    Reets[tk] = C(xhatts[tk])**2 * Ptilts[tk] + .09
+    Kts[tk] = util.div0( Ptilts[tk] * C(xrefts[tk]) , Reets[tk] )
 
-    yhatts[tk] = (xrefts[tk]**2 + xrefts[tk]**3) + (2 * xrefts[tk] + 3 * xrefts[tk]**2) * (xhatts[tk] - xrefts[tk])
+    yhatts[tk] = y(xrefts[tk], 0) + C(xrefts[tk]) * (xhatts[tk] - xrefts[tk])
     ets[tk] =  yts[tk] - yhatts[tk]
 
     xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
-    Ptilts[tk] = (1 - Kts[tk] * (2 * xrefts[tk] + 3 * xrefts[tk]**2)) * Ptilts[tk]
+    Ptilts[tk] = (1 - Kts[tk] * C(xrefts[tk])) * Ptilts[tk]
 
     xtilts[tk] = xhatts[tk] - xts[tk]
 
-plots.xts(xts, tts, end=None)
+plots.xts(ets, tts, end=None)
 
 pass
 
