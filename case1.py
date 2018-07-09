@@ -6,54 +6,45 @@ import util, math, plots
 n = 150
 deltat = .01
 
-def xref(t):
-    return 2. + .067 * t
-
 def x(x, w):
     return (1 - .05 * deltat) * x + .04 * deltat * x**2 + w
 
 def y(x, v):
     return x**2 + x**3 + v
 
-def A(x):
-    return 1 - .05 * deltat + .08 * deltat * x
-
-def C(x):
-    return 2 * x + 3 * x**2
-
-Rvv = .09**2
-Rww = 0
 tts = np.arange(0, n * deltat, deltat)
+Rvv = .09**2
 vts = math.sqrt(Rvv) * np.random.randn(n)
+Rww = 0
 wts = math.sqrt(Rww) * np.random.randn(n)
 
 xts = np.zeros_like(tts)
-xts[0] = 2.
 yts = np.zeros_like(tts)
-yts[0] = y(xts[0], vts[0])
-
 xrefts = np.zeros_like(tts)
-xrefts[0] = xref(t=0)
-
 xhatts = np.zeros_like(tts)
-xhatts[0] = 2.3
-xtilts = np.zeros_like(tts)
-xtilts[0] = xhatts[0] - xts[0]
 Ptilts = np.zeros_like(tts)
-Ptilts[0] = .01
-
-yhatts = np.zeros_like(tts)
-yhatts[0] = (xrefts[0]**2 + xrefts[0]**3) + (2 * xrefts[0] + 3 * xrefts[0]**2) * (xhatts[0] - xrefts[0])
-ets = np.zeros_like(tts)
 Reets = np.zeros_like(tts)
 Kts = np.zeros_like(tts)
+yhatts = np.zeros_like(tts)
+ets = np.zeros_like(tts)
+xtilts = np.zeros_like(tts)
+
+xts[0] = 2. + wts[0]
+yts[0] = y(xts[0], vts[0])
+xrefts[0] = 2.
+xhatts[0] = 2.3
+Ptilts[0] = .01
+Reets[0] = 0
+Kts[0] = 0
+yhatts[0] = (xrefts[0]**2 + xrefts[0]**3) + (2 * xrefts[0] + 3 * xrefts[0]**2) * (xhatts[0] - xrefts[0])
+ets[0] = 0
+xtilts[0] = xhatts[0] - xts[0]
 
 for tk in range(1, n):
-    xrefts[tk] = xref(tts[tk])
-
     xts[tk] = x(xts[tk - 1], wts[tk - 1])
     yts[tk] = y(xts[tk], vts[tk])
 
+    xrefts[tk] = 2. + .067 * tts[tk]
     xhatts[tk] = (1 - .05 * deltat) * xrefts[tk-1] + (1 - .05 * deltat + .08 * deltat * xrefts[tk-1]) * (xhatts[tk-1] - xrefts[tk-1])
     Ptilts[tk] = (1 - .05 * deltat + .08 * deltat * xrefts[tk-1])**2 * Ptilts[tk-1]
 
@@ -68,7 +59,7 @@ for tk in range(1, n):
 
     xtilts[tk] = xhatts[tk] - xts[tk]
 
-plots.xts(ets, tts)
+plots.xts(xts, tts, end=None)
 
 pass
 
