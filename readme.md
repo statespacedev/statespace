@@ -3,7 +3,9 @@
 
 of uncertainty, confidence, knowledge
 
-their evolution with processes
+their evolution with various processes
+
+including acquisition of new information
 
 ## decisions
 
