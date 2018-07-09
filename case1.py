@@ -41,7 +41,7 @@ xhatts[0] = 2.3
 Ptilts[0] = .01
 Reets[0] = 0
 Kts[0] = 0
-yhatts[0] = (xrefts[0]**2 + xrefts[0]**3) + C(xrefts[0]) * (xhatts[0] - xrefts[0])
+yhatts[0] = y(xrefts[0], 0) + C(xrefts[0]) * (xhatts[0] - xrefts[0])
 ets[0] = 0
 xtilts[0] = xhatts[0] - xts[0]
 
