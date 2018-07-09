@@ -50,8 +50,6 @@ for tk in range(1, n):
     yts[tk] = y(xts[tk], vts[tk])
     xrefts[tk] = 2. + .067 * tts[tk]
 
-    # xhatts[tk] = (1 - .05 * deltat) * xrefts[tk-1] + A(xrefts[tk-1]) * (xhatts[tk-1] - xrefts[tk-1])
-    # xhatts[tk] = xrefts[tk] + A(xrefts[tk-1]) * (xhatts[tk-1] - xrefts[tk-1])
     xhatts[tk] = x(xrefts[tk-1], 0) + A(xrefts[tk-1]) * (xhatts[tk-1] - xrefts[tk-1])
     Ptilts[tk] = A(xrefts[tk-1])**2 * Ptilts[tk-1]
 
