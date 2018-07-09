@@ -68,7 +68,7 @@ for tk in range(1, n):
 
     xtilts[tk] = xhatts[tk] - xts[tk]
 
-plots.xts(xhatts, tts)
+plots.xts(ets, tts)
 
 pass
 
