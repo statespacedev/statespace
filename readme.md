@@ -13,13 +13,13 @@ risk
 
 the cost of errors
 
-## case studies
+## studies
 
-case1a - jazwinski, linearized processor
+1a - jazwinski, linearized processor
 
-case1b - jazwinski, extended processor
+1b - jazwinski, extended processor
 
-case1c - jazwinski, sigma-point sampling processor
+1c - jazwinski, sigma-point sampling processor
 
 ## references
 
