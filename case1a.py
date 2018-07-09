@@ -1,4 +1,4 @@
-# linear bayesian processor, linear kalman filter
+# linearized processor
 
 import numpy as np
 import util, math, plots
