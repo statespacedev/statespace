@@ -1,11 +1,9 @@
 
 ## distributions and decisions
 
-uncertainty, confidence, knowledge
+uncertainty and confidence
 
-their evolution with various processes
-
-including acquisition of new information
+their evolution under various processes
 
 risk and the cost of errors
 
