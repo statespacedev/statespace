@@ -15,7 +15,7 @@ risk and the cost of errors
 
 [s1c, jazwinski tracking problem, deterministic sampling processor](./s1c.py)
 
-## references
+## background
 
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 
