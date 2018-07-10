@@ -1,4 +1,4 @@
-# linearized processor
+# linearized bayesian processor, linearized kalman filter, LZ-BP
 
 import numpy as np
 import util, math, plots

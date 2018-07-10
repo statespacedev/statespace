@@ -1,4 +1,4 @@
-# sigma-point sampling processor
+# sigma-point bayesian processor, unscented kalman filter, SPBP, UKF
 
 import numpy as np
 import util, math, plots

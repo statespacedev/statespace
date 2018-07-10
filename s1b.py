@@ -1,4 +1,4 @@
-# extended processor
+# extended bayesian processor, extended kalman filter, XBP, EKF
 
 import numpy as np
 import util, math, plots
