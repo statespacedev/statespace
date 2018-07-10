@@ -10,9 +10,7 @@ risk and the cost of errors
 ## studies
 
 [1a - linearized processor](./study1a.py)
-
 [1b - extended processor](./study1b.py)
-
 [1c - sampling processor](./study1c.py)
 
 ## references
