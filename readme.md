@@ -9,11 +9,11 @@ risk and the cost of errors
 
 ## studies
 
-[1a - linearized processor](./study1a.py)
+[s1a, jazwinski tracking problem, linearized processor](./s1a.py)
 
-[1b - extended processor](./study1b.py)
+[s1b, jazwinski tracking problem, extended processor](./s1b.py)
 
-[1c - sampling processor](./study1c.py)
+[s1c, jazwinski tracking problem, sigma-point processor](./s1c.py)
 
 ## references
 
