@@ -1,7 +1,7 @@
 
 ## distributions and decisions
 
-uncertainty and confidence
+uncertainty, confidence, and knowledge
 
 their evolution under various processes
 
