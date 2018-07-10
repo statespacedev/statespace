@@ -31,7 +31,7 @@ Ptilts = np.zeros_like(tts)
 Reets = np.zeros_like(tts)
 Kts = np.zeros_like(tts)
 yhatts = np.zeros_like(tts)
-ytillts = np.zeros_like(tts)
+ets = np.zeros_like(tts)
 xtilts = np.zeros_like(tts)
 
 xts[0] = 2.
@@ -42,7 +42,7 @@ Ptilts[0] = .01
 Reets[0] = 0
 Kts[0] = 0
 yhatts[0] = y(xrefts[0], 0) + C(xrefts[0]) * (xhatts[0] - xrefts[0])
-ytillts[0] = 0
+ets[0] = 0
 xtilts[0] = xhatts[0] - xts[0]
 
 for tk in range(1, n):
@@ -57,15 +57,15 @@ for tk in range(1, n):
     Kts[tk] = util.div0( Ptilts[tk] * C(xrefts[tk]) , Reets[tk] )
 
     yhatts[tk] = y(xrefts[tk], 0) + C(xrefts[tk]) * (xhatts[tk] - xrefts[tk])
-    ytillts[tk] = yts[tk] - yhatts[tk]
+    ets[tk] = yts[tk] - yhatts[tk]
 
-    xhatts[tk] = xhatts[tk] + Kts[tk] * ytillts[tk]
+    xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
     Ptilts[tk] = (1 - Kts[tk] * C(xrefts[tk])) * Ptilts[tk]
 
     xtilts[tk] = xhatts[tk] - xts[tk]
 
 # plots.xts(xhatts, tts, end=None)
-plots.test(xhatts, xtilts, yhatts, ytillts, yts, Reets, tts)
+plots.test(xhatts, xtilts, yhatts, ets, yts, Reets, tts)
 
 pass
 
