@@ -13,7 +13,7 @@ risk and the cost of errors
 
 [s1b, jazwinski tracking problem, extended processor](./s1b.py)
 
-[s1c, jazwinski tracking problem, deterministic sampling processor](./s1c.py)
+[s1c, jazwinski tracking problem, sigma-point processor](./s1c.py)
 
 ## background
 
