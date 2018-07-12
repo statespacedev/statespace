@@ -18,7 +18,7 @@ def C(x):
     return 2 * x + 3 * x**2
 
 tts = np.arange(0, n * deltat, deltat)
-Rvv = .09**2
+Rvv = .09
 Rww = 0
 vts = math.sqrt(Rvv) * np.random.randn(n)
 wts = math.sqrt(Rww) * np.random.randn(n)
