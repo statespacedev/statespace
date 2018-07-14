@@ -15,7 +15,9 @@ risk and the cost of errors
 
 [s1c, jazwinski tracking problem, deterministic sampling processor](./s1c.py), tbd
 
-s1d, jazwinski tracking problem, sequential monte carlo, tbd
+s1d, jazwinski tracking problem, sequential monte carlo processor, tbd
+
+s1d, jazwinski problem, detector, tbd
 
 ## background
 

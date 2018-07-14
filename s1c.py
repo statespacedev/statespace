@@ -11,11 +11,11 @@ def x(x, w):
 def y(x, v):
     return x**2 + x**3 + v
 
-def A(x):
-    return 1 - .05 * deltat + .08 * deltat * x
+def a(x):
+    return x(x, 0)
 
-def C(x):
-    return 2 * x + 3 * x**2
+def c(x):
+    return y(x, 0)
 
 Rvv = .09
 Rww = 0
@@ -34,9 +34,12 @@ Kts = np.zeros_like(tts)
 yhatts = np.zeros_like(tts)
 ets = np.zeros_like(tts)
 xtilts = np.zeros_like(tts)
-chi0 = np.zeros_like(tts)
-chi1 = np.zeros_like(tts)
-chi2 = np.zeros_like(tts)
+W = np.zeros((3,))
+Xts = np.zeros((n, 3))
+Xtilts = np.zeros((n, 3))
+Xhatts = np.zeros((n, 3))
+Yts = np.zeros((n, 3))
+ksits = np.zeros((n, 3))
 
 xts[0] = 2.
 yts[0] = y(xts[0], vts[0])
@@ -44,12 +47,14 @@ xhatts[0] = 2.
 Ptilts[0] = .01
 Reets[0] = 0
 Kts[0] = 0
-yhatts[0] = y(xhatts[0], 0)
 ets[0] = 0
 xtilts[0] = xhatts[0] - xts[0]
-chi0[0] = xhatts[0]
-chi1[0] = xhatts[0] + math.sqrt((bignsubx + kappa) * Ptilts[0])
-chi2[0] = xhatts[0] - math.sqrt((bignsubx + kappa) * Ptilts[0])
+W[:] = [kappa / float(bignsubx + kappa), .5 * kappa / float(bignsubx + kappa), .5 * kappa / float(bignsubx + kappa)]
+Xts[0, :] = [xhatts[0], xhatts[0] + math.sqrt((bignsubx + kappa) * Ptilts[0]), xhatts[0] - math.sqrt((bignsubx + kappa) * Ptilts[0])]
+Xtilts[0, :] = [Xts[0, 0] - xhatts[0], Xts[0, 1] - xhatts[0], Xts[0, 2] - xhatts[0]]
+Xhatts[0, :] = Xts[0, :]
+Yts[0, :] = c(Xhatts[0, :])
+yhatts[0] = W @ Yts[0, :]
 
 for tk in range(1, n):
     xts[tk] = x(xts[tk - 1], wts[tk - 1])
