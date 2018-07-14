@@ -17,9 +17,11 @@ def A(x):
 def C(x):
     return 2 * x + 3 * x**2
 
-tts = np.arange(0, n * deltat, deltat)
 Rvv = .09
 Rww = 0
+bignsubx = 1
+kappa = 1
+tts = np.arange(0, n * deltat, deltat)
 vts = math.sqrt(Rvv) * np.random.randn(n)
 wts = math.sqrt(Rww) * np.random.randn(n)
 
@@ -32,6 +34,9 @@ Kts = np.zeros_like(tts)
 yhatts = np.zeros_like(tts)
 ets = np.zeros_like(tts)
 xtilts = np.zeros_like(tts)
+chi0 = np.zeros_like(tts)
+chi1 = np.zeros_like(tts)
+chi2 = np.zeros_like(tts)
 
 xts[0] = 2.
 yts[0] = y(xts[0], vts[0])
@@ -42,6 +47,9 @@ Kts[0] = 0
 yhatts[0] = y(xhatts[0], 0)
 ets[0] = 0
 xtilts[0] = xhatts[0] - xts[0]
+chi0[0] = xhatts[0]
+chi1[0] = xhatts[0] + math.sqrt((bignsubx + kappa) * Ptilts[0])
+chi2[0] = xhatts[0] - math.sqrt((bignsubx + kappa) * Ptilts[0])
 
 for tk in range(1, n):
     xts[tk] = x(xts[tk - 1], wts[tk - 1])
@@ -61,7 +69,6 @@ for tk in range(1, n):
 
     xtilts[tk] = xhatts[tk] - xts[tk]
 
-# plots.xts(xhatts, tts, end=None)
 plots.test(xhatts, xtilts, yhatts, ets, yts, Reets, tts)
 
 pass
