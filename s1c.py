@@ -67,40 +67,30 @@ yhatts[0] = W @ Yts[0, :]
 ksits = np.zeros((n, 3))
 ksits[0, :] = Yts[0, :] - yhatts[0]
 
-Rksiksi = np.zeros((n,))
-Rksiksi[0] = W @ ksits[0, :] * np.ones((3,)) @ ksits[0, :] + Rvv
+Rksiksits = np.zeros((n,))
+Rksiksits[0] = W @ ksits[0, :] * np.ones((3,)) @ ksits[0, :] + Rvv
 
-RXtilksi = np.zeros((n,))
-RXtilksi[0] = W @ Xtilts[0, :] * np.ones((3,)) @ ksits[0,:]
+RXtilksits = np.zeros((n,))
+RXtilksits[0] = W @ Xtilts[0, :] * np.ones((3,)) @ ksits[0,:]
 
 Kts = np.zeros((n,))
-Kts[0] = RXtilksi[0] / Rksiksi[0]
+Kts[0] = RXtilksits[0] / Rksiksits[0]
 
 ets = np.zeros((n,))
 ets[0] = yts[0] - yhatts[0]
+# xhatts[0] = xhatts[0] + Kts[0] * ets[0]
+# Ptilts[0] = Ptilts[0] - Kts[0] * Rksiksits[0] * Kts[0]
 
 xtilts = np.zeros((n,))
 xtilts[0] = xhatts[0] - xts[0]
+ytilts = np.zeros((n,))
+ytilts[0] = yhatts[0] - yts[0]
 
 for tk in range(1, n):
     xts[tk] = x(xts[tk - 1], wts[tk - 1])
     yts[tk] = y(xts[tk], vts[tk])
 
-    xhatts[tk] = x(xhatts[tk-1], 0)
-    Ptilts[tk] = A(xhatts[tk-1])**2 * Ptilts[tk-1]
-
-    Reets[tk] = C(xhatts[tk])**2 * Ptilts[tk] + .09
-    Kts[tk] = util.div0( Ptilts[tk] * C(xhatts[tk]) , Reets[tk] )
-
-    yhatts[tk] = y(xhatts[tk], 0)
-    ets[tk] = yts[tk] - yhatts[tk]
-
-    xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
-    Ptilts[tk] = (1 - Kts[tk] * C(xhatts[tk])) * Ptilts[tk]
-
-    xtilts[tk] = xhatts[tk] - xts[tk]
-
-plots.test(xhatts, xtilts, yhatts, ets, yts, Reets, tts)
+plots.test(xhatts, xtilts, yhatts, ets, yts, Rksiksits, tts)
 
 pass
 
