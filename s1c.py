@@ -8,13 +8,13 @@ deltat = .01
 def fx(x, w):
     return (1 - .05 * deltat) * x + .04 * deltat * x**2 + w
 vfx = np.vectorize(fx)
-def vfa(x):
-    return vfx(x, 0)
+def vfa(vx):
+    return vfx(vx, 0)
 def fy(x, v):
     return x**2 + x**3 + v
 vfy = np.vectorize(fy)
-def vfc(x):
-    return vfy(x, 0)
+def vfc(vx):
+    return vfy(vx, 0)
 
 tts = np.arange(0, n * deltat, deltat)
 Rvv = .09
@@ -31,15 +31,12 @@ Ptil0 = .01
 '''weights'''
 bignsubx = 1
 kappa = 1
-bkfac = kappa / float(bignsubx + kappa)
+bk = bignsubx + kappa
 W = np.zeros((3,))
-W[:] = [bkfac, .5 * bkfac, .5 * bkfac]
+W[:] = [kappa / float(bk), .5 / float(bk), .5 / float(bk)]
 '''state prediction'''
-def X(xhat, Ptil):
-    a = math.sqrt((bignsubx + kappa) * Ptil)
-    return [xhat, xhat + a, xhat - a]
 Xts = np.zeros((n, 3))
-Xts[0, :] = X(xhat0, Ptil0) # Xts[tk, :] = a(Xts[tk-1, :]) + b(uts[tk-1, :])
+Xts[0, :] = [xhat0, xhat0 + math.sqrt((bk) * Ptil0), xhat0 - math.sqrt((bk) * Ptil0)] # Xts[tk, :] = vfa(Xts[tk-1, :])
 xhatts = np.zeros((n,))
 xhatts[0] = xhat0 # xhatts[tk] = W @ Xts[tk, :]
 '''state error prediction'''
@@ -47,10 +44,9 @@ Xtilts = np.zeros((n, 3))
 Xtilts[0, :] = Xts[0, :] - xhatts[0] # Xtilts[tk, :] = Xts[tk, :] - xhatts[tk]
 Ptilts = np.zeros((n,))
 Ptilts[0] = Ptil0 # Ptilts[tk] = W @ Xtilts[tk, :] * np.ones((3,)) @ Xtilts[tk, :] + Rww
-'''measurement sigma-points and weights'''
+'''measurement sigma-points'''
 def Xhat(X, Rww):
-    a = kappa * math.sqrt(Rww)
-    return [X[0], X[0] + a, X[0] - a]
+    return [X[0], X[1] + kappa * math.sqrt(Rww), X[2] - kappa * math.sqrt(Rww)]
 Xhatts = np.zeros((n, 3))
 Xhatts[0, :] = Xts[0, :] # Xhatts[tk, :] = Xhat(Xts[tk, :], Rww)
 '''measurement prediction'''
@@ -81,7 +77,7 @@ ytilts[0] = yhatts[0] - yts[0] # ytilts[tk] = yhatts[tk] - yts[tk]
 for tk in range(1, n):
     xts[tk] = fx(xts[tk - 1], wts[tk - 1])
     yts[tk] = fy(xts[tk], vts[tk])
-    Xts[tk, :] = vfa(Xts[tk - 1, :]) # + b(uts[tk-1, :])
+    Xts[tk, :] = vfa(Xts[tk - 1, :])
     xhatts[tk] = W @ Xts[tk, :]
     Xtilts[tk, :] = Xts[tk, :] - xhatts[tk]
     Ptilts[tk] = W @ Xtilts[tk, :] * np.ones((3,)) @ Xtilts[tk, :] + Rww
