@@ -26,7 +26,7 @@ xts[0] = 2.
 yts = np.zeros((n,))
 yts[0] = fy(xts[0], vts[0])
 
-xhat0 = 2.1
+xhat0 = 2.3
 Ptil0 = .01
 '''weights'''
 bignsubx = 1
@@ -50,7 +50,7 @@ Ptilts[0] = Ptil0 # Ptilts[tk] = W @ Xtilts[tk, :] * np.ones((3,)) @ Xtilts[tk, 
 '''measurement sigma-points and weights'''
 def Xhat(X, Rww):
     a = kappa * math.sqrt(Rww)
-    return [X[0], X[1] + a, X[2] - a]
+    return [X[0], X[0] + a, X[0] - a]
 Xhatts = np.zeros((n, 3))
 Xhatts[0, :] = Xts[0, :] # Xhatts[tk, :] = Xhat(Xts[tk, :], Rww)
 '''measurement prediction'''
