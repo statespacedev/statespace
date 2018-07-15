@@ -26,7 +26,7 @@ xts[0] = 2.
 yts = np.zeros((n,))
 yts[0] = fy(xts[0], vts[0])
 
-xhat0 = 2.3
+xhat0 = 2.0
 Ptil0 = .01
 '''weights'''
 bignsubx = 1
@@ -36,7 +36,9 @@ W = np.zeros((3,))
 W[:] = [kappa / float(bk), .5 / float(bk), .5 / float(bk)]
 '''state prediction'''
 Xts = np.zeros((n, 3))
-Xts[0, :] = [xhat0, xhat0 + math.sqrt((bk) * Ptil0), xhat0 - math.sqrt((bk) * Ptil0)] # Xts[tk, :] = vfa(Xts[tk-1, :])
+def vfX(xhat, Ptil):
+    return [xhat, xhat + math.sqrt(bk * Ptil), xhat - math.sqrt(bk * Ptil)]
+Xts[0, :] = vfX(xhat0, Ptil0) # Xts[tk, :] = vfa(Xts[tk-1, :])
 xhatts = np.zeros((n,))
 xhatts[0] = xhat0 # xhatts[tk] = W @ Xts[tk, :]
 '''state error prediction'''
@@ -51,7 +53,7 @@ Xhatts = np.zeros((n, 3))
 Xhatts[0, :] = Xts[0, :] # Xhatts[tk, :] = Xhat(Xts[tk, :], Rww)
 '''measurement prediction'''
 Yts = np.zeros((n, 3))
-Yts[0, :] = vfc(Xhatts[0, :]) # Yts[tk, :] = c(Xhatts[tk, :])
+Yts[0, :] = vfc(Xhatts[0, :]) # Yts[tk, :] = vfc(Xhatts[tk, :])
 yhatts = np.zeros((n,))
 yhatts[0] = W @ Yts[0, :] # yhatts[tk] = W @ Yts[tk, :]
 '''residual prediction'''
@@ -77,7 +79,8 @@ ytilts[0] = yhatts[0] - yts[0] # ytilts[tk] = yhatts[tk] - yts[tk]
 for tk in range(1, n):
     xts[tk] = fx(xts[tk - 1], wts[tk - 1])
     yts[tk] = fy(xts[tk], vts[tk])
-    Xts[tk, :] = vfa(Xts[tk - 1, :])
+    X = vfX(xhatts[tk-1], Ptilts[tk-1])
+    Xts[tk, :] = vfa(X)
     xhatts[tk] = W @ Xts[tk, :]
     Xtilts[tk, :] = Xts[tk, :] - xhatts[tk]
     Ptilts[tk] = W @ Xtilts[tk, :] * np.ones((3,)) @ Xtilts[tk, :] + Rww
@@ -90,6 +93,8 @@ for tk in range(1, n):
     ets[tk] = yts[tk] - yhatts[tk]
     xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
     Ptilts[tk] = Ptilts[tk] - Kts[tk] * Rksiksits[tk] * Kts[tk]
+    if Ptilts[tk] < 1e-5:
+        Ptilts[tk] = 1e-5
     xtilts[tk] = xhatts[tk] - xts[tk]
     ytilts[tk] = yhatts[tk] - yts[tk]
 plots.test(xhatts, xtilts, yhatts, ets, yts, Rksiksits, tts)
