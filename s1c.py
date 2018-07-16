@@ -60,10 +60,10 @@ yhatts[0] = W @ Yts[0, :] # yhatts[tk] = W @ Yts[tk, :]
 ksits = np.zeros((n, 3))
 ksits[0, :] = Yts[0, :] - yhatts[0] # ksits[tk, :] = Yts[tk, :] - yhatts[tk]
 Rksiksits = np.zeros((n,))
-Rksiksits[0] = W @ ksits[0, :] * np.ones((3,)) @ ksits[0, :] + Rvv # Rksiksits[tk] = W @ ksits[tk, :] * np.ones((3,)) @ ksits[tk, :] + Rvv
+Rksiksits[0] = (W @ ksits[0, :] * np.ones((3,))) @ ksits[0, :] + Rvv # Rksiksits[tk] = W @ ksits[tk, :] * np.ones((3,)) @ ksits[tk, :] + Rvv
 '''gain'''
 RXtilksits = np.zeros((n,))
-RXtilksits[0] = W @ Xtilts[0, :] * np.ones((3,)) @ ksits[0,:] # RXtilksits[tk] = W @ Xtilts[tk, :] * np.ones((3,)) @ ksits[tk,:]
+RXtilksits[0] = (W @ Xtilts[0, :] * np.ones((3,))) @ ksits[0,:] # RXtilksits[tk] = W @ Xtilts[tk, :] * np.ones((3,)) @ ksits[tk,:]
 Kts = np.zeros((n,))
 Kts[0] = RXtilksits[0] / Rksiksits[0] # Kts[tk] = RXtilksits[tk] / Rksiksits[tk]
 '''update'''
@@ -83,13 +83,13 @@ for tk in range(1, n):
     Xts[tk, :] = vfa(X)
     xhatts[tk] = W @ Xts[tk, :]
     Xtilts[tk, :] = Xts[tk, :] - xhatts[tk]
-    Ptilts[tk] = W @ Xtilts[tk, :] * np.ones((3,)) @ Xtilts[tk, :] + Rww
+    Ptilts[tk] = (W @ Xtilts[tk, :] * np.ones((3,))) @ Xtilts[tk, :] + Rww
     Xhatts[tk, :] = Xhat(Xts[tk, :], Rww)
     Yts[tk, :] = vfc(Xhatts[tk, :])
     yhatts[tk] = W @ Yts[tk, :]
     ksits[tk, :] = Yts[tk, :] - yhatts[tk]
-    Rksiksits[tk] = W @ ksits[tk, :] * np.ones((3,)) @ ksits[tk, :] + Rvv
-    RXtilksits[tk] = W @ Xtilts[tk, :] * np.ones((3,)) @ ksits[tk, :]
+    Rksiksits[tk] = (W @ ksits[tk, :] * np.ones((3,))) @ ksits[tk, :] + Rvv
+    RXtilksits[tk] = (W @ Xtilts[tk, :] * np.ones((3,))) @ ksits[tk, :]
     ets[tk] = yts[tk] - yhatts[tk]
     xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
     Ptilts[tk] = Ptilts[tk] - Kts[tk] * Rksiksits[tk] * Kts[tk]
