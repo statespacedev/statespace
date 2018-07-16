@@ -45,7 +45,7 @@ xhatts[0] = xhat0 # xhatts[tk] = W @ Xts[tk, :]
 Xtilts = np.zeros((n, 3))
 Xtilts[0, :] = Xts[0, :] - xhatts[0] # Xtilts[tk, :] = Xts[tk, :] - xhatts[tk]
 Ptilts = np.zeros((n,))
-Ptilts[0] = Ptil0 # Ptilts[tk] = W @ Xtilts[tk, :] * np.ones((3,)) @ Xtilts[tk, :] + Rww
+Ptilts[0] = Ptil0 # Ptilts[tk] = W @ np.power(Xtilts[tk, :], 2) + Rww
 '''measurement sigma-points'''
 def Xhat(X, Rww):
     return [X[0], X[1] + kappa * math.sqrt(Rww), X[2] - kappa * math.sqrt(Rww)]
@@ -83,7 +83,7 @@ for tk in range(1, n):
     Xts[tk, :] = vfa(X)
     xhatts[tk] = W @ Xts[tk, :]
     Xtilts[tk, :] = Xts[tk, :] - xhatts[tk]
-    Ptilts[tk] = (W @ Xtilts[tk, :] * np.ones((3,))) @ Xtilts[tk, :] + Rww
+    Ptilts[tk] = W @ np.power(Xtilts[tk, :], 2) + Rww
     Xhatts[tk, :] = Xhat(Xts[tk, :], Rww)
     Yts[tk, :] = vfc(Xhatts[tk, :])
     yhatts[tk] = W @ Yts[tk, :]
@@ -94,8 +94,6 @@ for tk in range(1, n):
     ets[tk] = yts[tk] - yhatts[tk]
     xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
     Ptilts[tk] = Ptilts[tk] - Kts[tk] * Rksiksits[tk] * Kts[tk]
-    if Ptilts[tk] < 1e-5:
-        Ptilts[tk] = 1e-5
     xtilts[tk] = xhatts[tk] - xts[tk]
     ytilts[tk] = yhatts[tk] - yts[tk]
 plots.test(xhatts, xtilts, yhatts, ets, yts, Rksiksits, tts)
