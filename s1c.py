@@ -26,7 +26,7 @@ xts[0] = 2.
 yts = np.zeros((n,))
 yts[0] = fy(xts[0], vts[0])
 
-xhat0 = 2.0
+xhat0 = 2.3
 Ptil0 = .01
 '''weights'''
 bignsubx = 1
@@ -60,10 +60,10 @@ yhatts[0] = W @ Yts[0, :] # yhatts[tk] = W @ Yts[tk, :]
 ksits = np.zeros((n, 3))
 ksits[0, :] = Yts[0, :] - yhatts[0] # ksits[tk, :] = Yts[tk, :] - yhatts[tk]
 Rksiksits = np.zeros((n,))
-Rksiksits[0] = (W @ ksits[0, :] * np.ones((3,))) @ ksits[0, :] + Rvv # Rksiksits[tk] = W @ ksits[tk, :] * np.ones((3,)) @ ksits[tk, :] + Rvv
+Rksiksits[0] = W @ np.power(ksits[0, :], 2) + Rvv # Rksiksits[tk] = W @ np.power(ksits[tk, :], 2) + Rvv
 '''gain'''
 RXtilksits = np.zeros((n,))
-RXtilksits[0] = (W @ Xtilts[0, :] * np.ones((3,))) @ ksits[0,:] # RXtilksits[tk] = W @ Xtilts[tk, :] * np.ones((3,)) @ ksits[tk,:]
+RXtilksits[0] = W @ np.multiply(Xtilts[0, :], ksits[0, :]) # RXtilksits[tk] = W @ np.multiply(Xtilts[tk, :], ksits[tk, :])
 Kts = np.zeros((n,))
 Kts[0] = RXtilksits[0] / Rksiksits[0] # Kts[tk] = RXtilksits[tk] / Rksiksits[tk]
 '''update'''
@@ -88,8 +88,9 @@ for tk in range(1, n):
     Yts[tk, :] = vfc(Xhatts[tk, :])
     yhatts[tk] = W @ Yts[tk, :]
     ksits[tk, :] = Yts[tk, :] - yhatts[tk]
-    Rksiksits[tk] = (W @ ksits[tk, :] * np.ones((3,))) @ ksits[tk, :] + Rvv
-    RXtilksits[tk] = (W @ Xtilts[tk, :] * np.ones((3,))) @ ksits[tk, :]
+    Rksiksits[tk] = W @ np.power(ksits[tk, :], 2) + Rvv
+    RXtilksits[tk] = W @ np.multiply(Xtilts[tk, :], ksits[tk, :])
+    Kts[tk] = RXtilksits[tk] / Rksiksits[tk]
     ets[tk] = yts[tk] - yhatts[tk]
     xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
     Ptilts[tk] = Ptilts[tk] - Kts[tk] * Rksiksits[tk] * Kts[tk]
