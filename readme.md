@@ -9,15 +9,15 @@ risk and the cost of errors
 
 ## studies
 
-[s1a, jazwinski tracking problem, linearized processor](./s1a.py)
+[s1a, linearized processor](./s1a.py)
 
-[s1b, jazwinski tracking problem, extended processor](./s1b.py)
+[s1b, extended processor](./s1b.py)
 
-[s1c, jazwinski tracking problem, deterministic sampling processor](./s1c.py)
+[s1c, deterministic sampling processor](./s1c.py)
 
-s1d, jazwinski tracking problem, sequential monte carlo processor, tbd
+[s1d, sequential monte carlo processor](./s1d.py), tbd
 
-s1d, jazwinski problem, detector, tbd
+s1d, sequential detector, tbd
 
 ## background
 
