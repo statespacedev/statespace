@@ -1,4 +1,4 @@
-# sequential monte carlo processor, bootstrap particle filter
+# monte carlo sampling processor, bootstrap particle filter
 import numpy as np
 import util, math, plots
 

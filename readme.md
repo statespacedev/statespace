@@ -13,9 +13,9 @@ risk and the cost of errors
 
 [s1b, extended processor](./s1b.py)
 
-[s1c, deterministic sampling processor](./s1c.py)
+[s1c, sigma-point sampling processor](./s1c.py)
 
-[s1d, sequential monte carlo processor](./s1d.py), tbd
+[s1d, monte carlo sampling processor](./s1d.py), tbd
 
 s1d, sequential detector, tbd
 
