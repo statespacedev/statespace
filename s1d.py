@@ -2,21 +2,34 @@
 import numpy as np
 import util, math, plots
 
+npart = 250
 n = 150
 deltat = .01
-npart = 250
 Rww = 1e-6
 Rvv = .09
 x0 = 2.
-Px0 = 1e-20
+
+def fx(x, w):
+    return (1 - .05 * deltat) * x + .04 * deltat * x**2 + w
+def fy(x, v):
+    return x**2 + x**3 + v
+vfx = np.vectorize(fx)
+vfy = np.vectorize(fy)
+def vfa(vx):
+    return vfx(vx, 0)
+def vfc(vx):
+    return vfy(vx, 0)
 
 tts = np.arange(0, n * deltat, deltat)
-vts = math.sqrt(Rvv) * np.random.randn(n)
 wts = math.sqrt(Rww) * np.random.randn(n)
+vts = math.sqrt(Rvv) * np.random.randn(n)
 xts = np.zeros((n,))
-xts[0] = x0
 yts = np.zeros((n,))
+xts[0] = x0
 yts[0] = fy(xts[0], vts[0])
+for tk in range(1, n):
+    xts[tk] = fx(xts[tk - 1], wts[tk - 1])
+    yts[tk] = fy(xts[tk], vts[tk])
 
 xhat0 = 2.3
 Ptil0 = .01
