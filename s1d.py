@@ -4,25 +4,17 @@ import util, math, plots
 
 n = 150
 deltat = .01
-
-def fx(x, w):
-    return (1 - .05 * deltat) * x + .04 * deltat * x**2 + w
-vfx = np.vectorize(fx)
-def vfa(vx):
-    return vfx(vx, 0)
-def fy(x, v):
-    return x**2 + x**3 + v
-vfy = np.vectorize(fy)
-def vfc(vx):
-    return vfy(vx, 0)
+npart = 250
+Rww = 1e-6
+Rvv = .09
+x0 = 2.
+Px0 = 1e-20
 
 tts = np.arange(0, n * deltat, deltat)
-Rvv = .09
 vts = math.sqrt(Rvv) * np.random.randn(n)
-Rww = 0
 wts = math.sqrt(Rww) * np.random.randn(n)
 xts = np.zeros((n,))
-xts[0] = 2.
+xts[0] = x0
 yts = np.zeros((n,))
 yts[0] = fy(xts[0], vts[0])
 
