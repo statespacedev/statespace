@@ -33,6 +33,7 @@ for tk in range(1, n):
     yts[tk] = fy(xts[tk], vts[tk])
 
 xits = np.zeros((n, nsamp))
-xits[0, :] = x0 + math.sqrt(P0) * np.random.randn(nsamp)
+xits[0, :] = xts[0] + math.sqrt(P0) * np.random.randn(nsamp)
+wits = math.sqrt(Rww) * np.random.randn(n, nsamp)
 
 pass
