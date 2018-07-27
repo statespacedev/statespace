@@ -7,17 +7,17 @@ their evolution with various processes
 
 risk and the cost of errors
 
-## studies
+## processors  
 
-[s1a, linearized processor](./s1a.py)
+[jazwinski-kf](jazwinski-kf.py), linearized processor
 
-[s1b, extended processor](./s1b.py)
+[jazwinski-ekf](jazwinski-ekf.py), extended processor
 
-[s1c, sigma-point sampling processor](./s1c.py)
+[jazwinski-spkf](jazwinski-spkf.py), sigma-point sampling processor
 
-[s1d, monte carlo sampling processor](./s1d.py), tbd
+[jazwinski-pf](jazwinski-pf.py), monte carlo sampling processor
 
-s1d, sequential detector, tbd
+jazwinski-sd, sequential detector
 
 ## background
 
