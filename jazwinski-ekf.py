@@ -1,5 +1,4 @@
 # extended bayesian processor, extended kalman filter, XBP, EKF
-
 import numpy as np
 import util, math, plots
 n = 150
@@ -18,29 +17,32 @@ def C(x):
     return 2 * x + 3 * x**2
 
 tts = np.arange(0, n * deltat, deltat)
-Rvv = .09
 Rww = 0
-vts = math.sqrt(Rvv) * np.random.randn(n)
 wts = math.sqrt(Rww) * np.random.randn(n)
+Rvv = .09
+vts = math.sqrt(Rvv) * np.random.randn(n)
 
 xts = np.zeros_like(tts)
-yts = np.zeros_like(tts)
-xhatts = np.zeros_like(tts)
-Ptilts = np.zeros_like(tts)
-Reets = np.zeros_like(tts)
-Kts = np.zeros_like(tts)
-yhatts = np.zeros_like(tts)
-ets = np.zeros_like(tts)
-xtilts = np.zeros_like(tts)
-
 xts[0] = 2.
+yts = np.zeros_like(tts)
 yts[0] = y(xts[0], vts[0])
+
+xhatts = np.zeros_like(tts)
 xhatts[0] = 2.
+Ptilts = np.zeros_like(tts)
 Ptilts[0] = .01
+
+Reets = np.zeros_like(tts)
 Reets[0] = 0
+Kts = np.zeros_like(tts)
 Kts[0] = 0
+
+yhatts = np.zeros_like(tts)
 yhatts[0] = y(xhatts[0], 0)
+ets = np.zeros_like(tts)
 ets[0] = 0
+
+xtilts = np.zeros_like(tts)
 xtilts[0] = xhatts[0] - xts[0]
 
 for tk in range(1, n):
@@ -61,7 +63,6 @@ for tk in range(1, n):
 
     xtilts[tk] = xhatts[tk] - xts[tk]
 
-# plots.xts(xhatts, tts, end=None)
 plots.test(xhatts, xtilts, yhatts, ets, yts, Reets, tts)
 
 pass
