@@ -25,6 +25,5 @@ jazwinski-sd, sequential detector
 
 [Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, James V. Candy](http://a.co/gp4upXd)
 
-[Stochastic Processes and Filtering Theory, Andrew H. Jazwinski](http://a.co/3QuMFkh)
 
 
