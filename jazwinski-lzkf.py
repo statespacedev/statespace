@@ -1,7 +1,7 @@
 # linearized bayesian processor, linearized kalman filter, LZ-BP
 import numpy as np
 import util, math, plots
-import class_innovation_testing
+import class_innov
 
 n = 150
 deltat = .01
@@ -68,7 +68,7 @@ for tk in range(1, n):
 
     xtilts[tk] = xhatts[tk] - xts[tk]
 
-innov = class_innovation_testing.InnovationTesting(tts, ets)
+innov = class_innov.Innov(tts, ets)
 plots.test(xhatts, xtilts, yhatts, ets, yts, Reets, tts)
 
 pass

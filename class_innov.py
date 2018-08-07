@@ -1,5 +1,5 @@
 
-class InnovationTesting():
+class Innov():
     def __init__(self, tts, ets):
         self.tts = tts
         self.ets = ets
