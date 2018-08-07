@@ -57,7 +57,7 @@ for tk in range(1, n):
     xhatts[tk] = x(xrefts[tk-1], 0) + A(xrefts[tk-1]) * (xhatts[tk-1] - xrefts[tk-1])
     Ptilts[tk] = A(xrefts[tk-1])**2 * Ptilts[tk-1]
 
-    Reets[tk] = C(xhatts[tk])**2 * Ptilts[tk] + .09
+    Reets[tk] = C(xhatts[tk])**2 * Ptilts[tk] + Rvv
     Kts[tk] = util.div0( Ptilts[tk] * C(xrefts[tk]) , Reets[tk] )
 
     yhatts[tk] = y(xrefts[tk], 0) + C(xrefts[tk]) * (xhatts[tk] - xrefts[tk])
