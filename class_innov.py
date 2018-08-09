@@ -5,7 +5,7 @@ class Innov():
     def __init__(self, tts, ets):
         self.tts = tts
         self.ets = ets
-        self.autocorrelation()
+        self.whiteness()
         return
 
     def autocorr1(self, x):
@@ -21,7 +21,7 @@ class Innov():
         res = np.correlate(x, x, mode='full')
         return res[res.size//2:][1:]
 
-    def autocorrelation(self):
+    def whiteness(self):
         self.mhate = np.mean(self.ets)
         self.Rhatee = np.mean(np.power(self.ets, 2))
         n = len(self.ets)
