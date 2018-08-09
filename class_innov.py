@@ -5,19 +5,24 @@ class Innov():
     def __init__(self, tts, ets):
         self.tts = tts
         self.ets = ets
-        self.zeromean()
+        self.autocorrelation()
         return
 
-    def zeromean(self):
+    def autocorrelation(self):
         self.mhate = np.mean(self.ets)
         self.Rhatee = np.mean(np.power(self.ets, 2))
-        self.tau = 1.96 * math.sqrt(self.Rhatee / len(self.ets))
+        n = len(self.ets)
+        self.tau = 1.96 * math.sqrt(self.Rhatee / n)
         self.iszeromean = True
-        if self.mhate > self.tau:
+        if abs(self.mhate) > self.tau:
             self.iszeromean = False
-        return
-
-    def whiteness(self):
+        self.Rhatee = []
+        for k in range(1, n): # k = 1 to n-1
+            tmp = 0
+            for t in range(1, n-k+1): # t = 1 to n-k
+                tndx = t-1
+                tmp += (self.ets[tndx] - self.mhate) * (self.ets[tndx+k] - self.mhate)
+            self.Rhatee.append(tmp / (n-k))
         return
 
     def wssr(self):
