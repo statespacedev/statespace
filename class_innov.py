@@ -8,9 +8,18 @@ class Innov():
         self.autocorrelation()
         return
 
-    def autocorr(self, x):
+    def autocorr1(self, x):
+        res = np.zeros_like(x)[1:]
+        n = x.size
+        for k in range(1, n): # k = 1 to n-1
+            res[k-1] = 0
+            for t in range(1, n-k): # t = 1 to n-k
+                res[k-1] += (self.ets[t-1] - self.mhate) * (self.ets[t-1+k] - self.mhate) #/ (n-k)
+        return res
+
+    def autocorr2(self, x):
         res = np.correlate(x, x, mode='full')
-        return res[res.size//2:]
+        return res[res.size//2:][1:]
 
     def autocorrelation(self):
         self.mhate = np.mean(self.ets)
@@ -20,14 +29,8 @@ class Innov():
         self.iszeromean = True
         if abs(self.mhate) > self.tau:
             self.iszeromean = False
-        test1 = []
-        for k in range(1, n): # k = 1 to n-1
-            tmp = 0
-            for t in range(1, n-k+1): # t = 1 to n-k
-                tndx = t-1
-                tmp += (self.ets[tndx] - self.mhate) * (self.ets[tndx+k] - self.mhate)
-            test1.append(tmp)
-        test3 = self.autocorr(self.ets)
+        test1 = self.autocorr1(self.ets)
+        test2 = self.autocorr2(self.ets)
         return
 
     def wssr(self):
