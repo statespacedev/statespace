@@ -37,10 +37,16 @@ vfC = np.vectorize(fC)
 xits = np.zeros((n, nsamp))
 xits[0, :] = xts[0] + math.sqrt(P0) * np.random.randn(nsamp)
 Wits = np.zeros((n, nsamp))
+Wi = vfC(yts[0], xits[0, :])
+Wits[0, :] = Wi / sum(Wi)
+xhatits = np.copy(xits)
+Whatits = np.copy(Wits)
 
+rs = class_resample.Resample()
 for tk in range(1, n):
     xits[tk, :] = vfA(xits[tk - 1, :], math.sqrt(Rww) * np.random.randn(nsamp))
     Wi = vfC(yts[tk], xits[tk, :])
     Wits[tk, :] = Wi / sum(Wi)
+    xhatits[tk, :], Whatits[tk, :] = rs.resample(xits[tk, :], Wits[tk, :])
 
 pass
