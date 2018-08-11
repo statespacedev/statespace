@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-class Innov():
+class Residuals():
     def __init__(self, tts, ets):
         self.tts = tts
         self.ets = ets

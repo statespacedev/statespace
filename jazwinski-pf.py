@@ -1,6 +1,7 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
-import util, math, plots
+import util, math
+import class_resample
 
 nsamp = 250
 n = 150
@@ -30,7 +31,7 @@ def fA(xi, wi):
     return (1 - .05 * deltat) * xi + .04 * deltat * xi**2 + wi
 vfA = np.vectorize(fA)
 def fC(y, xi):
-    return np.exp(-.5 * np.log(2 * np.pi * Rvv) - (y - xi**2 - xi**3)**2 / (2 * Rvv))
+    return np.exp(-np.log(2 * np.pi * Rvv) / 2. - (y - xi**2 - xi**3)**2 / (2. * Rvv))
 vfC = np.vectorize(fC)
 
 xits = np.zeros((n, nsamp))
