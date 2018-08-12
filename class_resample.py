@@ -4,6 +4,8 @@ class Resample():
     def __init__(self):
         pass
 
-    def resample(self, xi, Wi):
+    def multinomial(self, xi, Wi):
 
-        return xi, Wi
+        xhati = xi
+        Whati = Wi
+        return xhati, Whati
