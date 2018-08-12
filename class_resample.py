@@ -9,18 +9,14 @@ class Resample():
         for ndx in range(xi.size):
             tmp.append([xi[ndx], Wi[ndx]])
         tmp = sorted(tmp, key=lambda x: x[0])
-        cdf = []
-        xprv, Wprv = tmp[0][0], tmp[0][1]
-        cdf.append([xprv, Wprv])
+        cdf = [[tmp[0][0], tmp[0][1]]]
         cdfndx = 0
         for i in range(1, len(tmp)):
-            if abs(tmp[i][0] - xprv) > 1e-5:
-                cdf[cdfndx][1] = Wprv
-                xprv, Wprv = tmp[i][0], tmp[i][1]
-                cdf.append([xprv, Wprv])
+            if abs(tmp[i][0] - tmp[i-1][0]) > 1e-5:
+                cdf.append([tmp[i][0], tmp[i][1]])
                 cdfndx += 1
             else:
-                Wprv += tmp[i][1]
+                cdf[cdfndx][1] += tmp[i][1]
         cdf = np.asarray(cdf)
         cdfsum = np.sum(cdf, axis=0)
         cdfmen = np.mean(cdf, axis=0)
