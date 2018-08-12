@@ -47,6 +47,6 @@ for tk in range(1, n):
     xits[tk, :] = vfA(xits[tk - 1, :], math.sqrt(Rww) * np.random.randn(nsamp))
     Wi = vfC(yts[tk], xits[tk, :])
     Wits[tk, :] = Wi / sum(Wi)
-    xhatits[tk, :], Whatits[tk, :] = resamp.multinomial(xits[tk, :], Wits[tk, :])
+    xhatits[tk, :], Whatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
 
 pass
