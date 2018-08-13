@@ -25,5 +25,7 @@ jazwinski-sd, sequential detector
 
 [Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, James V. Candy](http://a.co/gp4upXd)
 
+*13.08.18*
 
+testing [pypi packaging](https://test.pypi.org/project/statespace/) 
 
