@@ -48,5 +48,5 @@ for tk in range(1, n):
     Wi = vfC(yts[tk], xits[tk, :])
     Wits[tk, :] = Wi / sum(Wi)
     xhatits[tk, :], Whatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
-
+    continue
 pass
