@@ -9,13 +9,13 @@ risk and the cost of errors
 
 ## processors  
 
-[jazwinski-lzkf](statespace/jazwinski-lzkf.py), linearized processor, linearized kalman filter
+[jazwinski-lzkf](./statespace/jazwinski-lzkf.py), linearized processor, linearized kalman filter
 
-[jazwinski-ekf](statespace/jazwinski-ekf.py), extended processor, extended kalman filter
+[jazwinski-ekf](./statespace/jazwinski-ekf.py), extended processor, extended kalman filter
 
-[jazwinski-spkf](statespace/jazwinski-spkf.py), sigma-point sampling processor, unscented kalman filter
+[jazwinski-spkf](./statespace/jazwinski-spkf.py), sigma-point sampling processor, unscented kalman filter
 
-[jazwinski-pf](statespace/jazwinski-pf.py), sequential monte carlo sampling processor, particle filter
+[jazwinski-pf](./statespace/jazwinski-pf.py), sequential monte carlo sampling processor, particle filter
 
 jazwinski-sd, sequential detector
 
