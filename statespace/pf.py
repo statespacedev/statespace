@@ -34,19 +34,23 @@ def fC(y, xi):
     return np.exp(-np.log(2 * np.pi * Rvv) / 2. - (y - xi**2 - xi**3)**2 / (2. * Rvv))
 vfC = np.vectorize(fC)
 
-xits = np.zeros((n, nsamp))
-xits[0, :] = xts[0] + math.sqrt(P0) * np.random.randn(nsamp)
-Wits = np.zeros((n, nsamp))
-Wi = vfC(yts[0], xits[0, :])
-Wits[0, :] = Wi / sum(Wi)
-xhatits = np.copy(xits)
-Whatits = np.copy(Wits)
+def main():
+    xits = np.zeros((n, nsamp))
+    xits[0, :] = xts[0] + math.sqrt(P0) * np.random.randn(nsamp)
+    Wits = np.zeros((n, nsamp))
+    Wi = vfC(yts[0], xits[0, :])
+    Wits[0, :] = Wi / sum(Wi)
+    xhatits = np.copy(xits)
+    Whatits = np.copy(Wits)
 
-resamp = class_resample.Resample()
-for tk in range(1, n):
-    xits[tk, :] = vfA(xits[tk - 1, :], math.sqrt(Rww) * np.random.randn(nsamp))
-    Wi = vfC(yts[tk], xits[tk, :])
-    Wits[tk, :] = Wi / sum(Wi)
-    xhatits[tk, :], Whatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
-    continue
-pass
+    resamp = class_resample.Resample()
+    for tk in range(1, n):
+        xits[tk, :] = vfA(xits[tk - 1, :], math.sqrt(Rww) * np.random.randn(nsamp))
+        Wi = vfC(yts[tk], xits[tk, :])
+        Wits[tk, :] = Wi / sum(Wi)
+        xhatits[tk, :], Whatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
+        print(xhatits[tk, :])
+        continue
+
+if __name__ == "__main__":
+    main()

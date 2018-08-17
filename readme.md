@@ -9,15 +9,15 @@ risk and the cost of errors
 
 ## processors  
 
-jazwinski-lzkf, linearized processor, linearized kalman filter
+lzkf, linearized processor, linearized kalman filter
 
-jazwinski-ekf, extended processor, extended kalman filter
+ekf, extended processor, extended kalman filter
 
-jazwinski-spkf, sigma-point sampling processor, unscented kalman filter
+spkf, sigma-point sampling processor, unscented kalman filter
 
-jazwinski-pf, sequential monte carlo sampling processor, particle filter
+pf, sequential monte carlo sampling processor, particle filter
 
-jazwinski-sd, sequential detector
+sd, sequential detector
 
 ## background
 
@@ -28,11 +28,15 @@ jazwinski-sd, sequential detector
 ## notes
 
     ~/statespace$ venv/bin/python -m statespace -h
-    usage: statespace [-h] [-t]
+    usage: statespace [-h] [-t] [-lzkf] [-ekf] [-ukf] [-pf]
     
     optional arguments:
       -h, --help  show this help message and exit
       -t          test the package
+      -lzkf       linearized processor
+      -ekf        extended processor
+      -ukf        sigma-point sampling processor
+      -pf         sequential monte carlo processor
 
 *13.08.18*
 
