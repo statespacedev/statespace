@@ -1,6 +1,6 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
-import util, math
+import util, math, plots
 import class_resample
 
 nsamp = 250
@@ -42,6 +42,8 @@ def main():
     Wits[0, :] = Wi / sum(Wi)
     xhatits = np.copy(xits)
     Whatits = np.copy(Wits)
+    xhatts = np.zeros((n,))
+    xhatts[0] = np.mean(xits[0, :])
 
     resamp = class_resample.Resample()
     for tk in range(1, n):
@@ -49,8 +51,11 @@ def main():
         Wi = vfC(yts[tk], xits[tk, :])
         Wits[tk, :] = Wi / sum(Wi)
         xhatits[tk, :], Whatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
-        print(xhatits[tk, :])
+        xits[tk, :], Wits[tk, :] = xhatits[tk, :], Whatits[tk, :]
+        xhatts[tk] = np.mean(xits[tk, :])
         continue
+
+    plots.xy(tts, xhatts)
 
 if __name__ == "__main__":
     main()

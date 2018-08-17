@@ -64,7 +64,7 @@ def main():
 
         xtilts[tk] = xhatts[tk] - xts[tk]
 
-    plots.test(xhatts, xtilts, yhatts, ets, yts, Reets, tts)
+    plots.test(tts, xhatts, xtilts, yhatts, ets, yts, Reets)
 
 if __name__ == "__main__":
     main()

@@ -1,15 +1,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def xts(xts, tts, end=None):
-    x2 = len(tts)-1
-    if not end == None:
-        x2 = end
-    plt.plot(tts[:x2], xts[:x2])
+def xy(x, y, end=None):
+    lw = 1
+    plt.plot(x, y, linewidth=lw)
     plt.show()
     pass
 
-def test(xhatts, xtilts, yhatts, ytillts, yts, Reets, tts):
+def test(tts, xhatts, xtilts, yhatts, ytillts, yts, Reets):
     lw = 1
     plt.subplot(3,2,1)
     plt.plot(tts, xhatts, linewidth=lw)
