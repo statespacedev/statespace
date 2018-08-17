@@ -1,6 +1,3 @@
-
-## distributions and decisions
-
 uncertainty, confidence, knowledge
 
 their evolution with various processes
@@ -17,9 +14,6 @@ risk and the cost of errors
       -ekf        extended processor, extended kalman filter
       -ukf        sigma-point sampling processor, unscented kalman filter
       -pf         sequential monte carlo processor, particle filter
-
-
-## background
 
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 
