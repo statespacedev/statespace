@@ -28,11 +28,11 @@ jazwinski-sd, sequential detector
 ## notes
 
     ~/statespace$ venv/bin/python -m statespace -h
-    usage: starid [-h] [-t]
+    usage: statespace [-h] [-t]
+    
     optional arguments:
       -h, --help  show this help message and exit
       -t          test the package
-
 
 *13.08.18*
 
