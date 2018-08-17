@@ -7,8 +7,6 @@ their evolution with various processes
 
 risk and the cost of errors
 
-## processors  
-
     ~/statespace$ venv/bin/python -m statespace -h
     usage: statespace [-h] [-t] [-lzkf] [-ekf] [-ukf] [-pf]
     
@@ -26,8 +24,6 @@ risk and the cost of errors
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 
 [Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, James V. Candy](http://a.co/gp4upXd)
-
-## notes
 
 180813
 
