@@ -14,7 +14,7 @@ risk and the cost of errors
     
     optional arguments:
       -h, --help  show this help message and exit
-      -t          test the package
+      -t          test the project
       -lzkf       linearized processor
       -ekf        extended processor
       -ukf        sigma-point sampling processor

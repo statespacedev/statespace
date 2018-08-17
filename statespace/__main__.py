@@ -4,7 +4,7 @@ import class_statespace
 
 def main():
     parser = argparse.ArgumentParser('statespace')
-    parser.add_argument('-t', help='test the package', action='store_true')
+    parser.add_argument('-t', help='test the project', action='store_true')
     parser.add_argument('-lzkf', help='linearized processor', action='store_true')
     parser.add_argument('-ekf', help='extended processor', action='store_true')
     parser.add_argument('-ukf', help='sigma-point sampling processor', action='store_true')
