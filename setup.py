@@ -8,11 +8,16 @@ setuptools.setup(
     version='0.0.1',
     author='noah smith',
     author_email='noahhsmith@gmail.com',
-    description='state space distributions and decisions',
+    description='state-space distributions and decisions',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/noahhsmith/statespace',
     packages=setuptools.find_packages(),
+    entry_points={
+        'console_scripts': [
+            'statespace = statespace.__main__:main'
+        ]
+    },
     classifiers=(
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
