@@ -19,7 +19,15 @@ risk and the cost of errors
 
 [Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, James V. Candy](http://a.co/gp4upXd)
 
+[Capital Ideas: The Improbable Origins of Modern Wall Street, Peter L. Bernstein](http://a.co/1Y1DR9p)
+
+[Capital Ideas Evolving, Peter L. Bernstein](http://a.co/awiRMxq)
+
+[A Demon of Our Own Design: Markets, Hedge Funds, and the Perils of Financial Innovation, Richard Bookstaber](http://a.co/4FvnyfB)
+
+[Irrational Exuberance, Robert J. Shiller](http://a.co/28kIJtS)
+
 180813
 
-testing [pypi packaging](https://test.pypi.org/project/statespace/) 
+preparing to package the project on [pypi](https://test.pypi.org/project/statespace/) 
 
