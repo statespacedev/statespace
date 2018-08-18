@@ -55,7 +55,7 @@ def main():
         Ptilts[tk] = (1 - Kts[tk] * C(xhatts[tk])) * Ptilts[tk]
         xtilts[tk] = xhatts[tk] - xts[tk]
     innov = class_residuals.Residuals(tts, ets)
-    Reets = innov.whiteness()
+    Reets = innov.zmw()
     plots.standard(tts, xhatts, xtilts, yhatts, ets, Reets)
 
 if __name__ == "__main__":

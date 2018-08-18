@@ -63,7 +63,7 @@ def main():
         yhatts[tk] = fy(xhatts[tk], 0)
         ets[tk] = yts[tk] - yhatts[tk]
     innov = class_residuals.Residuals(tts, ets)
-    Reets = innov.whiteness()
+    Reets = innov.zmw()
     plots.standard(tts, xhatts, xtilts, yhatts, ets, Reets)
 
 if __name__ == "__main__":

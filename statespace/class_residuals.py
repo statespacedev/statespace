@@ -5,7 +5,7 @@ class Residuals():
     def __init__(self, tts, ets):
         self.tts = tts
         self.ets = ets
-        self.whiteness()
+        self.zmw()
         return
 
     def autocorr1(self, x):
@@ -21,7 +21,7 @@ class Residuals():
         res = np.correlate(x, x, mode='full')
         return res[res.size//2:]
 
-    def whiteness(self):
+    def zmw(self):
         self.mhate = np.mean(self.ets)
         self.Rhatee = np.mean(np.power(self.ets, 2))
         n = len(self.ets)
