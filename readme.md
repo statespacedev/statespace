@@ -1,6 +1,6 @@
 uncertainty, confidence, knowledge
 
-their evolution with various processes
+their evolution with time and various processes, including noise and observations
 
 risk and the cost of errors
 
