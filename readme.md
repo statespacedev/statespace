@@ -21,11 +21,15 @@ risk and the cost of errors
 
 [Capital Ideas: The Improbable Origins of Modern Wall Street, Peter L. Bernstein](http://a.co/1Y1DR9p)
 
-[Capital Ideas Evolving, Peter L. Bernstein](http://a.co/awiRMxq)
+[Stochastic Processes and Filtering Theory, Andrew H. Jazwinski](http://a.co/cm5zfQu) 
 
 [A Demon of Our Own Design: Markets, Hedge Funds, and the Perils of Financial Innovation, Richard Bookstaber](http://a.co/4FvnyfB)
 
+[Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
+
 [Irrational Exuberance, Robert J. Shiller](http://a.co/28kIJtS)
+
+[Capital Ideas Evolving, Peter L. Bernstein](http://a.co/awiRMxq)
 
 180813
 

@@ -1,7 +1,8 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
-import util, math, plots
+import math, plots
 import class_resample
+import class_residuals
 
 nsamp = 250
 n = 150
@@ -18,6 +19,13 @@ def fx(x, w):
 def fy(x, v):
     return x ** 2 + x ** 3 + v
 
+def fA(xi, wi):
+    return (1 - .05 * deltat) * xi + .04 * deltat * xi**2 + wi
+vfA = np.vectorize(fA)
+def fC(y, xi):
+    return np.exp(-np.log(2 * np.pi * Rvv) / 2. - (y - xi**2 - xi**3)**2 / (2. * Rvv))
+vfC = np.vectorize(fC)
+
 xts = np.zeros((n,))
 xts[0] = 2.
 P0 = 1e-20
@@ -26,13 +34,6 @@ yts[0] = fy(xts[0], vts[0])
 for tk in range(1, n):
     xts[tk] = fx(xts[tk - 1], wts[tk - 1])
     yts[tk] = fy(xts[tk], vts[tk])
-
-def fA(xi, wi):
-    return (1 - .05 * deltat) * xi + .04 * deltat * xi**2 + wi
-vfA = np.vectorize(fA)
-def fC(y, xi):
-    return np.exp(-np.log(2 * np.pi * Rvv) / 2. - (y - xi**2 - xi**3)**2 / (2. * Rvv))
-vfC = np.vectorize(fC)
 
 def main():
     xits = np.zeros((n, nsamp))
@@ -44,7 +45,12 @@ def main():
     Whatits = np.copy(Wits)
     xhatts = np.zeros((n,))
     xhatts[0] = np.mean(xits[0, :])
-
+    xtilts = np.zeros((n,))
+    xtilts[0] = xhatts[0] - xts[0]
+    yhatts = np.zeros((n,))
+    yhatts[0] = fy(xhatts[0], 0)
+    ets = np.zeros((n,))
+    ets[0] = yts[0] - yhatts[0]
     resamp = class_resample.Resample()
     for tk in range(1, n):
         xits[tk, :] = vfA(xits[tk - 1, :], math.sqrt(Rww) * np.random.randn(nsamp))
@@ -53,9 +59,12 @@ def main():
         xhatits[tk, :], Whatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
         xits[tk, :], Wits[tk, :] = xhatits[tk, :], Whatits[tk, :]
         xhatts[tk] = np.mean(xits[tk, :])
-        continue
-
-    plots.xy(tts, xhatts)
+        xtilts[tk] = xhatts[tk] - xts[tk]
+        yhatts[tk] = fy(xhatts[tk], 0)
+        ets[tk] = yts[tk] - yhatts[tk]
+    innov = class_residuals.Residuals(tts, ets)
+    Reets = innov.whiteness()
+    plots.standard(tts, xhatts, xtilts, yhatts, ets, Reets)
 
 if __name__ == "__main__":
     main()

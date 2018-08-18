@@ -24,53 +24,42 @@ def main():
     wts = math.sqrt(Rww) * np.random.randn(n)
     Rvv = .09
     vts = math.sqrt(Rvv) * np.random.randn(n)
-
     xts = np.zeros_like(tts)
     xts[0] = 2.
     yts = np.zeros_like(tts)
     yts[0] = y(xts[0], vts[0])
-
     xrefts = np.zeros_like(tts)
     xrefts[0] = 2.
     xhatts = np.zeros_like(tts)
     xhatts[0] = 2.
     Ptilts = np.zeros_like(tts)
     Ptilts[0] = .01
-
     Reets = np.zeros_like(tts)
     Reets[0] = 0
     Kts = np.zeros_like(tts)
     Kts[0] = 0
-
     yhatts = np.zeros_like(tts)
     yhatts[0] = y(xrefts[0], 0) + C(xrefts[0]) * (xhatts[0] - xrefts[0])
     ets = np.zeros_like(tts)
     ets[0] = 0
-
     xtilts = np.zeros_like(tts)
     xtilts[0] = xhatts[0] - xts[0]
-
     for tk in range(1, n):
         xts[tk] = x(xts[tk - 1], wts[tk - 1])
         yts[tk] = y(xts[tk], vts[tk])
         xrefts[tk] = 2. + .067 * tts[tk]
-
         xhatts[tk] = x(xrefts[tk-1], 0) + A(xrefts[tk-1]) * (xhatts[tk-1] - xrefts[tk-1])
         Ptilts[tk] = A(xrefts[tk-1])**2 * Ptilts[tk-1]
-
         Reets[tk] = C(xhatts[tk])**2 * Ptilts[tk] + Rvv
         Kts[tk] = util.div0( Ptilts[tk] * C(xrefts[tk]) , Reets[tk] )
-
         yhatts[tk] = y(xrefts[tk], 0) + C(xrefts[tk]) * (xhatts[tk] - xrefts[tk])
         ets[tk] = yts[tk] - yhatts[tk]
-
         xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
         Ptilts[tk] = (1 - Kts[tk] * C(xrefts[tk])) * Ptilts[tk]
-
         xtilts[tk] = xhatts[tk] - xts[tk]
-
     innov = class_residuals.Residuals(tts, ets)
-    plots.test(tts, xhatts, xtilts, yhatts, ets, yts, Reets)
+    Reets = innov.whiteness()
+    plots.standard(tts, xhatts, xtilts, yhatts, ets, Reets)
 
 if __name__ == "__main__":
     main()

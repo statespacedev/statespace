@@ -109,7 +109,7 @@ def main():
         xtilts[tk] = xhatts[tk] - xts[tk]
         ytilts[tk] = yhatts[tk] - yts[tk]
 
-    plots.test(tts, xhatts, xtilts, yhatts, ets, yts, Rksiksits)
+    plots.standard(tts, xhatts, xtilts, yhatts, ets, Rksiksits)
 
 if __name__ == "__main__":
     main()

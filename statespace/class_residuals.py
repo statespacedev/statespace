@@ -19,7 +19,7 @@ class Residuals():
 
     def autocorr2(self, x):
         res = np.correlate(x, x, mode='full')
-        return res[res.size//2:][1:]
+        return res[res.size//2:]
 
     def whiteness(self):
         self.mhate = np.mean(self.ets)
@@ -31,7 +31,8 @@ class Residuals():
             self.iszeromean = False
         test1 = self.autocorr1(self.ets)
         test2 = self.autocorr2(self.ets)
-        return
+        Reets = test2
+        return Reets
 
     def wssr(self):
         return
