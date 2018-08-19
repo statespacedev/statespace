@@ -1,7 +1,6 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
 import math
-import class_resample
 import class_residuals
 
 nsamp = 250
@@ -53,7 +52,6 @@ def main():
     ets = np.zeros((n,))
     ets[0] = yts[0] - yhatts[0]
 
-    resamp = class_resample.Resample(tol=1e-5)
     for tk in range(1, n):
         xits[tk, :] = vfA(xits[tk - 1, :], wits[tk - 1, :])
         Wi = vfC(yts[tk], xits[tk, :])
@@ -62,10 +60,35 @@ def main():
         xtilts[tk] =  xts[tk] - xhatts[tk]
         yhatts[tk] = fy(xhatts[tk], 0)
         ets[tk] = yts[tk] - yhatts[tk]
-        xits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
+        xits[tk, :] = invcdf(xits[tk, :], Wits[tk, :])
 
     innov = class_residuals.Residuals(tts, ets)
     innov.standard(tts, xhatts, xtilts, yhatts)
+
+def invcdf(xi, Wi):
+    tmp = []
+    for ndx in range(xi.size):
+        tmp.append([xi[ndx], Wi[ndx]])
+    tmp = sorted(tmp, key=lambda x: x[0])
+    cdf = [[tmp[0][0], tmp[0][1]]]
+    cdfndx = 0
+    for i in range(1, len(tmp)):
+        if abs(tmp[i][0] - tmp[i-1][0]) > 1e-5:
+            cdf.append([tmp[i][0], tmp[i][1] + cdf[cdfndx][1]])
+            cdfndx += 1
+        else:
+            cdf[cdfndx][1] += tmp[i][1]
+    cdf = np.asarray(cdf)
+    uk = np.sort(np.random.uniform(size=xi.size))
+    xhati, Whati, k = [], [], 0
+    for row in cdf:
+        while k < uk.size and uk[k] <= row[1]:
+            xhati.append(row[0])
+            Whati.append(1/float(xi.size))
+            k += 1
+    xhati = np.asarray(xhati)
+    assert xhati.size == xi.size
+    return xhati
 
 if __name__ == "__main__":
     main()
