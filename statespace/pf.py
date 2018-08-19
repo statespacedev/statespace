@@ -15,14 +15,14 @@ vts = math.sqrt(Rvv) * np.random.randn(n)
 
 def fx(x, w):
     return (1 - .05 * deltat) * x + .04 * deltat * x**2 + w
+
 def fy(x, v):
     return x ** 2 + x ** 3 + v
 
-def fA(xi, wi):
-    return (1 - .05 * deltat) * xi + .04 * deltat * xi**2 + wi
-vfA = np.vectorize(fA)
+vfA = np.vectorize(fx)
+
 def fC(y, xi):
-    return np.exp(-np.log(2 * np.pi * Rvv) / 2. - (y - xi**2 - xi**3)**2 / (2. * Rvv))
+    return np.exp(-np.log(2. * np.pi * Rvv) / 2. - (y - xi**2 - xi**3)**2 / (2. * Rvv))
 vfC = np.vectorize(fC)
 
 xts = np.zeros((n,))
@@ -35,7 +35,7 @@ for tk in range(1, n):
 
 def main():
     xhatts = np.zeros((n,))
-    xhatts[0] = 2.2
+    xhatts[0] = 2.02
     xtilts = np.zeros((n,))
     xtilts[0] = xts[0] - xhatts[0]
 
@@ -53,7 +53,7 @@ def main():
     ets[0] = yts[0] - yhatts[0]
 
     for tk in range(1, n):
-        xits[tk, :] = vfA(xits[tk - 1, :], wits[tk - 1, :])
+        xits[tk, :] = vfA(xits[tk - 1, :], wits[tk, :])
         Wi = vfC(yts[tk], xits[tk, :])
         Wits[tk, :] = Wi / sum(Wi)
         xhatts[tk] = Wits[tk, :] @ xits[tk, :]
