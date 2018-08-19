@@ -13,7 +13,7 @@ risk and the cost of errors
       -l, --lzkf  linearized processor, linearized kalman filter
       -e, --ekf   extended processor, extended kalman filter
       -u, --ukf   sigma-point sampling processor, unscented kalman filter
-      -p, --pf    sequential monte carlo processor, particle filter
+      -p, --pf    sequential monte carlo sampling processor, particle filter
 
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 

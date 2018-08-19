@@ -37,35 +37,35 @@ for tk in range(1, n):
 def main():
     xhatts = np.zeros((n,))
     xhatts[0] = 2.2
-    P0 = 1e-20
 
+    wits = math.sqrt(Rww) * np.random.randn(n, nsamp)
     xits = np.zeros((n, nsamp))
-    xits[0, :] = xhatts[0] + math.sqrt(P0) * np.random.randn(nsamp)
+    xits[0, :] = xhatts[0] + wits[0, :]
+
     Wits = np.zeros((n, nsamp))
     Wi = vfC(yts[0], xits[0, :])
     Wits[0, :] = Wi / sum(Wi)
 
-    resamp = class_resample.Resample()
     xhatits = np.copy(xits)
     Whatits = np.copy(Wits)
     xtilts = np.zeros((n,))
-    xtilts[0] = xhatts[0] - xts[0]
+    xtilts[0] = xts[0] - xhatts[0]
 
     yhatts = np.zeros((n,))
     yhatts[0] = fy(xhatts[0], 0)
     ets = np.zeros((n,))
     ets[0] = yts[0] - yhatts[0]
 
+    resamp = class_resample.Resample(tol=1e-5)
     for tk in range(1, n):
-        xits[tk, :] = vfA(xits[tk - 1, :], math.sqrt(Rww) * np.random.randn(nsamp))
+        xits[tk, :] = vfA(xhatits[tk - 1, :], wits[tk - 1, :])
         Wi = vfC(yts[tk], xits[tk, :])
         Wits[tk, :] = Wi / sum(Wi)
 
         xhatits[tk, :], Whatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
-        xits[tk, :], Wits[tk, :] = xhatits[tk, :], Whatits[tk, :]
 
-        xhatts[tk] = np.mean(xits[tk, :])
-        xtilts[tk] = xhatts[tk] - xts[tk]
+        xhatts[tk] = np.mean(xhatits[tk, :])
+        xtilts[tk] =  xts[tk] - xhatts[tk]
 
         yhatts[tk] = fy(xhatts[tk], 0)
         ets[tk] = yts[tk] - yhatts[tk]

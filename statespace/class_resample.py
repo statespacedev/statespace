@@ -1,8 +1,8 @@
 import numpy as np
 
 class Resample():
-    def __init__(self):
-        pass
+    def __init__(self, tol):
+        self.tol = tol
 
     def invcdf(self, xi, Wi):
         tmp = []
@@ -12,7 +12,7 @@ class Resample():
         cdf = [[tmp[0][0], tmp[0][1]]]
         cdfndx = 0
         for i in range(1, len(tmp)):
-            if abs(tmp[i][0] - tmp[i-1][0]) > 1e-5:
+            if abs(tmp[i][0] - tmp[i-1][0]) > self.tol:
                 cdf.append([tmp[i][0], tmp[i][1] + cdf[cdfndx][1]])
                 cdfndx += 1
             else:
@@ -29,5 +29,6 @@ class Resample():
                 k += 1
         xhati = np.asarray(xhati)
         Whati = np.asarray(Whati)
+
         assert xhati.size == xi.size
         return xhati, Whati

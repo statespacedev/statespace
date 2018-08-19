@@ -53,7 +53,7 @@ def main():
     xhatts = np.zeros((n,))
     xhatts[0] = xhat0
     xtilts = np.zeros((n,))
-    xtilts[0] = xhatts[0] - xts[0]
+    xtilts[0] = xts[0] - xhatts[0]
 
     Xtilts = np.zeros((n, 3))
     Xtilts[0, :] = Xts[0, :] - xhatts[0]
@@ -104,7 +104,7 @@ def main():
 
         xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
         Ptilts[tk] = Ptilts[tk] - Kts[tk] * Rksiksits[tk] * Kts[tk]
-        xtilts[tk] = xhatts[tk] - xts[tk]
+        xtilts[tk] = xts[tk] - xhatts[tk]
 
     innov = class_residuals.Residuals(tts, ets)
     innov.standard(tts, xhatts, xtilts, yhatts)

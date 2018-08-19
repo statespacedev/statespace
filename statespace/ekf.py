@@ -34,7 +34,7 @@ def main():
     Ptilts = np.zeros_like(tts)
     Ptilts[0] = .01
     xtilts = np.zeros_like(tts)
-    xtilts[0] = xhatts[0] - xts[0]
+    xtilts[0] = xts[0] - xhatts[0]
 
     Reets = np.zeros_like(tts)
     Reets[0] = 0
@@ -44,7 +44,7 @@ def main():
     yhatts = np.zeros_like(tts)
     yhatts[0] = y(xhatts[0], 0)
     ets = np.zeros_like(tts)
-    ets[0] = 0
+    ets[0] = yts[0] - yhatts[0]
 
     for tk in range(1, n):
         xts[tk] = x(xts[tk - 1], wts[tk - 1])
@@ -61,7 +61,7 @@ def main():
 
         xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
         Ptilts[tk] = (1 - Kts[tk] * C(xhatts[tk])) * Ptilts[tk]
-        xtilts[tk] = xhatts[tk] - xts[tk]
+        xtilts[tk] = xts[tk] - xhatts[tk]
 
     innov = class_residuals.Residuals(tts, ets)
     innov.standard(tts, xhatts, xtilts, yhatts)
