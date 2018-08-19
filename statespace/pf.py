@@ -35,7 +35,7 @@ for tk in range(1, n):
 
 def main():
     xhatts = np.zeros((n,))
-    xhatts[0] = 2.02
+    xhatts[0] = 2.2
     xtilts = np.zeros((n,))
     xtilts[0] = xts[0] - xhatts[0]
 
@@ -67,24 +67,18 @@ def main():
 
 def resample(xi, Wi):
     tmp = []
-    for ndx in range(xi.size):
-        tmp.append([xi[ndx], Wi[ndx]])
+    for i in range(xi.size):
+        tmp.append([xi[i], Wi[i]])
     tmp = sorted(tmp, key=lambda x: x[0])
     cdf = [[tmp[0][0], tmp[0][1]]]
-    cdfndx = 0
     for i in range(1, len(tmp)):
-        if abs(tmp[i][0] - tmp[i-1][0]) > 1e-5:
-            cdf.append([tmp[i][0], tmp[i][1] + cdf[cdfndx][1]])
-            cdfndx += 1
-        else:
-            cdf[cdfndx][1] += tmp[i][1]
+        cdf.append([tmp[i][0], tmp[i][1] + cdf[i-1][1]])
     cdf = np.asarray(cdf)
     uk = np.sort(np.random.uniform(size=xi.size))
-    xhati, Whati, k = [], [], 0
+    xhati, k = [], 0
     for row in cdf:
         while k < uk.size and uk[k] <= row[1]:
             xhati.append(row[0])
-            Whati.append(1/float(xi.size))
             k += 1
     xhati = np.asarray(xhati)
     assert xhati.size == xi.size
