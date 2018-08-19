@@ -28,10 +28,3 @@ risk and the cost of errors
 [Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
 
 [Irrational Exuberance, Robert J. Shiller](http://a.co/28kIJtS)
-
-[Capital Ideas Evolving, Peter L. Bernstein](http://a.co/awiRMxq)
-
-180813
-
-preparing to package the project on [pypi](https://test.pypi.org/project/statespace/) 
-
