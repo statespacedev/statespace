@@ -37,6 +37,8 @@ for tk in range(1, n):
 def main():
     xhatts = np.zeros((n,))
     xhatts[0] = 2.2
+    xtilts = np.zeros((n,))
+    xtilts[0] = xts[0] - xhatts[0]
 
     wits = math.sqrt(Rww) * np.random.randn(n, nsamp)
     xits = np.zeros((n, nsamp))
@@ -46,10 +48,6 @@ def main():
     Wi = vfC(yts[0], xits[0, :])
     Wits[0, :] = Wi / sum(Wi)
 
-    xhatits = np.copy(xits)
-    xtilts = np.zeros((n,))
-    xtilts[0] = xts[0] - xhatts[0]
-
     yhatts = np.zeros((n,))
     yhatts[0] = fy(xhatts[0], 0)
     ets = np.zeros((n,))
@@ -57,19 +55,14 @@ def main():
 
     resamp = class_resample.Resample(tol=1e-5)
     for tk in range(1, n):
-
-        xits[tk, :] = vfA(xhatits[tk - 1, :], wits[tk - 1, :])
-
+        xits[tk, :] = vfA(xits[tk - 1, :], wits[tk - 1, :])
         Wi = vfC(yts[tk], xits[tk, :])
         Wits[tk, :] = Wi / sum(Wi)
-
-        xhatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
-
-        xhatts[tk] = np.mean(xhatits[tk, :])
+        xhatts[tk] = Wits[tk, :] @ xits[tk, :]
         xtilts[tk] =  xts[tk] - xhatts[tk]
-
         yhatts[tk] = fy(xhatts[tk], 0)
         ets[tk] = yts[tk] - yhatts[tk]
+        xits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
 
     innov = class_residuals.Residuals(tts, ets)
     innov.standard(tts, xhatts, xtilts, yhatts)
