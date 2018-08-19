@@ -60,12 +60,12 @@ def main():
         xtilts[tk] =  xts[tk] - xhatts[tk]
         yhatts[tk] = fy(xhatts[tk], 0)
         ets[tk] = yts[tk] - yhatts[tk]
-        xits[tk, :] = invcdf(xits[tk, :], Wits[tk, :])
+        xits[tk, :] = resample(xits[tk, :], Wits[tk, :])
 
     innov = class_residuals.Residuals(tts, ets)
     innov.standard(tts, xhatts, xtilts, yhatts)
 
-def invcdf(xi, Wi):
+def resample(xi, Wi):
     tmp = []
     for ndx in range(xi.size):
         tmp.append([xi[ndx], Wi[ndx]])
