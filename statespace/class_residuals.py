@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import math
 
 class Residuals():
@@ -31,8 +32,22 @@ class Residuals():
             self.iszeromean = False
         test1 = self.autocorr1(self.ets)
         test2 = self.autocorr2(self.ets)
-        Reets = test2
-        return Reets
+        self.Reets = test2
+        return self.Reets
 
     def wssr(self):
         return
+
+    def standard(self, tts, xhatts, xtilts, yhatts):
+        lw = 1
+        plt.subplot(3, 2, 1)
+        plt.plot(tts, xhatts, linewidth=lw)
+        plt.subplot(3, 2, 2)
+        plt.plot(tts, xtilts, linewidth=lw)
+        plt.subplot(3, 2, 3)
+        plt.plot(tts, yhatts, linewidth=lw)
+        plt.subplot(3, 2, 4)
+        plt.plot(tts, self.ets, linewidth=lw)
+        plt.subplot(3, 2, 5)
+        plt.plot(tts, self.Reets, linewidth=lw)
+        plt.show()

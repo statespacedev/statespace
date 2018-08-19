@@ -1,6 +1,6 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
-import math, plots
+import math
 import class_resample
 import class_residuals
 
@@ -28,7 +28,6 @@ vfC = np.vectorize(fC)
 
 xts = np.zeros((n,))
 xts[0] = 2.
-P0 = 1e-20
 yts = np.zeros((n,))
 yts[0] = fy(xts[0], vts[0])
 for tk in range(1, n):
@@ -36,35 +35,43 @@ for tk in range(1, n):
     yts[tk] = fy(xts[tk], vts[tk])
 
 def main():
+    xhatts = np.zeros((n,))
+    xhatts[0] = 2.2
+    P0 = 1e-20
+
     xits = np.zeros((n, nsamp))
-    xits[0, :] = xts[0] + math.sqrt(P0) * np.random.randn(nsamp)
+    xits[0, :] = xhatts[0] + math.sqrt(P0) * np.random.randn(nsamp)
     Wits = np.zeros((n, nsamp))
     Wi = vfC(yts[0], xits[0, :])
     Wits[0, :] = Wi / sum(Wi)
+
+    resamp = class_resample.Resample()
     xhatits = np.copy(xits)
     Whatits = np.copy(Wits)
-    xhatts = np.zeros((n,))
-    xhatts[0] = np.mean(xits[0, :])
     xtilts = np.zeros((n,))
     xtilts[0] = xhatts[0] - xts[0]
+
     yhatts = np.zeros((n,))
     yhatts[0] = fy(xhatts[0], 0)
     ets = np.zeros((n,))
     ets[0] = yts[0] - yhatts[0]
-    resamp = class_resample.Resample()
+
     for tk in range(1, n):
         xits[tk, :] = vfA(xits[tk - 1, :], math.sqrt(Rww) * np.random.randn(nsamp))
         Wi = vfC(yts[tk], xits[tk, :])
         Wits[tk, :] = Wi / sum(Wi)
+
         xhatits[tk, :], Whatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
         xits[tk, :], Wits[tk, :] = xhatits[tk, :], Whatits[tk, :]
+
         xhatts[tk] = np.mean(xits[tk, :])
         xtilts[tk] = xhatts[tk] - xts[tk]
+
         yhatts[tk] = fy(xhatts[tk], 0)
         ets[tk] = yts[tk] - yhatts[tk]
+
     innov = class_residuals.Residuals(tts, ets)
-    Reets = innov.zmw()
-    plots.standard(tts, xhatts, xtilts, yhatts, ets, Reets)
+    innov.standard(tts, xhatts, xtilts, yhatts)
 
 if __name__ == "__main__":
     main()

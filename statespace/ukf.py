@@ -1,12 +1,12 @@
 # sigma-point bayesian processor, unscented kalman filter, SPBP, UKF
 import numpy as np
-import util, math, plots
+import math
 import class_residuals
 
 n = 150
 deltat = .01
 
-xhat0 = 2.3
+xhat0 = 2.2
 Ptil0 = .01
 
 bignsubx = 1
@@ -52,6 +52,8 @@ def main():
     Xts[0, :] = vfX(xhat0, Ptil0)
     xhatts = np.zeros((n,))
     xhatts[0] = xhat0
+    xtilts = np.zeros((n,))
+    xtilts[0] = xhatts[0] - xts[0]
 
     Xtilts = np.zeros((n, 3))
     Xtilts[0, :] = Xts[0, :] - xhatts[0]
@@ -65,6 +67,8 @@ def main():
     Yts[0, :] = vfc(Xhatts[0, :])
     yhatts = np.zeros((n,))
     yhatts[0] = W @ Yts[0, :]
+    ets = np.zeros((n,))
+    ets[0] = yts[0] - yhatts[0]
 
     ksits = np.zeros((n, 3))
     ksits[0, :] = Yts[0, :] - yhatts[0]
@@ -75,13 +79,6 @@ def main():
     RXtilksits[0] = W @ np.multiply(Xtilts[0, :], ksits[0, :])
     Kts = np.zeros((n,))
     Kts[0] = RXtilksits[0] / Rksiksits[0]
-
-    ets = np.zeros((n,))
-    ets[0] = yts[0] - yhatts[0]
-    xtilts = np.zeros((n,))
-    xtilts[0] = xhatts[0] - xts[0]
-    ytilts = np.zeros((n,))
-    ytilts[0] = yhatts[0] - yts[0]
 
     for tk in range(1, n):
         xts[tk] = fx(xts[tk - 1], wts[tk - 1])
@@ -97,6 +94,7 @@ def main():
 
         Yts[tk, :] = vfc(Xhatts[tk, :])
         yhatts[tk] = W @ Yts[tk, :]
+        ets[tk] = yts[tk] - yhatts[tk]
 
         ksits[tk, :] = Yts[tk, :] - yhatts[tk]
         Rksiksits[tk] = W @ np.power(ksits[tk, :], 2) + Rvv
@@ -104,14 +102,12 @@ def main():
         RXtilksits[tk] = W @ np.multiply(Xtilts[tk, :], ksits[tk, :])
         Kts[tk] = RXtilksits[tk] / Rksiksits[tk]
 
-        ets[tk] = yts[tk] - yhatts[tk]
         xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
         Ptilts[tk] = Ptilts[tk] - Kts[tk] * Rksiksits[tk] * Kts[tk]
         xtilts[tk] = xhatts[tk] - xts[tk]
-        ytilts[tk] = yhatts[tk] - yts[tk]
+
     innov = class_residuals.Residuals(tts, ets)
-    Reets = innov.zmw()
-    plots.standard(tts, xhatts, xtilts, yhatts, ets, Reets)
+    innov.standard(tts, xhatts, xtilts, yhatts)
 
 if __name__ == "__main__":
     main()

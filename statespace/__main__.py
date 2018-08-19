@@ -1,27 +1,33 @@
 import argparse, sys
 sys.path.append('statespace')
-import class_statespace
 
 def main():
     parser = argparse.ArgumentParser('statespace')
-    parser.add_argument('-t', help='test the project', action='store_true')
-    parser.add_argument('-lzkf', help='linearized processor, linearized kalman filter', action='store_true')
-    parser.add_argument('-ekf', help='extended processor, extended kalman filter', action='store_true')
-    parser.add_argument('-ukf', help='sigma-point sampling processor, unscented kalman filter', action='store_true')
-    parser.add_argument('-pf', help='sequential monte carlo processor, particle filter', action='store_true')
+    parser.add_argument('-t', '--test', help='test the project', action='store_true')
+    parser.add_argument('-l', '--lzkf', help='linearized processor, linearized kalman filter', action='store_true')
+    parser.add_argument('-e', '--ekf', help='extended processor, extended kalman filter', action='store_true')
+    parser.add_argument('-u', '--ukf', help='sigma-point sampling processor, unscented kalman filter', action='store_true')
+    parser.add_argument('-p', '--pf', help='sequential monte carlo processor, particle filter', action='store_true')
     args = parser.parse_args()
 
-    ss = class_statespace.Statespace()
-    if args.t:
+    if args.test:
         print('test successful')
+
     if args.lzkf:
-        ss.lzkf()
+        import lzkf
+        lzkf.main()
+
     if args.ekf:
-        ss.ekf()
+        import ekf
+        ekf.main()
+
     if args.ukf:
-        ss.ukf()
+        import ukf
+        ukf.main()
+
     if args.pf:
-        ss.pf()
+        import pf
+        pf.main()
 
 if __name__ == "__main__":
     main()
