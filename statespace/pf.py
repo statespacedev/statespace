@@ -47,7 +47,6 @@ def main():
     Wits[0, :] = Wi / sum(Wi)
 
     xhatits = np.copy(xits)
-    Whatits = np.copy(Wits)
     xtilts = np.zeros((n,))
     xtilts[0] = xts[0] - xhatts[0]
 
@@ -58,11 +57,13 @@ def main():
 
     resamp = class_resample.Resample(tol=1e-5)
     for tk in range(1, n):
+
         xits[tk, :] = vfA(xhatits[tk - 1, :], wits[tk - 1, :])
+
         Wi = vfC(yts[tk], xits[tk, :])
         Wits[tk, :] = Wi / sum(Wi)
 
-        xhatits[tk, :], Whatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
+        xhatits[tk, :] = resamp.invcdf(xits[tk, :], Wits[tk, :])
 
         xhatts[tk] = np.mean(xhatits[tk, :])
         xtilts[tk] =  xts[tk] - xhatts[tk]

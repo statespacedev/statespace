@@ -28,7 +28,5 @@ class Resample():
                 Whati.append(1/float(xi.size))
                 k += 1
         xhati = np.asarray(xhati)
-        Whati = np.asarray(Whati)
-
         assert xhati.size == xi.size
-        return xhati, Whati
+        return xhati
