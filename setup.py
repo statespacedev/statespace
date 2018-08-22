@@ -5,7 +5,7 @@ with open('readme.md', 'r') as fh:
 
 setuptools.setup(
     name='statespace',
-    version='1.1.1',
+    version='2018.1.1',
     author='noah smith',
     author_email='noahhsmith@gmail.com',
     description='state-space distributions and decisions',
