@@ -5,15 +5,15 @@ their evolution with time and various processes, including noise and observation
 risk and the cost of errors
 
     ~/statespace$ venv/bin/python -m statespace -h
-    usage: statespace [-h] [-t] [-l] [-e] [-u] [-p]
+    usage: statespace [-h] [--lzbp] [--xbp] [--spbp] [--sspf] [--jbp]
     
     optional arguments:
       -h, --help  show this help message and exit
-      -t, --test  test the project
-      -l, --lzkf  linearized processor, linearized kalman filter
-      -e, --ekf   extended processor, extended kalman filter
-      -u, --ukf   sigma-point sampling processor, unscented kalman filter
-      -p, --pf    sequential monte carlo sampling processor, particle filter
+      --lzbp      linearized bayesian processor, linearized kalman filter
+      --xbp       extended bayesian processor, extended kalman filter
+      --spbp      sigma-point bayesian processor, unscented kalman filter
+      --sspf      state space particle filter
+      --jbp       joint bayesian state/parameteric processors
 
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 
