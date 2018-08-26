@@ -26,5 +26,3 @@ risk and the cost of errors
 [A Demon of Our Own Design: Markets, Hedge Funds, and the Perils of Financial Innovation, Richard Bookstaber](http://a.co/4FvnyfB)
 
 [Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
-
-[Irrational Exuberance, Robert J. Shiller](http://a.co/28kIJtS)
