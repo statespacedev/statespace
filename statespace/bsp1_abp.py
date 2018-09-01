@@ -11,28 +11,28 @@ Rww = np.array([0, 0, 0])
 wts = np.multiply(np.random.randn(n, 3), Rww)
 xts = np.zeros([n, 3])
 xts[0, :] = [2., .05, .04]
-def x(x, w):
-    return (1 - x[1] * deltat) * x[0] + x[2] * deltat * x**2 + w
+def fx(x, w):
+    return [(1 - x[1] * deltat) * x[0] + x[2] * deltat * x[0]**2, x[1], x[2]] + w
+
+Rvv = .09
+vts = math.sqrt(Rvv) * np.random.randn(n)
+yts = np.zeros([n, 1])
+def fy(x, v):
+    return x[0]**2 + x[0]**3 + v
+yts[0] = fy(xts[0, :], vts[0])
 
 for tk in range(1, n):
-    xts[tk, :] = x(xts[tk - 1, :], wts[tk - 1, :])
+    xts[tk, :] = fx(xts[tk - 1, :], wts[tk - 1, :])
+    yts[tk] = fy(xts[tk, :], vts[tk])
     pass
 
-# def y(x, v):
-#     return x**2 + x**3 + v
-#
 # def A(x):
 #     return 1 - .05 * deltat + .08 * deltat * x
 #
 # def C(x):
 #     return 2 * x + 3 * x**2
 
-#Rvv = .09
-#vts = math.sqrt(Rvv) * np.random.randn(n)
 
-
-# yts = np.zeros_like(tts)
-# yts[0] = y(xts[0], vts[0])
 #
 # xhatts = np.zeros_like(tts)
 # xhatts[0] = 2.2
