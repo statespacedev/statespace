@@ -6,8 +6,8 @@ def main():
     parser.add_argument('--lzbp', help='linearized bayesian processor, linearized kalman filter', action='store_true')
     parser.add_argument('--xbp', help='extended bayesian processor, extended kalman filter', action='store_true')
     parser.add_argument('--spbp', help='sigma-point bayesian processor, unscented kalman filter', action='store_true')
-    parser.add_argument('--sspf', help='state space particle filter', action='store_true')
-    parser.add_argument('--jbp', help='joint bayesian state/parameteric processors', action='store_true')
+    parser.add_argument('--sspf', help='state space particle filter, sequential monte carlo processor', action='store_true')
+    parser.add_argument('--abp', help='adaptive bayesian processors, joint bayesian state/parameteric processors', action='store_true')
     args = parser.parse_args()
 
     if args.lzbp:
@@ -26,9 +26,9 @@ def main():
         import bsp1_sspf
         bsp1_sspf.main()
 
-    if args.jbp:
-        import bsp1_jbp
-        bsp1_jbp.main()
+    if args.abp:
+        import bsp1_abp
+        bsp1_abp.main()
 
 if __name__ == "__main__":
     main()

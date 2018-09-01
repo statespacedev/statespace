@@ -1,4 +1,4 @@
-# joint bayesian state/parametric processor
+# adaptive bayesian processor, joint state/parametric processor
 import numpy as np
 import util, math
 import class_residuals
