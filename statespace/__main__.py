@@ -27,8 +27,8 @@ def main():
         bsp1_sspf.main()
 
     if args.abp:
-        import bsp1_abp
-        bsp1_abp.main()
+        import bsp1_abp_xbp
+        bsp1_abp_xbp.main()
 
 if __name__ == "__main__":
     main()

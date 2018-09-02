@@ -10,17 +10,17 @@ class Residuals():
         return
 
     def autocorr1(self, x):
-        res = np.zeros_like(x)[1:]
         n = x.size
+        ac = np.zeros([n, 1])
         for k in range(1, n): # k = 1 to n-1
-            res[k-1] = 0
+            ac[k] = 0
             for t in range(1, n-k): # t = 1 to n-k
-                res[k-1] += (self.ets[t-1] - self.mhate) * (self.ets[t-1+k] - self.mhate) #/ (n-k)
-        return res
+                ac[k] += (self.ets[t-1] - self.mhate) * (self.ets[t-1+k] - self.mhate) #/ (n-k)
+        return ac
 
     def autocorr2(self, x):
-        res = np.correlate(x, x, mode='full')
-        return res[res.size//2:]
+        ac = np.correlate(x, x, mode='full')
+        return ac[ac.size//2:]
 
     def zmw(self):
         self.mhate = np.mean(self.ets)
@@ -31,9 +31,9 @@ class Residuals():
         if abs(self.mhate) > self.tau:
             self.iszeromean = False
         test1 = self.autocorr1(self.ets)
-        test2 = self.autocorr2(self.ets)
-        self.Reets = test2
-        return self.Reets
+        #test2 = self.autocorr2(self.ets)
+        self.Rhatee = test1
+        return self.Rhatee
 
     def wssr(self):
         return
@@ -49,5 +49,5 @@ class Residuals():
         plt.subplot(3, 2, 4)
         plt.plot(tts, self.ets, linewidth=lw)
         plt.subplot(3, 2, 5)
-        plt.plot(tts, self.Reets, linewidth=lw)
+        plt.plot(tts, self.Rhatee, linewidth=lw)
         plt.show()
