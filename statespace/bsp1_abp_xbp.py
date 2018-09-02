@@ -18,7 +18,7 @@ for tk in range(1, n):
 
 Rvv = .09
 vts = math.sqrt(Rvv) * np.random.randn(n)
-yts = np.zeros([n, 1])
+yts = np.zeros(n)
 def fy(x, v):
     return x[0]**2 + x[0]**3 + v
 yts[0] = fy(xts[0, :], vts[0])
@@ -38,14 +38,14 @@ Ptilts = np.zeros([n, 3, 3])
 Ptilts[0, :, :] = 100. * np.eye(3)
 
 tk = 0
-yhatts = np.zeros([n, 1])
+yhatts = np.zeros(n)
 yhatts[tk] = fy(xhatts[tk, :], 0)
-ets = np.zeros([n, 1])
+ets = np.zeros(n)
 ets[tk] = yts[tk] - yhatts[tk]
 def fC(x):
     return np.array([2 * x[0] + 3 * x[0]**2, 0, 0])
 C = fC(xhatts[tk, :])
-Reets = np.zeros([n, 1])
+Reets = np.zeros(n)
 Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
 
 Kts = np.zeros([n, 3])

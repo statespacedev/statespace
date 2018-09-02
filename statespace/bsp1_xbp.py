@@ -25,41 +25,40 @@ yts[0] = fy(xts[0], vts[0])
 for tk in range(1, n):
     yts[tk] = fy(xts[tk], vts[tk])
 
-def A(x):
-    return 1 - .05 * deltat + .08 * deltat * x
-
-def C(x):
-    return 2 * x + 3 * x**2
-
-xhatts = np.zeros_like(tts)
+xhatts = np.zeros(n)
 xhatts[0] = 2.2
-Ptilts = np.zeros_like(tts)
+def fA(x):
+    return 1 - .05 * deltat + .08 * deltat * x
+Ptilts = np.zeros(n)
+#Ptilts[tk] = fA(xhatts[tk - 1]) ** 2 * Ptilts[tk - 1]
 Ptilts[0] = .01
-xtilts = np.zeros_like(tts)
+
+tk = 0
+yhatts = np.zeros(n)
+yhatts[tk] = fy(xhatts[tk], 0)
+ets = np.zeros(n)
+ets[tk] = yts[tk] - yhatts[tk]
+def fC(x):
+    return 2 * x + 3 * x**2
+C = fC(xhatts[tk])
+Reets = np.zeros(n)
+Reets[tk] = C * Ptilts[tk] * C + Rvv
+
+Kts = np.zeros(n)
+Kts[tk] = Ptilts[tk] * C / Reets[tk]
+xtilts = np.zeros(n)
 xtilts[0] = xts[0] - xhatts[0]
-
-Reets = np.zeros_like(tts)
-Reets[0] = 0
-Kts = np.zeros_like(tts)
-Kts[0] = 0
-
-yhatts = np.zeros_like(tts)
-yhatts[0] = fy(xhatts[0], 0)
-ets = np.zeros_like(tts)
-ets[0] = yts[0] - yhatts[0]
 
 for tk in range(1, n):
     xhatts[tk] = fx(xhatts[tk-1], 0)
-    Ptilts[tk] = A(xhatts[tk-1])**2 * Ptilts[tk-1]
-
-    Reets[tk] = C(xhatts[tk])**2 * Ptilts[tk] + .09
-    Kts[tk] = util.div0( Ptilts[tk] * C(xhatts[tk]) , Reets[tk] )
-
+    Ptilts[tk] = fA(xhatts[tk-1])**2 * Ptilts[tk-1]
     yhatts[tk] = fy(xhatts[tk], 0)
     ets[tk] = yts[tk] - yhatts[tk]
-
+    C = fC(xhatts[tk])
+    Reets[tk] = C * Ptilts[tk] * C + Rvv
+    Kts[tk] = Ptilts[tk] * C / Reets[tk]
     xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
-    Ptilts[tk] = (1 - Kts[tk] * C(xhatts[tk])) * Ptilts[tk]
+    Ptilts[tk] = (1 - Kts[tk] * C) * Ptilts[tk]
     xtilts[tk] = xts[tk] - xhatts[tk]
 
 innov = class_residuals.Residuals(tts, ets)
