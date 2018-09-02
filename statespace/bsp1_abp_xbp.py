@@ -3,7 +3,7 @@ import numpy as np
 import util, math
 import class_residuals
 
-n = 1500
+n = 150
 deltat = .01
 tts = np.arange(0, n * deltat, deltat)
 
@@ -26,7 +26,6 @@ for tk in range(1, n):
     yts[tk] = fy(xts[tk, :], vts[tk])
 
 xhatts = np.zeros([n, 3])
-# xhatts[tk, :] = fx(xhatts[tk-1, :], 0)
 xhatts[0, :] = [2., .055, .044]
 def fA(x):
     A = np.eye(3)
@@ -35,7 +34,7 @@ def fA(x):
     A[0, 2] = deltat * x[0]**2
     return A
 Ptilts = np.zeros([n, 3, 3])
-# Ptilts[tk, :, :] = fA(xhatts[tk - 1, :]) * Ptilts[tk - 1, :, :] * fA(xhatts[tk - 1, :]).T + Rww
+#Ptilts[tk, :, :] = fA(xhatts[tk-1, :]) @ Ptilts[tk-1, :, :] @ fA(xhatts[tk-1, :]).T + Rww
 Ptilts[0, :, :] = 100. * np.eye(3)
 
 tk = 0
@@ -58,7 +57,7 @@ xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
 
 for tk in range(1, n):
     xhatts[tk, :] = fx(xhatts[tk-1, :], 0)
-    Ptilts[tk, :, :] = fA(xhatts[tk-1, :]) * Ptilts[tk-1, :, :] * fA(xhatts[tk-1, :]).T + Rww
+    Ptilts[tk, :, :] = fA(xhatts[tk-1, :]) @ Ptilts[tk-1, :, :] @ fA(xhatts[tk-1, :]).T + Rww
     yhatts[tk] = fy(xhatts[tk, :], 0)
     ets[tk] = yts[tk] - yhatts[tk]
     C = fC(xhatts[tk, :])
