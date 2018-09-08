@@ -1,9 +1,10 @@
 # adaptive bayesian processor, joint state/parametric processor
 import numpy as np
+import scipy.linalg as la
 import util, math
 import class_residuals
 
-n = 150
+n = 1500
 deltat = .01
 tts = np.arange(0, n * deltat, deltat)
 
@@ -34,8 +35,9 @@ def fA(x):
     A[0, 2] = deltat * x[0]**2
     return A
 Ptilts = np.zeros([n, 3, 3])
-#Ptilts[tk, :, :] = fA(xhatts[tk-1, :]) @ Ptilts[tk-1, :, :] @ fA(xhatts[tk-1, :]).T + Rww
 Ptilts[0, :, :] = 100. * np.eye(3)
+xtilts = np.zeros([n, 3])
+xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
 
 tk = 0
 yhatts = np.zeros(n)
@@ -48,27 +50,42 @@ C = fC(xhatts[tk, :])
 Reets = np.zeros(n)
 Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
 
-Kts = np.zeros([n, 3])
-Kts[tk, :] = Ptilts[tk, :, :] @ C / Reets[tk]
-xhatts[tk, :] = xhatts[tk, :] + Kts[tk, :] * ets[tk]
-Ptilts[tk, :, :] = (np.eye(3) - Kts[tk, :] @ C) @ Ptilts[tk, :, :]
-xtilts = np.zeros([n, 3])
-xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
-
-for tk in range(1, n):
+def ver1():
     xhatts[tk, :] = fx(xhatts[tk-1, :], 0)
     Ptilts[tk, :, :] = fA(xhatts[tk-1, :]) @ Ptilts[tk-1, :, :] @ fA(xhatts[tk-1, :]).T + Rww
     yhatts[tk] = fy(xhatts[tk, :], 0)
     ets[tk] = yts[tk] - yhatts[tk]
     C = fC(xhatts[tk, :])
     Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
-    Kts[tk, :] = Ptilts[tk, :, :] @ C / Reets[tk]
-    xhatts[tk, :] = xhatts[tk, :] + Kts[tk, :] * ets[tk]
-    Ptilts[tk, :, :] = (np.eye(3) - Kts[tk, :] @ C) @ Ptilts[tk, :, :]
+    K = Ptilts[tk, :, :] @ C / Reets[tk]
+    xhatts[tk, :] = xhatts[tk, :] + K * ets[tk]
+    Ptilts[tk, :, :] = (np.eye(3) - K @ C) @ Ptilts[tk, :, :]
     xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
 
+def fUD(P):
+    P, L, U = la.lu(P)
+    D = np.diag(np.diag(U))   # D is just the diagonal of U
+    U /= np.diag(U)[:, None]
+    return U, D
+
+def ver2():
+    xhatts[tk, :] = fx(xhatts[tk-1, :], 0)
+    Ptilts[tk, :, :] = fA(xhatts[tk-1, :]) @ Ptilts[tk-1, :, :] @ fA(xhatts[tk-1, :]).T + Rww
+    U, D = fUD(Ptilts[tk, :, :])
+    yhatts[tk] = fy(xhatts[tk, :], 0)
+    ets[tk] = yts[tk] - yhatts[tk]
+    C = fC(xhatts[tk, :])
+    Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
+    K = Ptilts[tk, :, :] @ C / Reets[tk]
+    xhatts[tk, :] = xhatts[tk, :] + K * ets[tk]
+    Ptilts[tk, :, :] = (np.eye(3) - K @ C) @ Ptilts[tk, :, :]
+    xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
+
+for tk in range(1, n):
+    ver2()
+
 innov = class_residuals.Residuals(tts, ets)
-innov.standard(tts, xhatts[:, 0], xtilts[:, 0], yhatts)
+innov.abp(tts, xhatts, xtilts, yhatts)
 
 
 

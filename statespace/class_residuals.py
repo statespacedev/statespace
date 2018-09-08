@@ -51,3 +51,20 @@ class Residuals():
         plt.subplot(3, 2, 5)
         plt.plot(tts, self.Rhatee, linewidth=lw)
         plt.show()
+
+    def abp(self, tts, xhatts, xtilts, yhatts):
+        lw = 1
+        plt.subplot(3, 2, 1)
+        plt.plot(tts, xhatts[:, 0], linewidth=lw)
+        plt.subplot(3, 2, 2)
+        plt.plot(tts, xhatts[:, 1], linewidth=lw)
+        plt.subplot(3, 2, 3)
+        plt.plot(tts, xhatts[:, 2], linewidth=lw)
+
+        plt.subplot(3, 2, 4)
+        plt.plot(tts, self.ets, linewidth=lw)
+        plt.subplot(3, 2, 5)
+        plt.plot(tts, yhatts, linewidth=lw)
+        plt.subplot(3, 2, 6)
+        plt.plot(tts, self.Rhatee, linewidth=lw)
+        plt.show()
