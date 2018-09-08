@@ -82,23 +82,19 @@ def ver2(tk):
     for j in range(3):
         delta = delta - H[j] * x[j]
         v[j] = H[j]
-        jlim = j - 1
-        if jlim < 0:
-            continue
-        for i in range(jlim+1):
-            v[j] = v[j] + U[i, j] * H[i]
+        if not j == 0:
+            for i in range(j):
+                v[j] = v[j] + U[i, j] * H[i]
     sigma = R
     for j in range(3):
         nu = v[j]
         v[j] = v[j] * D[j, j]
         w[j] = nu
-        jlim = j - 1
-        if jlim < 0:
-            continue
-        for i in range(jlim+1):
-            tau = U[i, j] * nu
-            U[i, j] = U[i, j] - nu * w[i] / sigma
-            w[i] = w[i] + tau
+        if not j == 0:
+            for i in range(j):
+                tau = U[i, j] * nu
+                U[i, j] = U[i, j] - nu * w[i] / sigma
+                w[i] = w[i] + tau
         D[j, j] = D[j, j] * sigma
         sigma = sigma + nu * v[j]
         D[j, j] = D[j, j] * sigma
