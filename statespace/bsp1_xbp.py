@@ -30,8 +30,9 @@ xhatts[0] = 2.2
 def fA(x):
     return 1 - .05 * deltat + .08 * deltat * x
 Ptilts = np.zeros(n)
-#Ptilts[tk] = fA(xhatts[tk - 1]) ** 2 * Ptilts[tk - 1]
 Ptilts[0] = .01
+xtilts = np.zeros(n)
+xtilts[0] = xts[0] - xhatts[0]
 
 tk = 0
 yhatts = np.zeros(n)
@@ -44,21 +45,17 @@ C = fC(xhatts[tk])
 Reets = np.zeros(n)
 Reets[tk] = C * Ptilts[tk] * C + Rvv
 
-Kts = np.zeros(n)
-Kts[tk] = Ptilts[tk] * C / Reets[tk]
-xtilts = np.zeros(n)
-xtilts[0] = xts[0] - xhatts[0]
-
 for tk in range(1, n):
+    Phi = fA(fx(xhatts[tk-1], 0))
     xhatts[tk] = fx(xhatts[tk-1], 0)
-    Ptilts[tk] = fA(xhatts[tk-1])**2 * Ptilts[tk-1]
+    Ptilts[tk] = Phi * Ptilts[tk-1] * Phi
     yhatts[tk] = fy(xhatts[tk], 0)
     ets[tk] = yts[tk] - yhatts[tk]
     C = fC(xhatts[tk])
     Reets[tk] = C * Ptilts[tk] * C + Rvv
-    Kts[tk] = Ptilts[tk] * C / Reets[tk]
-    xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
-    Ptilts[tk] = (1 - Kts[tk] * C) * Ptilts[tk]
+    K = Ptilts[tk] * C / Reets[tk]
+    xhatts[tk] = xhatts[tk] + K * ets[tk]
+    Ptilts[tk] = (1 - K * C) * Ptilts[tk]
     xtilts[tk] = xts[tk] - xhatts[tk]
 
 innov = class_innov.Innov(tts, ets)
