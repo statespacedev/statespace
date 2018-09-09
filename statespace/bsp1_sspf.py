@@ -1,7 +1,7 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
 import math
-import class_residuals
+import class_innov
 
 nsamp = 250
 n = 150
@@ -62,7 +62,7 @@ def main():
         ets[tk] = yts[tk] - yhatts[tk]
         xits[tk, :] = resample(xits[tk, :], Wits[tk, :])
 
-    innov = class_residuals.Residuals(tts, ets)
+    innov = class_innov.Innov(tts, ets)
     innov.standard(tts, xhatts, xtilts, yhatts)
 
 def resample(xi, Wi):

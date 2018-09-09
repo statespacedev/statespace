@@ -1,7 +1,7 @@
 # extended bayesian processor, extended kalman filter, XBP, EKF
 import numpy as np
 import util, math
-import class_residuals
+import class_innov
 
 n = 150
 deltat = .01
@@ -61,7 +61,7 @@ for tk in range(1, n):
     Ptilts[tk] = (1 - Kts[tk] * C) * Ptilts[tk]
     xtilts[tk] = xts[tk] - xhatts[tk]
 
-innov = class_residuals.Residuals(tts, ets)
+innov = class_innov.Innov(tts, ets)
 innov.standard(tts, xhatts, xtilts, yhatts)
 
 

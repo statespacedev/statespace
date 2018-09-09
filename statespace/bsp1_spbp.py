@@ -1,7 +1,7 @@
 # sigma-point bayesian processor, unscented kalman filter, SPBP, UKF
 import numpy as np
 import math
-import class_residuals
+import class_innov
 
 n = 150
 deltat = .01
@@ -106,7 +106,7 @@ def main():
         Ptilts[tk] = Ptilts[tk] - Kts[tk] * Rksiksits[tk] * Kts[tk]
         xtilts[tk] = xts[tk] - xhatts[tk]
 
-    innov = class_residuals.Residuals(tts, ets)
+    innov = class_innov.Innov(tts, ets)
     innov.standard(tts, xhatts, xtilts, yhatts)
 
 if __name__ == "__main__":

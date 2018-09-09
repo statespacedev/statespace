@@ -1,7 +1,7 @@
 # linearized bayesian processor, linearized kalman filter, LZ-BP
 import numpy as np
 import util, math
-import class_residuals
+import class_innov
 
 n = 150
 deltat = .01
@@ -66,7 +66,7 @@ def main():
         Ptilts[tk] = (1 - Kts[tk] * C(xrefts[tk])) * Ptilts[tk]
         xtilts[tk] = xts[tk] - xhatts[tk]
 
-    innov = class_residuals.Residuals(tts, ets)
+    innov = class_innov.Innov(tts, ets)
     innov.standard(tts, xhatts, xtilts, yhatts)
 
 if __name__ == "__main__":

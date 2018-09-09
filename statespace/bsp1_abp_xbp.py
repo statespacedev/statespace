@@ -2,7 +2,7 @@
 import numpy as np
 import scipy.linalg as la
 import util, math
-import class_residuals
+import class_innov
 
 n = 1500
 deltat = .01
@@ -38,6 +38,7 @@ Ptilts = np.zeros([n, 3, 3])
 Ptilts[0, :, :] = 100. * np.eye(3)
 xtilts = np.zeros([n, 3])
 xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
+U, D = util.UD(Ptilts[0, :, :])
 
 tk = 0
 yhatts = np.zeros(n)
@@ -50,7 +51,7 @@ C = fC(xhatts[tk, :])
 Reets = np.zeros(n)
 Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
 
-def ver1(tk):
+def ver1(tk, U, D):
     xhatts[tk, :] = fx(xhatts[tk-1, :], 0)
     Ptilts[tk, :, :] = fA(xhatts[tk-1, :]) @ Ptilts[tk-1, :, :] @ fA(xhatts[tk-1, :]).T + Rww
     yhatts[tk] = fy(xhatts[tk, :], 0)
@@ -62,54 +63,18 @@ def ver1(tk):
     Ptilts[tk, :, :] = (np.eye(3) - K @ C) @ Ptilts[tk, :, :]
     xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
 
-def ver2(tk):
-    xhatts[tk, :] = fx(xhatts[tk-1, :], 0)
-    P = Ptilts[tk-1, :, :]
-    #P = fA(xhatts[tk-1, :]) @ P @ fA(xhatts[tk-1, :]).T + Rww
-    yhatts[tk] = fy(xhatts[tk, :], 0)
+def ver2(tk, U, D):
+    x1, U, D = util.thornton(xin=xhatts[tk-1, :], Phi=fA(xhatts[tk-1, :]), Uin=U, Din=D, Gin=np.eye(3), Q=Rww)
+    x2, U, D = util.bierman1(z=yts[tk], R=Rvv, H=fC(x1), xin=x1, Uin=U, Din=D)
+    yhatts[tk] = fy(x1, 0)
     ets[tk] = yts[tk] - yhatts[tk]
-    C = fC(xhatts[tk, :])
-    z = yhatts[tk]
-    R = Rvv
-    H = C
-    tmp, L, U = la.lu(P)
-    D = np.diag(np.diag(U))
-    U /= np.diag(U)[:, None]
-    x = xhatts[tk, :]
-    v = np.zeros(3)
-    w = np.zeros(3)
-    delta = z
-    for j in range(3):
-        delta = delta - H[j] * x[j]
-        v[j] = H[j]
-        if not j == 0:
-            for i in range(j):
-                v[j] = v[j] + U[i, j] * H[i]
-    sigma = R
-    for j in range(3):
-        nu = v[j]
-        v[j] = v[j] * D[j, j]
-        w[j] = nu
-        if not j == 0:
-            for i in range(j):
-                tau = U[i, j] * nu
-                U[i, j] = U[i, j] - nu * w[i] / sigma
-                w[i] = w[i] + tau
-        D[j, j] = D[j, j] * sigma
-        sigma = sigma + nu * v[j]
-        D[j, j] = D[j, j] * sigma
-    epsilon = delta / sigma
-    for i in range(3):
-        x[i] = x[i] + v[i] * epsilon
-    xhatts[tk, :] = x
-    P = U @ D @ U.T
-    Ptilts[tk, :, :] = P
+    xhatts[tk, :] = x2
     pass
 
 for tk in range(1, n):
-    ver2(tk)
+    ver2(tk, U, D)
 
-innov = class_residuals.Residuals(tts, ets)
+innov = class_innov.Innov(tts, ets)
 innov.abp(tts, xhatts, xtilts, yhatts)
 
 
