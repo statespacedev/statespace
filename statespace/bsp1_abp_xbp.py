@@ -1,6 +1,5 @@
-# adaptive bayesian processor, joint state/parametric processor
+# adaptive bayesian processor, joint state/parametric processor, adaptive extended kalman filter
 import numpy as np
-import scipy.linalg as la
 import util, math
 import class_innov
 
@@ -51,28 +50,25 @@ C = fC(xhatts[tk, :])
 Reets = np.zeros(n)
 Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
 
-def ver1(tk, U, D):
-    xhatts[tk, :] = fx(xhatts[tk-1, :], 0)
-    Ptilts[tk, :, :] = fA(xhatts[tk-1, :]) @ Ptilts[tk-1, :, :] @ fA(xhatts[tk-1, :]).T + Rww
-    yhatts[tk] = fy(xhatts[tk, :], 0)
-    ets[tk] = yts[tk] - yhatts[tk]
-    C = fC(xhatts[tk, :])
-    Reets[tk] = C @ Ptilts[tk, :, :] @ C.T + Rvv
-    K = Ptilts[tk, :, :] @ C.T / Reets[tk]
-    xhatts[tk, :] = xhatts[tk, :] + K * ets[tk]
-    Ptilts[tk, :, :] = (np.eye(3) - K @ C) @ Ptilts[tk, :, :]
-    xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
-
-def ver2(tk, U, D):
-    x1, U, D = util.thornton(xin=xhatts[tk-1, :], Phi=fA(xhatts[tk-1, :]), Uin=U, Din=D, Gin=np.eye(3), Q=Rww)
-    x2, U, D = util.bierman1(z=yts[tk], R=Rvv, H=fC(x1), xin=x1, Uin=U, Din=D)
-    yhatts[tk] = fy(x1, 0)
-    ets[tk] = yts[tk] - yhatts[tk]
-    xhatts[tk, :] = x2
-    pass
-
+mode = 1
 for tk in range(1, n):
-    ver2(tk, U, D)
+    if mode == 0:
+        xhatts[tk, :] = fx(xhatts[tk-1, :], 0)
+        Ptilts[tk, :, :] = fA(xhatts[tk-1, :]) @ Ptilts[tk-1, :, :] @ fA(xhatts[tk-1, :]).T + Rww
+        yhatts[tk] = fy(xhatts[tk, :], 0)
+        ets[tk] = yts[tk] - yhatts[tk]
+        C = fC(xhatts[tk, :])
+        Reets[tk] = C @ Ptilts[tk, :, :] @ C.T + Rvv
+        K = Ptilts[tk, :, :] @ C.T / Reets[tk]
+        xhatts[tk, :] = xhatts[tk, :] + K * ets[tk]
+        Ptilts[tk, :, :] = (np.eye(3) - K @ C) @ Ptilts[tk, :, :]
+    elif mode == 1:
+        x, U, D = util.thornton(xin=xhatts[tk-1, :], Phi=fA(xhatts[tk-1, :]), Uin=U, Din=D, Gin=np.eye(3), Q=Rww)
+        yhatts[tk] = fy(x, 0)
+        ets[tk] = yts[tk] - yhatts[tk]
+        x, U, D = util.bierman(z=ets[tk], R=Rvv, H=fC(x), xin=x, Uin=U, Din=D)
+        xhatts[tk, :] = x
+    xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
 
 innov = class_innov.Innov(tts, ets)
 innov.abp(tts, xhatts, xtilts, yhatts)

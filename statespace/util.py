@@ -47,11 +47,11 @@ def thornton(xin, Phi, Uin, Din, Gin, Q):
                 G[j,k] = G[j,k] - U[j,i] * G[i,k]
     return x, U, D
 
-def bierman1(z, R, H, xin, Uin, Din):
+def bierman(z, R, H, xin, Uin, Din):
     x, U, D = xin, Uin, Din
     a = U.T @ H.T
     b = D @ a
-    dz = z - H @ xin
+    dz = z # z - H @ xin
     alpha = R
     gamma = 1 / alpha
     for j in range(3):
