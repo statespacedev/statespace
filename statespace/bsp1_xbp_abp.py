@@ -2,6 +2,7 @@
 import numpy as np
 import util, math
 import class_innov
+import scipy.linalg as la
 
 n = 1500
 deltat = .01
@@ -52,9 +53,10 @@ Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
 
 mode = 1
 for tk in range(1, n):
+    Phi = fA(fx(xhatts[tk - 1, :], 0))
     if mode == 0:
-        xhatts[tk, :] = fx(xhatts[tk-1, :], 0)
-        Ptilts[tk, :, :] = fA(xhatts[tk-1, :]) @ Ptilts[tk-1, :, :] @ fA(xhatts[tk-1, :]).T + Rww
+        xhatts[tk, :] = Phi @ xhatts[tk-1, :]
+        Ptilts[tk, :, :] = Phi @ Ptilts[tk-1, :, :] @ Phi.T + Rww
         yhatts[tk] = fy(xhatts[tk, :], 0)
         ets[tk] = yts[tk] - yhatts[tk]
         C = fC(xhatts[tk, :])
@@ -63,7 +65,7 @@ for tk in range(1, n):
         xhatts[tk, :] = xhatts[tk, :] + K * ets[tk]
         Ptilts[tk, :, :] = (np.eye(3) - K @ C) @ Ptilts[tk, :, :]
     elif mode == 1:
-        x, U, D = util.thornton(xin=xhatts[tk-1, :], Phi=fA(xhatts[tk-1, :]), Uin=U, Din=D, Gin=np.eye(3), Q=Rww)
+        x, U, D = util.thornton(xin=xhatts[tk-1, :], Phi=Phi, Uin=U, Din=D, Gin=np.eye(3), Q=Rww)
         yhatts[tk] = fy(x, 0)
         ets[tk] = yts[tk] - yhatts[tk]
         x, U, D = util.bierman(z=ets[tk], R=Rvv, H=fC(x), xin=x, Uin=U, Din=D)
