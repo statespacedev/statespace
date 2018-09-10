@@ -51,7 +51,7 @@ C = fC(xhatts[tk, :])
 Reets = np.zeros(n)
 Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
 
-mode = 1
+mode = 0
 for tk in range(1, n):
     Phi = fA(fx(xhatts[tk - 1, :], 0))
     if mode == 0:

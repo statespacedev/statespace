@@ -32,19 +32,19 @@ def thornton(xin, Phi, Uin, Din, Gin, Q):
             if (j <= r-1):
                 sigma = sigma + G[i,j]**2 + Q[j,j]
         D[i,i] = sigma
-        if i == 0:
-            continue
-        for j in range(i):
-            sigma = 0
-            for k in range(n):
-                sigma = sigma + PhiU[i,k] * Din[k,k] * PhiU[j,k]
-            for k in range(r):
-                sigma = sigma + G[i,k] * Q[k,k] * G[j,k]
-            U[j,i] = sigma / D[i,i]
-            for k in range(n):
-                PhiU[j,k] = PhiU[j,k] - U[j,i] * PhiU[i,k]
-            for k in range(r):
-                G[j,k] = G[j,k] - U[j,i] * G[i,k]
+        ilim = i-1
+        if not ilim < 0:
+            for j in range(ilim):
+                sigma = 0
+                for k in range(n):
+                    sigma = sigma + PhiU[i,k] * Din[k,k] * PhiU[j,k]
+                for k in range(r):
+                    sigma = sigma + G[i,k] * Q[k,k] * G[j,k]
+                U[j,i] = sigma / D[i,i]
+                for k in range(n):
+                    PhiU[j,k] = PhiU[j,k] - U[j,i] * PhiU[i,k]
+                for k in range(r):
+                    G[j,k] = G[j,k] - U[j,i] * G[i,k]
     return x, U, D
 
 def bierman(z, R, H, xin, Uin, Din):
@@ -60,43 +60,14 @@ def bierman(z, R, H, xin, Uin, Din):
         lamda = -a[j] * gamma
         gamma = 1 / alpha
         D[j, j] = beta * gamma * D[j, j]
-        if j == 0:
-            continue
-        for i in range(j):
-            beta = U[i, j]
-            U[i, j] = beta + b[i] * lamda
-            b[i] = b[i] + b[j] * beta
+        jlim = j-1
+        if not jlim < 0:
+            for i in range(jlim):
+                beta = U[i, j]
+                U[i, j] = beta + b[i] * lamda
+                b[i] = b[i] + b[j] * beta
     dzs = gamma * dz
     x = x + dzs * b
-    return x, U, D
-
-def bierman2(z, R, H, xin, Uin, Din):
-    x, U, D = xin, Uin, Din
-    v = np.zeros(3)
-    w = np.zeros(3)
-    delta = z
-    for j in range(3):
-        delta = delta - H[j] * x[j]
-        v[j] = H[j]
-        if not j == 0:
-            for i in range(j):
-                v[j] = v[j] + U[i, j] * H[i]
-    sigma = R
-    for j in range(3):
-        nu = v[j]
-        v[j] = v[j] * D[j, j]
-        w[j] = nu
-        if not j == 0:
-            for i in range(j):
-                tau = U[i, j] * nu
-                U[i, j] = U[i, j] - nu * w[i] / sigma
-                w[i] = w[i] + tau
-        D[j, j] = D[j, j] * sigma
-        sigma = sigma + nu * v[j]
-        D[j, j] = D[j, j] * sigma
-    epsilon = delta / sigma
-    for i in range(3):
-        x[i] = x[i] + v[i] * epsilon
     return x, U, D
 
 def div0(a, b):

@@ -53,18 +53,18 @@ class Innov():
         plt.show()
 
     def abp(self, tts, xhatts, xtilts, yhatts):
-        lw = 1
+        def tsplot(x, y):
+            plt.plot(x, y, marker='o', markersize=1, linewidth=0)
         plt.subplot(3, 2, 1)
-        plt.plot(tts, xhatts[:, 0], linewidth=lw)
+        tsplot(tts, xhatts[:, 0])
         plt.subplot(3, 2, 2)
-        plt.plot(tts, xhatts[:, 1], linewidth=lw)
+        tsplot(tts, xhatts[:, 1])
         plt.subplot(3, 2, 3)
-        plt.plot(tts, xhatts[:, 2], linewidth=lw)
-
+        tsplot(tts, xhatts[:, 2])
         plt.subplot(3, 2, 4)
-        plt.plot(tts, self.ets, linewidth=lw)
+        tsplot(tts, self.ets)
         plt.subplot(3, 2, 5)
-        plt.plot(tts, yhatts, linewidth=lw)
+        tsplot(tts, yhatts)
         plt.subplot(3, 2, 6)
-        plt.plot(tts, self.Rhatee, linewidth=lw)
+        tsplot(tts, self.Rhatee)
         plt.show()
