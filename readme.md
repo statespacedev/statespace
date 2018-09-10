@@ -10,5 +10,5 @@ risk and the cost of errors
 
 demonstration of covariance numerical instability using just the jazwinski tracking problem with two additional states for model-parameter estimation - first plot is direct ekf, second plot is ud factorized ekf
 
-![direct](https://github.com/noahhsmith/statespace/blob/master/docs/images/direct.png) 
-![ud](https://github.com/noahhsmith/statespace/blob/master/docs/images/udfactoring.png)
+![direct](docs/images/direct.png) 
+![ud](docs/images/udfactoring.png)
