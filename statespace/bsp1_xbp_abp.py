@@ -26,8 +26,10 @@ yts[0] = fy(xts[0, :], vts[0])
 for tk in range(1, n):
     yts[tk] = fy(xts[tk, :], vts[tk])
 
+tk = 0
+
 xhatts = np.zeros([n, 3])
-xhatts[0, :] = [2., .055, .044]
+xhatts[tk, :] = [2., .055, .044]
 def fA(x):
     A = np.eye(3)
     A[0, 0] = 1 - x[1] * deltat + 2 * x[2] * deltat * x[0]
@@ -35,12 +37,11 @@ def fA(x):
     A[0, 2] = deltat * x[0]**2
     return A
 Ptilts = np.zeros([n, 3, 3])
-Ptilts[0, :, :] = 100. * np.eye(3)
+Ptilts[tk, :, :] = 100. * np.eye(3)
 xtilts = np.zeros([n, 3])
 xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
-U, D = util.UD(Ptilts[0, :, :])
+U, D = util.UD(Ptilts[tk, :, :])
 
-tk = 0
 yhatts = np.zeros(n)
 yhatts[tk] = fy(xhatts[tk, :], 0)
 ets = np.zeros(n)
@@ -51,7 +52,7 @@ C = fC(xhatts[tk, :])
 Reets = np.zeros(n)
 Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
 
-mode = 0
+mode = 1
 for tk in range(1, n):
     Phi = fA(fx(xhatts[tk - 1, :], 0))
     if mode == 0:
