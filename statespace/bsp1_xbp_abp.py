@@ -37,7 +37,7 @@ def fA(x):
     A[0, 1] = -deltat * x[0]
     A[0, 2] = deltat * x[0]**2
     return A
-for tk in range(1, 2):
+for tk in range(1, 2): # test
     Phi = fA(fx(xhatts[tk-1, :], 0))
     xhat = Phi @ xhatts[tk-1, :]
     pass

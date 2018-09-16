@@ -35,19 +35,25 @@ xhatts[tk, :] = [2., .055, .044]
 Ptilts = np.zeros([n, 3, 3])
 Ptilts[tk, :, :] = 100. * np.eye(3)
 def fX(x, P):
-    X = np.zeros([7, 3])
-    X[0, :] = x
-    X[1, :] = x + np.array([math.sqrt((nx + kappa) * P[0, 0]), 0, 0])
-    X[2, :] = x + np.array([0, math.sqrt((nx + kappa) * P[1, 1]), 0])
-    X[3, :] = x + np.array([0, 0, math.sqrt((nx + kappa) * P[2, 2])])
-    X[4, :] = x - np.array([math.sqrt((nx + kappa) * P[0, 0]), 0, 0])
-    X[5, :] = x - np.array([0, math.sqrt((nx + kappa) * P[1, 1]), 0])
-    X[6, :] = x - np.array([0, 0, math.sqrt((nx + kappa) * P[2, 2])])
+    X = np.zeros([3, 7])
+    X[:, 0] = x
+    X[:, 1] = x + np.array([math.sqrt((nx + kappa) * P[0, 0]), 0, 0])
+    X[:, 2] = x + np.array([0, math.sqrt((nx + kappa) * P[1, 1]), 0])
+    X[:, 3] = x + np.array([0, 0, math.sqrt((nx + kappa) * P[2, 2])])
+    X[:, 4] = x - np.array([math.sqrt((nx + kappa) * P[0, 0]), 0, 0])
+    X[:, 5] = x - np.array([0, math.sqrt((nx + kappa) * P[1, 1]), 0])
+    X[:, 6] = x - np.array([0, 0, math.sqrt((nx + kappa) * P[2, 2])])
     return X
-for tk in range(1, 2):
-    X = fX(xhatts[tk-1, :], Ptilts[tk-1, :, :])
-    def fa(X):
-        return fx(X, 0)
+def fa(X):
+    for i in range(7):
+        X[:, i] = fx(X[:, i], 0)
+    return X
+for tk in range(1, 2): # test
+    X1 = fX(xhatts[tk-1, :], Ptilts[tk-1, :, :])
+    X2 = fa(X1)
+    xhat = W @ X2.T
+    Xtil = (X2.T - xhat).T
+    pass
     # X = fa(X)
     # xhatts[tk, :] = W @ X
     # Xtil = X - xhatts[tk, :]
