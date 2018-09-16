@@ -40,6 +40,7 @@ def fA(x):
 for tk in range(1, 2): # test
     Phi = fA(fx(xhatts[tk-1, :], 0))
     xhat = Phi @ xhatts[tk-1, :]
+    Ptil = Phi @ Ptilts[tk-1, :, :] @ Phi.T + Rww
     pass
 
 yhatts = np.zeros(n)

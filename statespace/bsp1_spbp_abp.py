@@ -49,15 +49,11 @@ def fa(X):
         X[:, i] = fx(X[:, i], 0)
     return X
 for tk in range(1, 2): # test
-    X1 = fX(xhatts[tk-1, :], Ptilts[tk-1, :, :])
-    X2 = fa(X1)
-    xhat = W @ X2.T
-    Xtil = (X2.T - xhat).T
+    X = fa(fX(xhatts[tk-1, :], Ptilts[tk-1, :, :]))
+    xhat = W @ X.T
+    Xtil = (X.T - xhat).T
+    Ptil = Xtil @ np.diag(W) @ Xtil.T + Rww
     pass
-    # X = fa(X)
-    # xhatts[tk, :] = W @ X
-    # Xtil = X - xhatts[tk, :]
-    # Ptilts[tk, :] = W @ np.power(Xtil, 2) + Rww
 
 # def fXhat(X, Rww):
 #     return [X[0], X[1] + kappa * math.sqrt(Rww), X[2] - kappa * math.sqrt(Rww)]
