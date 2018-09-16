@@ -27,32 +27,33 @@ for tk in range(1, n):
 
 tk = 0
 xhatts = np.zeros([n, 3])
-xhatts[tk, :] = [2., .055, .044]
 Ptilts = np.zeros([n, 3, 3])
-Ptilts[tk, :, :] = 100. * np.eye(3)
-U, D = util.UD(Ptilts[tk, :, :])
+yhatts = np.zeros(n)
+ets = np.zeros(n)
+Reets = np.zeros(n)
+xtilts = np.zeros([n, 3])
+
 def fA(x):
     A = np.eye(3)
     A[0, 0] = 1 - x[1] * deltat + 2 * x[2] * deltat * x[0]
     A[0, 1] = -deltat * x[0]
     A[0, 2] = deltat * x[0]**2
     return A
-for tk in range(1, 2): # test
-    Phi = fA(fx(xhatts[tk-1, :], 0))
-    xhat = Phi @ xhatts[tk-1, :]
-    Ptil = Phi @ Ptilts[tk-1, :, :] @ Phi.T + Rww
+xhatts[tk, :] = [2., .055, .044]
+Ptilts[tk, :, :] = 100. * np.eye(3)
+U, D = util.UD(Ptilts[tk, :, :])
+for tmp in range(1, 2):
+    Phi = fA(fx(xhatts[tmp-1, :], 0))
+    xhat = Phi @ xhatts[tmp-1, :]
+    Ptil = Phi @ Ptilts[tmp-1, :, :] @ Phi.T + Rww
     pass
 
-yhatts = np.zeros(n)
-yhatts[tk] = fy(xhatts[tk, :], 0)
-ets = np.zeros(n)
-ets[tk] = yts[tk] - yhatts[tk]
 def fC(x):
     return np.array([2 * x[0] + 3 * x[0]**2, 0, 0])
+yhatts[tk] = fy(xhatts[tk, :], 0)
+ets[tk] = yts[tk] - yhatts[tk]
 C = fC(xhatts[tk, :])
-Reets = np.zeros(n)
 Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
-xtilts = np.zeros([n, 3])
 xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
 
 mode = 1

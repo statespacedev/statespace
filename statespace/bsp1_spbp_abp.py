@@ -31,9 +31,10 @@ W = np.array([a, b, b, b, b, b, b])
 
 tk = 0
 xhatts = np.zeros([n, 3])
-xhatts[tk, :] = [2., .055, .044]
 Ptilts = np.zeros([n, 3, 3])
-Ptilts[tk, :, :] = 100. * np.eye(3)
+yhatts = np.zeros(n)
+ets = np.zeros(n)
+
 def fX(x, P):
     X = np.zeros([3, 7])
     X[:, 0] = x
@@ -48,25 +49,37 @@ def fa(X):
     for i in range(7):
         X[:, i] = fx(X[:, i], 0)
     return X
-for tk in range(1, 2): # test
-    X = fa(fX(xhatts[tk-1, :], Ptilts[tk-1, :, :]))
+xhatts[tk, :] = [2., .055, .044]
+Ptilts[tk, :, :] = 100. * np.eye(3)
+for tmp in range(1, 2):
+    X = fa(fX(xhatts[tmp-1, :], Ptilts[tmp-1, :, :]))
     xhat = W @ X.T
     Xtil = (X.T - xhat).T
     Ptil = Xtil @ np.diag(W) @ Xtil.T + Rww
     pass
 
-# def fXhat(X, Rww):
-#     return [X[0], X[1] + kappa * math.sqrt(Rww), X[2] - kappa * math.sqrt(Rww)]
-# Xhat = X
-# Xtil = Xhat - xhatts[tk, :]
-# def fc(x):
-#     return fy(x, 0)
-# Y = fc(Xhat)
-# yhatts = np.zeros((n,))
-# yhatts[0] = W @ Y
-# ets = np.zeros(n)
-# ets[0] = yts[0] - yhatts[0]
-#
+def fXhat(X, Rww):
+    Xhat = np.zeros([3, 7])
+    Xhat[:, 0] = X[:, 0]
+    Xhat[:, 1] = X[:, 1] + np.array([kappa * math.sqrt(Rww[0, 0]), 0, 0])
+    Xhat[:, 2] = X[:, 2] + np.array([0, kappa * math.sqrt(Rww[1, 1]), 0])
+    Xhat[:, 3] = X[:, 3] + np.array([0, 0, kappa * math.sqrt(Rww[2, 2])])
+    Xhat[:, 4] = X[:, 4] - np.array([kappa * math.sqrt(Rww[0, 0]), 0, 0])
+    Xhat[:, 5] = X[:, 5] - np.array([0, kappa * math.sqrt(Rww[1, 1]), 0])
+    Xhat[:, 6] = X[:, 6] - np.array([0, 0, kappa * math.sqrt(Rww[2, 2])])
+    return Xhat
+def fc(Xhat):
+    Y = np.zeros(7)
+    for i in range(7):
+        Y[i] = fy(Xhat[:, i], 0)
+    return Y
+X = fX(xhatts[tk, :], Ptilts[tk, :, :])
+Xhat = fXhat(X, Rww)
+Y = fc(Xhat)
+yhatts[tk] = W @ Y
+ets[tk] = yts[tk] - yhatts[tk]
+
+pass
 # ksits = np.zeros((n, 3))
 # ksits[0, :] = Yts[0, :] - yhatts[0]
 # Rksiksits = np.zeros((n,))
