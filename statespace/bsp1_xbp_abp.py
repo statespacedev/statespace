@@ -2,7 +2,6 @@
 import numpy as np
 import util, math
 import class_innov
-import scipy.linalg as la
 
 n = 1500
 deltat = .01
@@ -27,19 +26,16 @@ for tk in range(1, n):
     yts[tk] = fy(xts[tk, :], vts[tk])
 
 tk = 0
-
 xhatts = np.zeros([n, 3])
-xhatts[tk, :] = [2., .055, .044]
 def fA(x):
     A = np.eye(3)
     A[0, 0] = 1 - x[1] * deltat + 2 * x[2] * deltat * x[0]
     A[0, 1] = -deltat * x[0]
     A[0, 2] = deltat * x[0]**2
     return A
+xhatts[tk, :] = [2., .055, .044] # Phi @ xhatts[tk-1, :]
 Ptilts = np.zeros([n, 3, 3])
 Ptilts[tk, :, :] = 100. * np.eye(3)
-xtilts = np.zeros([n, 3])
-xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
 U, D = util.UD(Ptilts[tk, :, :])
 
 yhatts = np.zeros(n)
@@ -51,10 +47,12 @@ def fC(x):
 C = fC(xhatts[tk, :])
 Reets = np.zeros(n)
 Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
+xtilts = np.zeros([n, 3])
+xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
 
 mode = 1
 for tk in range(1, n):
-    Phi = fA(fx(xhatts[tk - 1, :], 0))
+    Phi = fA(fx(xhatts[tk-1, :], 0))
     if mode == 0:
         xhatts[tk, :] = Phi @ xhatts[tk-1, :]
         Ptilts[tk, :, :] = Phi @ Ptilts[tk-1, :, :] @ Phi.T + Rww

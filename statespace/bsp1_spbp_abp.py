@@ -25,53 +25,30 @@ yts[0] = fy(xts[0, :], vts[0])
 for tk in range(1, n):
     yts[tk] = fy(xts[tk, :], vts[tk])
 
-tk = 0
+bignsubx, kappa, bk = 3, 1, 4
+W = np.array([kappa / float(bk), .5 / float(bk), .5 / float(bk), .5 / float(bk), .5 / float(bk), .5 / float(bk), .5 / float(bk)])
 
+tk = 0
 xhatts = np.zeros([n, 3])
-xhatts[tk, :] = [2., .055, .044]
+def fa(x):
+    return fx(x, 0)
+xhatts[tk, :] = [2., .055, .044] # fa(xhatts[tk-1,:]
 Ptilts = np.zeros([n, 3, 3])
 Ptilts[tk, :, :] = 100. * np.eye(3)
-xtilts = np.zeros([n, 3])
-xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
-bignsubx = 3
-kappa = 1
-bk = bignsubx + kappa
-W = np.zeros((3,))
-W[:] = [kappa / float(bk), .5 / float(bk), .5 / float(bk)]
-Xts = np.zeros((n, 3))
 def fX(xhat, Ptil):
     return [xhat, xhat + math.sqrt(bk * Ptil), xhat - math.sqrt(bk * Ptil)]
-Xts[tk, :] = fX(xhatts[tk, :], Ptilts[tk, :, :])
-Xhatts = np.zeros((n, 3))
-Xhatts[tk, :] = Xts[tk, :]
-Xtilts = np.zeros((n, 3))
-Xtilts[tk, :] = Xts[tk, :] - xhatts[0]
+X = fX(xhatts[tk, :], Ptilts[tk, :, :])
 
-
-vfx = np.vectorize(fx)
-vfy = np.vectorize(fy)
-
-def vfa(vx):
-    return vfx(vx, 0)
-
-def vfc(vx):
-    return vfy(vx, 0)
-
-def vfX(xhat, Ptil):
-    return [xhat, xhat + math.sqrt(bk * Ptil), xhat - math.sqrt(bk * Ptil)]
-
-def Xhat(X, Rww):
+def fXhat(X, Rww):
     return [X[0], X[1] + kappa * math.sqrt(Rww), X[2] - kappa * math.sqrt(Rww)]
-
-
-
-
-
-Yts = np.zeros((n, 3))
-Yts[0, :] = vfc(Xhatts[0, :])
+Xhat = X
+Xtil = Xhat - xhatts[tk, :]
+def fc(x):
+    return fy(x, 0)
+Y = fc(Xhat)
 yhatts = np.zeros((n,))
-yhatts[0] = W @ Yts[0, :]
-ets = np.zeros((n,))
+yhatts[0] = W @ Y
+ets = np.zeros(n)
 ets[0] = yts[0] - yhatts[0]
 
 ksits = np.zeros((n, 3))
@@ -83,6 +60,8 @@ RXtilksits = np.zeros((n,))
 RXtilksits[0] = W @ np.multiply(Xtilts[0, :], ksits[0, :])
 Kts = np.zeros((n,))
 Kts[0] = RXtilksits[0] / Rksiksits[0]
+xtilts = np.zeros([n, 3])
+xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
 
 for tk in range(1, n):
     X = vfX(xhatts[tk-1], Ptilts[tk-1])
