@@ -78,6 +78,22 @@ Xhat = fXhat(X, Rww)
 Y = fc(Xhat)
 yhatts[tk] = W @ Y
 ets[tk] = yts[tk] - yhatts[tk]
+ep = Y - yhatts[tk]
+Repep = ep @ np.diag(W) @ ep.T + Rvv
+for tmp in range(1, 2):
+    X = fa(fX(xhatts[tmp-1, :], Ptilts[tmp-1, :, :]))
+    xhat = W @ X.T
+    Xtil = (X.T - xhat).T
+    Ptil = Xtil @ np.diag(W) @ Xtil.T + Rww
+    X = fX(xhatts[tmp-1, :], Ptilts[tmp-1, :, :])
+    Xhat = fXhat(X, Rww)
+    Y = fc(Xhat)
+    yhat = W @ Y
+    ep = Y - yhat
+    Repep = ep @ np.diag(W) @ ep.T + Rvv
+    Rxtilep = Xtil @ np.diag(W) * ep.T
+    K = Rxtilep / Repep
+    pass
 
 pass
 # ksits = np.zeros((n, 3))
