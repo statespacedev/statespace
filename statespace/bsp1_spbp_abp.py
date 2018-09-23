@@ -3,7 +3,7 @@ import numpy as np
 import math
 import class_innov
 
-n = 150
+n = 15
 deltat = .01
 tts = np.arange(0, n * deltat, deltat)
 
@@ -31,7 +31,7 @@ W = np.array([a, b, b, b, b, b, b])
 
 tk = 0
 xhatts = np.zeros([n, 3])
-Ptilts = np.zeros([n, 3, 3])
+xtilts = np.zeros([n, 3])
 yhatts = np.zeros(n)
 ets = np.zeros(n)
 
@@ -49,14 +49,8 @@ def fa(X):
     for i in range(7):
         X[:, i] = fx(X[:, i], 0)
     return X
-xhatts[tk, :] = [2., .055, .044]
-Ptilts[tk, :, :] = 100. * np.eye(3)
-for tmp in range(1, 2):
-    X = fa(fX(xhatts[tmp-1, :], Ptilts[tmp-1, :, :]))
-    xhat = W @ X.T
-    Xtil = (X.T - xhat).T
-    Ptil = Xtil @ np.diag(W) @ Xtil.T + Rww
-    pass
+xhat = [2., .055, .044]
+Ptil = 100. * np.eye(3)
 
 def fXhat(X, Rww):
     Xhat = np.zeros([3, 7])
@@ -73,63 +67,39 @@ def fc(Xhat):
     for i in range(7):
         Y[i] = fy(Xhat[:, i], 0)
     return Y
-X = fX(xhatts[tk, :], Ptilts[tk, :, :])
+X = fX(xhat, Ptil)
 Xhat = fXhat(X, Rww)
 Y = fc(Xhat)
-yhatts[tk] = W @ Y
-ets[tk] = yts[tk] - yhatts[tk]
-ep = Y - yhatts[tk]
+yhat = W @ Y
+e = yts[tk] - yhat
+ep = Y - yhat
 Repep = ep @ np.diag(W) @ ep.T + Rvv
-for tmp in range(1, 2):
-    X = fa(fX(xhatts[tmp-1, :], Ptilts[tmp-1, :, :]))
+
+xhatts[tk, :] = xhat
+xtilts[tk, :] = xts[tk] - xhat
+yhatts[tk] = yhat
+ets[tk] = e
+for tk in range(1, len(tts)):
+    X = fa(fX(xhat, Ptil))
     xhat = W @ X.T
     Xtil = (X.T - xhat).T
     Ptil = Xtil @ np.diag(W) @ Xtil.T + Rww
-    X = fX(xhatts[tmp-1, :], Ptilts[tmp-1, :, :])
+    X = fX(xhat, Ptil)
     Xhat = fXhat(X, Rww)
     Y = fc(Xhat)
     yhat = W @ Y
+    e = yts[tk] - yhat
     ep = Y - yhat
     Repep = ep @ np.diag(W) @ ep.T + Rvv
-    Rxtilep = Xtil @ np.diag(W) * ep.T
+    Rxtilep =  Xtil @ np.diag(W) @ ep
     K = Rxtilep / Repep
-    pass
+    #xhat = xhat + K * e
+    #Ptil = Ptil - K @ (Repep * K.T)
 
-pass
-# ksits = np.zeros((n, 3))
-# ksits[0, :] = Yts[0, :] - yhatts[0]
-# Rksiksits = np.zeros((n,))
-# Rksiksits[0] = W @ np.power(ksits[0, :], 2) + Rvv
-#
-# RXtilksits = np.zeros((n,))
-# RXtilksits[0] = W @ np.multiply(Xtilts[0, :], ksits[0, :])
-# Kts = np.zeros((n,))
-# Kts[0] = RXtilksits[0] / Rksiksits[0]
-# xtilts = np.zeros([n, 3])
-# xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
-#
-# for tk in range(1, n):
-#     X = vfX(xhatts[tk-1], Ptilts[tk-1])
-#     Xts[tk, :] = vfa(X)
-#     xhatts[tk] = W @ Xts[tk, :]
-#     Xtilts[tk, :] = Xts[tk, :] - xhatts[tk]
-#     Ptilts[tk] = W @ np.power(Xtilts[tk, :], 2) + Rww
-#
-#     Xhatts[tk, :] = Xhat(Xts[tk, :], Rww)
-#
-#     Yts[tk, :] = vfc(Xhatts[tk, :])
-#     yhatts[tk] = W @ Yts[tk, :]
-#     ets[tk] = yts[tk] - yhatts[tk]
-#
-#     ksits[tk, :] = Yts[tk, :] - yhatts[tk]
-#     Rksiksits[tk] = W @ np.power(ksits[tk, :], 2) + Rvv
-#
-#     RXtilksits[tk] = W @ np.multiply(Xtilts[tk, :], ksits[tk, :])
-#     Kts[tk] = RXtilksits[tk] / Rksiksits[tk]
-#
-#     xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
-#     Ptilts[tk] = Ptilts[tk] - Kts[tk] * Rksiksits[tk] * Kts[tk]
-#     xtilts[tk] = xts[tk] - xhatts[tk]
-#
-# innov = class_innov.Innov(tts, ets)
-# innov.standard(tts, xhatts, xtilts, yhatts)
+    xhatts[tk, :] = xhat
+    xtilts[tk, :] = xts[tk] - xhat
+    yhatts[tk] = yhat
+    ets[tk] = e
+
+innov = class_innov.Innov(tts, ets)
+innov.standard(tts, xhatts[:, 0], xtilts[:, 0], yhatts)
