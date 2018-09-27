@@ -3,7 +3,7 @@ import numpy as np
 import math
 import class_innov
 
-n = 15
+n = 150
 deltat = .01
 tts = np.arange(0, n * deltat, deltat)
 
@@ -50,7 +50,7 @@ def fa(X):
         X[:, i] = fx(X[:, i], 0)
     return X
 xhat = [2., .055, .044]
-Ptil = 100. * np.eye(3)
+Ptil = 10. * np.eye(3)
 
 def fXhat(X, Rww):
     Xhat = np.zeros([3, 7])
@@ -102,4 +102,4 @@ for tk in range(1, len(tts)):
     ets[tk] = e
 
 innov = class_innov.Innov(tts, ets)
-innov.standard(tts, xhatts[:, 0], xtilts[:, 0], yhatts)
+innov.abp(tts, xhatts[:, 0], xtilts[:, 0], yhatts)
