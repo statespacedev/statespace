@@ -30,10 +30,6 @@ a, b = kappa/float(nx+kappa), 1/float(2*(nx+kappa))
 W = np.array([a, b, b, b, b, b, b])
 
 tk = 0
-xhatts = np.zeros([n, 3])
-xtilts = np.zeros([n, 3])
-yhatts = np.zeros(n)
-ets = np.zeros(n)
 
 def fX(x, P):
     X = np.zeros([3, 7])
@@ -75,11 +71,12 @@ e = yts[tk] - yhat
 ep = Y - yhat
 Repep = ep @ np.diag(W) @ ep.T + Rvv
 
-xhatts[tk, :] = xhat
-xtilts[tk, :] = xts[tk] - xhat
-yhatts[tk] = yhat
-ets[tk] = e
+xhatts = np.zeros([n, 3])
+xtilts = np.zeros([n, 3])
+yhatts = np.zeros(n)
+ets = np.zeros(n)
 for tk in range(1, len(tts)):
+
     X = fa(fX(xhat, Ptil))
     xhat = W @ X.T
     Xtil = (X.T - xhat).T
@@ -100,6 +97,5 @@ for tk in range(1, len(tts)):
     xtilts[tk, :] = xts[tk] - xhat
     yhatts[tk] = yhat
     ets[tk] = e
-
 innov = class_innov.Innov(tts, ets)
 innov.abp(tts, xhatts, xtilts, yhatts)
