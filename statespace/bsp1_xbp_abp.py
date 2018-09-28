@@ -3,7 +3,7 @@ import numpy as np
 import util, math
 import class_innov
 
-n = 1500
+n = 150
 deltat = .01
 tts = np.arange(0, n * deltat, deltat)
 
