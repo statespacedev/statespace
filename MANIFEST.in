@@ -4,6 +4,7 @@ include MANIFEST.in
 include README.md
 include setup.py
 include requirements.txt
+include version
 
-recursive-include docs *
+recursive-exclude docs *
 recursive-include statespace *
