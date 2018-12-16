@@ -1,10 +1,15 @@
 image: python:3.6-slim
 
 stages:
+  - build
   - deploy
 
-before_script:
-   - pip install twine
+build:
+  stage: build
+  artifacts:
+    paths:
+      - dist/
+  script:
    - python setup.py sdist
 
 deploy_staging:
@@ -12,17 +17,33 @@ deploy_staging:
   variables:
     TWINE_USERNAME: $STAGING_USERNAME
     TWINE_PASSWORD: $STAGING_PASSWORD
-  script:
-    - twine upload --repository-url $PYPRI_REPOSITORY_URL dist/*
+  environment:
+    name: staging
+    url: $PYPRI_REPOSITORY_URL
+  dependencies:
+    - build
+  only:
+    - master
   except:
     - tags
+  script:
+    - pip install twine
+    - twine upload --repository-url $PYPRI_REPOSITORY_URL dist/*
 
 deploy_production:
   stage: deploy
   variables:
     TWINE_USERNAME: $PRODUCTION_USERNAME
     TWINE_PASSWORD: $PRODUCTION_PASSWORD
-  script:
-    - twine upload dist/*
+  environment:
+    name: production
+    url: https://pypi.org/project/statespace/
+  dependencies:
+    - build
   only:
     - tags
+  except:
+    - branches
+  script:
+    - pip install twine
+    - twine upload dist/*
