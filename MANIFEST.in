@@ -1,0 +1,9 @@
+include license.md
+include Makefile
+include MANIFEST.in
+include README.md
+include setup.py
+include requirements.txt
+
+recursive-include docs *
+recursive-include statespace *

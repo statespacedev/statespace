@@ -9,28 +9,14 @@ elif os.environ.get('CI_JOB_ID'):
 with open('requirements.txt') as fin:
     required = fin.read().splitlines()
 
-if version:
-    setuptools.setup(
-        name='statespace',
-        version=version,
-        author='noah smith',
-        author_email='noahhsmith@gmail.com',
-        description='state-space distributions and decisions',
-        url='https://gitlab.com/noahhsmith/statespace',
-        packages=setuptools.find_packages(),
-        entry_points={'console_scripts': ['statespace = statespace.__main__:main']},
-        install_requires=required,
-        zip_safe=False,
-    )
-else:
-    setuptools.setup(
-        name='statespace',
-        author='noah smith',
-        author_email='noahhsmith@gmail.com',
-        description='state-space distributions and decisions',
-        url='https://gitlab.com/noahhsmith/statespace',
-        packages=setuptools.find_packages(),
-        entry_points={'console_scripts': ['statespace = statespace.__main__:main']},
-        install_requires=required,
-        zip_safe=False,
-    )
+setuptools.setup(
+    name='statespace',
+    version=version,
+    author='noah smith',
+    author_email='noahhsmith@gmail.com',
+    description='state-space distributions and decisions',
+    url='https://gitlab.com/noahhsmith/statespace',
+    packages=setuptools.find_packages(),
+    entry_points={'console_scripts': ['statespace = statespace.__main__:main']},
+    install_requires=required,
+)
