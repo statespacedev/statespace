@@ -2,8 +2,10 @@ import setuptools, os
 
 if os.environ.get('CI_COMMIT_TAG'):
     version = os.environ['CI_COMMIT_TAG']
-else:
+elif os.environ['CI_JOB_ID']:
     version = os.environ['CI_JOB_ID']
+else:
+    version = 'latest'
 
 setuptools.setup(
     name='statespace',
