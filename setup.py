@@ -5,13 +5,13 @@ with open('readme.md', 'r') as fh:
 
 setuptools.setup(
     name='statespace',
-    version='2018.2.1',
+    version='2018.3.1',
     author='noah smith',
     author_email='noahhsmith@gmail.com',
     description='state-space distributions and decisions',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/noahhsmith/statespace',
+    url='https://gitlab.com/noahhsmith/statespace',
     packages=setuptools.find_packages(),
     entry_points={
         'console_scripts': [
