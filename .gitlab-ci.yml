@@ -19,7 +19,7 @@ deploy_staging:
     TWINE_PASSWORD: $STAGING_PASSWORD
   environment:
     name: staging
-    url: $PYPRI_REPOSITORY_URL
+    url: $TESTPYPI_URL
   dependencies:
     - build
   only:
