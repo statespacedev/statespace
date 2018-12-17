@@ -1,3 +1,19 @@
+uncertainty, confidence, knowledge
+
+their evolution with time and various processes, including noise and observations
+
+risk and the cost of errors
+
+181216
+
+testing gitlab
+
+180910
+
+demonstration of covariance numerical instability using just the jazwinski tracking problem with two additional states for model-parameter estimation - first plot is direct ekf, second plot is ud factorized ekf
+
+![direct](images/direct.png) 
+![ud](images/udfactoring.png)
 
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 

@@ -1,18 +1,13 @@
-uncertainty, confidence, knowledge
 
-their evolution with time and various processes, including noise and observations
+    ~/statespace$ venv/bin/python -m statespace -h
+    usage: statespace [-h] [--lzbp] [--xbp] [--spbp] [--sspf] [--abp]
+    
+    optional arguments:
+      -h, --help  show this help message and exit
+      --lzbp      linearized bayesian processor, linearized kalman filter
+      --xbp       extended bayesian processor, extended kalman filter
+      --spbp      sigma-point bayesian processor, unscented kalman filter
+      --sspf      state space particle filter, sequential monte carlo processor
+      --abp       adaptive bayesian processors, joint bayesian state/parameteric
+                  processors
 
-risk and the cost of errors
-
-[references](http://statespace.icu/docs/references), [help](https://github.com/noahhsmith/statespace/tree/master/statespace)
-
-181216
-
-testing gitlab
-
-180910
-
-demonstration of covariance numerical instability using just the jazwinski tracking problem with two additional states for model-parameter estimation - first plot is direct ekf, second plot is ud factorized ekf
-
-![direct](docs/images/direct.png) 
-![ud](docs/images/udfactoring.png)
