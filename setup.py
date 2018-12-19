@@ -15,6 +15,8 @@ if os.path.exists('version'):
 
 with open('requirements.txt') as fin:
     required = fin.read().splitlines()
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
 
 setuptools.setup(
     name='statespace',
@@ -22,6 +24,8 @@ setuptools.setup(
     author='noah smith',
     author_email='noahhsmith@gmail.com',
     description='state-space distributions and decisions',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://gitlab.com/noahhsmith/statespace',
     packages=setuptools.find_packages(),
     entry_points={'console_scripts': ['statespace = statespace.__main__:main']},
