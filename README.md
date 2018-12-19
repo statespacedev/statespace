@@ -1,4 +1,4 @@
-<img src="https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/udfactoring.png" align="center" width="200" height="200"/>
+<img src="https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/udfactoring.png" align="center" width="300" height="300"/>
 
 uncertainty, confidence, knowledge
 
