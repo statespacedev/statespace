@@ -1,5 +1,4 @@
 include license.md
-include Makefile
 include MANIFEST.in
 include README.md
 include setup.py
