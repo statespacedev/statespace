@@ -1,4 +1,4 @@
-<img src="https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/ekf.png" align="center" width="300" height="300"/>
+<img src="https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/ekf.png" align="center"/>
 
 [notes](https://gitlab.com/noahhsmith/statespace/blob/master/docs/readme.md)
 
