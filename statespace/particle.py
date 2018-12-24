@@ -67,7 +67,7 @@ class Particle():
             xits[tk, :] = Particle.resample(xits[tk, :], Wits[tk, :])
 
         innov = Innov(tts, ets)
-        innov.standard(tts, xhatts, xtilts, yhatts)
+        innov.plot_standard(tts, xhatts, xtilts, yhatts)
 
     @staticmethod
     def resample(xi, Wi):

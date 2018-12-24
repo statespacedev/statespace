@@ -9,27 +9,23 @@ class Classical():
     def sim1_linearized(self):
         from sim import Sim1
         sim = Sim1()
-        dt = sim.dt
-        xref = 2.
-        xhat = 2.2
-        Ptil = .01
-        def A(x): return 1 - .05 * dt + .08 * dt * x
-        def C(x): return 2 * x + 3 * x ** 2
+        dt, xref, xhat, Ptil = sim.dt, 2., 2.2, .01
+        def A(x): return 1 - .05*dt + .08*dt*x
+        def C(x): return 2*x + 3*x**2
         for step in sim.steps():
             xhat = ((1-.05*dt)*xref + .04*dt*xref**2) + A(xref) * (xhat - xref)
             Ptil = A(xref)**2 * Ptil
             xref = 2. + .067 * step[0]
-            Ree = C(xhat)**2 * Ptil + sim.Rvv
-            K = Ptil * C(xref) / Ree
+            Ree = C(xhat)**2*Ptil + sim.Rvv
+            K = Ptil*C(xref)/Ree
             yhat = (xref**2 + xref**3) + C(xref) * (xhat - xref)
             e = step[2] - yhat
-            xhat = xhat + K * e
-            Ptil = (1 - K * C(xref)) * Ptil
+            xhat = xhat + K*e
+            Ptil = (1 - K*C(xref)) * Ptil
             xtil = step[1] - xhat
-            self.log.append([step[0], xhat, yhat, e, xtil])
-        log = np.asarray(self.log)
-        innov = Innov(log[:,0], log[:,3])
-        innov.standard(log[:,0], log[:,1], log[:,4], log[:,2])
+            self.log.append([step[0], xhat, yhat, xtil, e])
+        innov = Innov(self.log)
+        innov.plot_standard()
 
     def xbp1(self):
         n = 150
@@ -88,7 +84,7 @@ class Classical():
             xtilts[tk] = xts[tk] - xhatts[tk]
 
         innov = Innov(tts, ets)
-        innov.standard(tts, xhatts, xtilts, yhatts)
+        innov.plot_standard(tts, xhatts, xtilts, yhatts)
 
     def xbp2(self):
         n = 150

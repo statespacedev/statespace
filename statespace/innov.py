@@ -3,11 +3,12 @@ import matplotlib.pyplot as plt
 import math
 
 class Innov():
-    def __init__(self, tts, ets):
-        self.tts = tts
-        self.ets = ets
+    def __init__(self, log):
+        self.log = np.asarray(log)
+        self.tts = self.log[:,0]
+        self.ets = self.log[:,4]
         self.zmw()
-        return
+        self.lw = 1
 
     def autocorr1(self, x):
         n = x.size
@@ -38,18 +39,12 @@ class Innov():
     def wssr(self):
         return
 
-    def standard(self, tts, xhatts, xtilts, yhatts):
-        lw = 1
-        plt.subplot(3, 2, 1)
-        plt.plot(tts, xhatts, linewidth=lw)
-        plt.subplot(3, 2, 2)
-        plt.plot(tts, xtilts, linewidth=lw)
-        plt.subplot(3, 2, 3)
-        plt.plot(tts, yhatts, linewidth=lw)
-        plt.subplot(3, 2, 4)
-        plt.plot(tts, self.ets, linewidth=lw)
-        plt.subplot(3, 2, 5)
-        plt.plot(tts, self.Rhatee, linewidth=lw)
+    def plot_standard(self):
+        plt.subplot(3, 2, 1), plt.plot(self.tts, self.log[:,1], linewidth=self.lw)
+        plt.subplot(3, 2, 2), plt.plot(self.tts, self.log[:,3], linewidth=self.lw)
+        plt.subplot(3, 2, 3), plt.plot(self.tts, self.log[:,2], linewidth=self.lw)
+        plt.subplot(3, 2, 4), plt.plot(self.tts, self.log[:,4], linewidth=self.lw)
+        plt.subplot(3, 2, 5), plt.plot(self.tts, self.Rhatee, linewidth=self.lw)
         plt.show()
 
     def abp(self, tts, xhatts, xtilts, yhatts):

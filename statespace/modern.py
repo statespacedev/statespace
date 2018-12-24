@@ -111,7 +111,7 @@ class Modern():
             xtilts[tk] = xts[tk] - xhatts[tk]
 
         innov = Innov(tts, ets)
-        innov.standard(tts, xhatts, xtilts, yhatts)
+        innov.plot_standard(tts, xhatts, xtilts, yhatts)
 
     def spbp2(self):
         n = 150
