@@ -31,20 +31,17 @@ class Innov():
         self.iszeromean = True
         if abs(self.mhate) > self.tau:
             self.iszeromean = False
-        test1 = self.autocorr1(self.ets)
-        #test2 = self.autocorr2(self.ets)
-        self.Rhatee = test1
-        return self.Rhatee
+        return self.autocorr1(self.ets)
 
     def wssr(self):
         return
 
     def plot_standard(self):
-        plt.subplot(3, 2, 1), plt.plot(self.tts, self.log[:,1], linewidth=self.lw)
-        plt.subplot(3, 2, 2), plt.plot(self.tts, self.log[:,3], linewidth=self.lw)
-        plt.subplot(3, 2, 3), plt.plot(self.tts, self.log[:,2], linewidth=self.lw)
-        plt.subplot(3, 2, 4), plt.plot(self.tts, self.log[:,4], linewidth=self.lw)
-        plt.subplot(3, 2, 5), plt.plot(self.tts, self.Rhatee, linewidth=self.lw)
+        plt.subplot(3, 2, 1), plt.plot(self.tts, self.log[:,1], linewidth=self.lw), plt.ylabel('xhat')
+        plt.subplot(3, 2, 2), plt.plot(self.tts, self.log[:,3], linewidth=self.lw), plt.ylabel('err')
+        plt.subplot(3, 2, 3), plt.plot(self.tts, self.log[:,2], linewidth=self.lw), plt.ylabel('yhat')
+        plt.subplot(3, 2, 4), plt.plot(self.tts, self.log[:,4], linewidth=self.lw), plt.ylabel('innov')
+        plt.subplot(3, 2, 5), plt.plot(self.tts, self.autocorr1(self.ets), linewidth=self.lw), plt.ylabel('autocorr')
         plt.show()
 
     def abp(self, tts, xhatts, xtilts, yhatts):

@@ -6,7 +6,7 @@ class Sim1():
         self.tsteps = 151
         self.dt = .01
         self.x = 2.
-        self.Rww = 0
+        self.Rww = .000001
         self.Rvv = .09
         self.log = []
 
@@ -18,7 +18,6 @@ class Sim1():
             self.x = (1 - .05 * self.dt) * self.x + (.04 * self.dt) * self.x**2 + w
             self.y = self.x**2 + self.x**3 + v
             self.log.append([tsec, self.x, self.y])
-            if tsec == 0: continue
             yield (tsec, self.x, self.y)
 
 if __name__ == "__main__":

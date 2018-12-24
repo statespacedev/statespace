@@ -9,82 +9,55 @@ class Classical():
     def sim1_linearized(self):
         from sim import Sim1
         sim = Sim1()
-        dt, xref, xhat, Ptil = sim.dt, 2., 2.2, .01
+        dt = sim.dt
+        def c(x): return x**2 + x**3
         def A(x): return 1 - .05*dt + .08*dt*x
         def C(x): return 2*x + 3*x**2
+        xref, xhat, Ptil = 2., 2.2, .01
         for step in sim.steps():
+            if step[0] == 0:
+                self.log.append([step[0], xhat, c(xhat), step[1]-xhat, step[2]-c(xhat)])
+                continue
             xhat = ((1-.05*dt)*xref + .04*dt*xref**2) + A(xref) * (xhat - xref)
             Ptil = A(xref)**2 * Ptil
             xref = 2. + .067 * step[0]
             Ree = C(xhat)**2*Ptil + sim.Rvv
             K = Ptil*C(xref)/Ree
             yhat = (xref**2 + xref**3) + C(xref) * (xhat - xref)
-            e = step[2] - yhat
+            e = step[2]-yhat
             xhat = xhat + K*e
             Ptil = (1 - K*C(xref)) * Ptil
-            xtil = step[1] - xhat
+            xtil = step[1]-xhat
             self.log.append([step[0], xhat, yhat, xtil, e])
         innov = Innov(self.log)
         innov.plot_standard()
 
-    def xbp1(self):
-        n = 150
-        deltat = .01
-        tts = np.arange(0, n * deltat, deltat)
-
-        Rww = 0
-        wts = math.sqrt(Rww) * np.random.randn(n)
-        xts = np.zeros(n)
-        xts[0] = 2.
-        def fx(x, w):
-            return (1 - .05 * deltat) * x + .04 * deltat * x**2 + w
-        for tk in range(1, n):
-            xts[tk] = fx(xts[tk - 1], wts[tk - 1])
-
-        Rvv = .09
-        vts = math.sqrt(Rvv) * np.random.randn(n)
-        yts = np.zeros(n)
-        def fy(x, v):
-            return x**2 + x**3 + v
-        yts[0] = fy(xts[0], vts[0])
-        for tk in range(1, n):
-            yts[tk] = fy(xts[tk], vts[tk])
-
-        xhatts = np.zeros(n)
-        xhatts[0] = 2.2
-        def fA(x):
-            return 1 - .05 * deltat + .08 * deltat * x
-        Ptilts = np.zeros(n)
-        Ptilts[0] = .01
-        xtilts = np.zeros(n)
-        xtilts[0] = xts[0] - xhatts[0]
-
-        tk = 0
-        yhatts = np.zeros(n)
-        yhatts[tk] = fy(xhatts[tk], 0)
-        ets = np.zeros(n)
-        ets[tk] = yts[tk] - yhatts[tk]
-        def fC(x):
-            return 2 * x + 3 * x**2
-        C = fC(xhatts[tk])
-        Reets = np.zeros(n)
-        Reets[tk] = C * Ptilts[tk] * C + Rvv
-
-        for tk in range(1, n):
-            Phi = fA(fx(xhatts[tk-1], 0))
-            xhatts[tk] = fx(xhatts[tk-1], 0)
-            Ptilts[tk] = Phi * Ptilts[tk-1] * Phi
-            yhatts[tk] = fy(xhatts[tk], 0)
-            ets[tk] = yts[tk] - yhatts[tk]
-            C = fC(xhatts[tk])
-            Reets[tk] = C * Ptilts[tk] * C + Rvv
-            K = Ptilts[tk] * C / Reets[tk]
-            xhatts[tk] = xhatts[tk] + K * ets[tk]
-            Ptilts[tk] = (1 - K * C) * Ptilts[tk]
-            xtilts[tk] = xts[tk] - xhatts[tk]
-
-        innov = Innov(tts, ets)
-        innov.plot_standard(tts, xhatts, xtilts, yhatts)
+    def sim1_extended(self):
+        from sim import Sim1
+        sim = Sim1()
+        dt = sim.dt
+        def a(x): return (1 - .05*dt)*x + (.04*dt)*x**2
+        def c(x): return x**2 + x**3
+        def A(x): return 1 - .05*dt + .08*dt*x
+        def C(x): return 2*x + 3*x**2
+        xref, xhat, Ptil = 2., 2.2, .01
+        for step in sim.steps():
+            if step[0] == 0:
+                self.log.append([step[0], xhat, c(xhat), step[1]-xhat, step[2]-c(xhat)])
+                continue
+            Phi = A(a(xhat))
+            xhat = a(xhat)
+            Ptil = Phi*Ptil*Phi
+            yhat = c(xhat)
+            e = step[2]-yhat
+            Ree = C(xhat)*Ptil*C(xhat) + sim.Rvv
+            K = Ptil*C(xhat)/Ree
+            xhat = xhat + K*e
+            Ptil = (1 - K*C(xhat))*Ptil
+            xtil = step[1]-xhat
+            self.log.append([step[0], xhat, yhat, xtil, e])
+        innov = Innov(self.log)
+        innov.plot_standard()
 
     def xbp2(self):
         n = 150
@@ -246,5 +219,6 @@ class Classical():
 if __name__ == "__main__":
     cl = Classical()
     cl.sim1_linearized()
-    # cl.xbp1()
+    cl = Classical()
+    cl.sim1_extended()
     # cl.xbp2()
