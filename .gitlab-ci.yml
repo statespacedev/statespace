@@ -2,6 +2,7 @@ image: python:3.6-slim
 
 stages:
   - build
+  - test
   - deploy
 
 build:
@@ -11,6 +12,14 @@ build:
       - dist/
   script:
    - python setup.py sdist
+
+test:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - python setup.py install
+    - pytest
 
 deploy_staging:
   stage: deploy

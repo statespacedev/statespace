@@ -72,7 +72,7 @@ def bierman_observational_update(z, R, H, xin, Uin, Din):
     return x, U, D
 
 class Classical():
-    def __init__(self, mode):
+    def __init__(self, mode, plot=True):
         self.log = []
         from sim import Sim1
         s= Sim1()
@@ -85,7 +85,7 @@ class Classical():
             s = Sim1b()
             self.sim1b_adaptive(s)
         innov = Innov(self.log)
-        innov.plot_standard()
+        if plot: innov.plot_standard()
 
     def sim1_linearized(self, s):
         xref, xhat, Ptil = 2., 2.2, .01
