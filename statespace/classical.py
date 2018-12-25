@@ -1,5 +1,4 @@
 import numpy as np
-import math
 from innov import Innov
 
 class Classical():
@@ -15,20 +14,15 @@ class Classical():
         def C(x): return 2*x + 3*x**2
         xref, xhat, Ptil = 2., 2.2, .01
         for step in sim.steps():
-            if step[0] == 0:
-                self.log.append([step[0], xhat, c(xhat), step[1]-xhat, step[2]-c(xhat)])
-                continue
             xhat = ((1-.05*dt)*xref + .04*dt*xref**2) + A(xref) * (xhat - xref)
             Ptil = A(xref)**2 * Ptil
             xref = 2. + .067 * step[0]
             Ree = C(xhat)**2*Ptil + sim.Rvv
             K = Ptil*C(xref)/Ree
             yhat = (xref**2 + xref**3) + C(xref) * (xhat - xref)
-            e = step[2]-yhat
-            xhat = xhat + K*e
+            xhat = xhat + K*(step[2]-yhat)
             Ptil = (1 - K*C(xref)) * Ptil
-            xtil = step[1]-xhat
-            self.log.append([step[0], xhat, yhat, xtil, e])
+            self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
         innov = Innov(self.log)
         innov.plot_standard()
 
@@ -42,106 +36,42 @@ class Classical():
         def C(x): return 2*x + 3*x**2
         xref, xhat, Ptil = 2., 2.2, .01
         for step in sim.steps():
-            if step[0] == 0:
-                self.log.append([step[0], xhat, c(xhat), step[1]-xhat, step[2]-c(xhat)])
-                continue
             Phi = A(a(xhat))
             xhat = a(xhat)
             Ptil = Phi*Ptil*Phi
             yhat = c(xhat)
-            e = step[2]-yhat
             Ree = C(xhat)*Ptil*C(xhat) + sim.Rvv
             K = Ptil*C(xhat)/Ree
-            xhat = xhat + K*e
+            xhat = xhat + K*(step[2]-yhat)
             Ptil = (1 - K*C(xhat))*Ptil
-            xtil = step[1]-xhat
-            self.log.append([step[0], xhat, yhat, xtil, e])
+            self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
         innov = Innov(self.log)
         innov.plot_standard()
 
-    def xbp2(self):
-        n = 150
-        deltat = .01
-        tts = np.arange(0, n * deltat, deltat)
-
-        Rww = np.diag([0, 0, 0])
-        wts = np.multiply(np.random.randn(n, 3), np.sqrt(np.diag(Rww)))
-        xts = np.zeros([n, 3])
-        xts[0, :] = [2., .05, .04]
-
-        def fx(x, w):
-            return np.array([(1 - x[1] * deltat) * x[0] + x[2] * deltat * x[0] ** 2, x[1], x[2]]) + w
-
-        for tk in range(1, n):
-            xts[tk, :] = fx(xts[tk - 1, :], wts[tk - 1, :])
-
-        Rvv = .09
-        vts = math.sqrt(Rvv) * np.random.randn(n)
-        yts = np.zeros(n)
-
-        def fy(x, v):
-            return x[0] ** 2 + x[0] ** 3 + v
-
-        yts[0] = fy(xts[0, :], vts[0])
-        for tk in range(1, n):
-            yts[tk] = fy(xts[tk, :], vts[tk])
-
-        tk = 0
-        xhatts = np.zeros([n, 3])
-        Ptilts = np.zeros([n, 3, 3])
-        yhatts = np.zeros(n)
-        ets = np.zeros(n)
-        Reets = np.zeros(n)
-        xtilts = np.zeros([n, 3])
-
-        def fA(x):
+    def sim1b_adaptive(self):
+        from sim import Sim1b
+        sim = Sim1b()
+        dt = sim.dt
+        def a(x): return np.array([(1 - x[1]*dt)*x[0] + x[2]*dt*x[0]**2, x[1], x[2]])
+        def c(x): return x[0]**2 + x[0]**3
+        def A(x):
             A = np.eye(3)
-            A[0, 0] = 1 - x[1] * deltat + 2 * x[2] * deltat * x[0]
-            A[0, 1] = -deltat * x[0]
-            A[0, 2] = deltat * x[0] ** 2
+            A[0, 0] = 1 - x[1]*dt + 2*x[2]*dt*x[0]
+            A[0, 1] = -dt*x[0]
+            A[0, 2] = dt*x[0]**2
             return A
-
-        xhatts[tk, :] = [2., .055, .044]
-        Ptilts[tk, :, :] = 100. * np.eye(3)
-        U, D = Classical.UD(Ptilts[tk, :, :])
-        for tmp in range(1, 2):
-            Phi = fA(fx(xhatts[tmp - 1, :], 0))
-            xhat = Phi @ xhatts[tmp - 1, :]
-            Ptil = Phi @ Ptilts[tmp - 1, :, :] @ Phi.T + Rww
-            pass
-
-        def fC(x):
-            return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])
-
-        yhatts[tk] = fy(xhatts[tk, :], 0)
-        ets[tk] = yts[tk] - yhatts[tk]
-        C = fC(xhatts[tk, :])
-        Reets[tk] = C @ Ptilts[tk, :, :] @ C + Rvv
-        xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
-
-        mode = 1
-        for tk in range(1, n):
-            Phi = fA(fx(xhatts[tk - 1, :], 0))
-            if mode == 0:
-                xhatts[tk, :] = Phi @ xhatts[tk - 1, :]
-                Ptilts[tk, :, :] = Phi @ Ptilts[tk - 1, :, :] @ Phi.T + Rww
-                yhatts[tk] = fy(xhatts[tk, :], 0)
-                ets[tk] = yts[tk] - yhatts[tk]
-                C = fC(xhatts[tk, :])
-                Reets[tk] = C @ Ptilts[tk, :, :] @ C.T + Rvv
-                K = Ptilts[tk, :, :] @ C.T / Reets[tk]
-                xhatts[tk, :] = xhatts[tk, :] + K * ets[tk]
-                Ptilts[tk, :, :] = (np.eye(3) - K @ C) @ Ptilts[tk, :, :]
-            elif mode == 1:
-                x, U, D = Classical.thornton(xin=xhatts[tk - 1, :], Phi=Phi, Uin=U, Din=D, Gin=np.eye(3), Q=Rww)
-                yhatts[tk] = fy(x, 0)
-                ets[tk] = yts[tk] - yhatts[tk]
-                x, U, D = Classical.bierman(z=ets[tk], R=Rvv, H=fC(x), xin=x, Uin=U, Din=D)
-                xhatts[tk, :] = x
-            xtilts[tk, :] = xts[tk, :] - xhatts[tk, :]
-
-        innov = Innov(tts, ets)
-        innov.abp(tts, xhatts, xtilts, yhatts)
+        def C(x): return np.array([2*x[0] + 3*x[0]**2, 0, 0])
+        xhat = [2.2, .055, .044]
+        Ptil = 100. * np.eye(3)
+        U, D = Classical.UD(Ptil)
+        for step in sim.steps():
+            Phi = A(a(xhat))
+            yhat = c(xhat)
+            xhat, U, D = Classical.thornton(xin=xhat, Phi=Phi, Uin=U, Din=D, Gin=np.eye(3), Q=sim.Rww)
+            xhat, U, D = Classical.bierman(z=step[2]-yhat, R=sim.Rvv, H=C(xhat), xin=xhat, Uin=U, Din=D)
+            self.log.append([step[0], xhat[0], yhat, step[1][0]-xhat[0], step[2]-yhat])
+        innov = Innov(self.log)
+        innov.plot_standard()
 
     @staticmethod
     def UD(M):
@@ -221,4 +151,5 @@ if __name__ == "__main__":
     cl.sim1_linearized()
     cl = Classical()
     cl.sim1_extended()
-    # cl.xbp2()
+    cl = Classical()
+    cl.sim1b_adaptive()
