@@ -11,6 +11,9 @@ class Sim1():
         self.log = []
         self.va = np.vectorize(self.a)
         self.vc = np.vectorize(self.c)
+        self.bignsubx = 1
+        self.kappa = 1
+        self.bk = self.bignsubx + self.kappa
 
     def a(self, x, w):
         return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + w
@@ -23,6 +26,12 @@ class Sim1():
 
     def C(self, x):
         return 2 * x + 3 * x ** 2
+
+    def vfX(self, xhat, Ptil):
+        return [xhat, xhat + math.sqrt(self.bk * Ptil), xhat - math.sqrt(self.bk * Ptil)]
+
+    def vfXhat(self, X, Rww):
+        return [X[0], X[1] + self.kappa * math.sqrt(Rww), X[2] - self.kappa * math.sqrt(Rww)]
 
     def steps(self):
         for tstep in range(self.tsteps):

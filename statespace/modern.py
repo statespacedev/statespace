@@ -13,27 +13,17 @@ class Modern():
         innov.plot_standard()
 
     def sim1_sigmapoint(self, s):
-        xhat, Ptil, bignsubx, kappa = 2.2, .01, 1, 1
-        bk = bignsubx + kappa
-        W = np.zeros((3,))
-        W[:] = [kappa / float(bk), .5 / float(bk), .5 / float(bk)]
-        def vfX(xhat, Ptil):  return [xhat, xhat + math.sqrt(bk * Ptil), xhat - math.sqrt(bk * Ptil)]
-        def vfXhat(X, Rww): return [X[0], X[1] + kappa * math.sqrt(Rww), X[2] - kappa * math.sqrt(Rww)]
+        xhat, Ptil = 2.2, .01
+        W = np.array([s.kappa / float(s.bk), .5 / float(s.bk), .5 / float(s.bk)])
         for step in s.steps():
-            X = s.va(vfX(xhat, Ptil), 0)
-            xhat = W @ X
-            Xtil = X - xhat
-            Ptil = W @ np.power(Xtil, 2) + s.Rww
-            Xhat = vfXhat(X, s.Rww)
-            Y = s.vc(Xhat, 0)
-            yhat = W @ Y
-            ksi = Y - yhat
-            Rksiksi = W @ np.power(ksi, 2) + s.Rvv
-            RXtilksi = W @ np.multiply(Xtil, ksi)
+            X = s.va(s.vfX(xhat, Ptil), 0)
+            Y = s.vc(s.vfXhat(X, s.Rww), 0)
+            Rksiksi = W @ np.power(Y - W @ Y, 2) + s.Rvv
+            RXtilksi = W @ np.multiply(X - W @ X, Y - W @ Y)
             K = RXtilksi / Rksiksi
-            xhat = xhat + K * (step[2] - yhat)
-            Ptil = Ptil - K * Rksiksi * K
-            self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
+            xhat = W @ X + K * (step[2] - W @ Y)
+            Ptil = W @ np.power(X - W @ X, 2) + s.Rww - K * Rksiksi * K
+            self.log.append([step[0], W @ X, W @ Y, step[1] - W @ X, step[2] - W @ Y])
 
     def spbp2(self):
         n = 150
