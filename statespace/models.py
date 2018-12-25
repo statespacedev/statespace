@@ -6,14 +6,17 @@ class Jazwinski1():
         self.tsteps = 151
         self.dt = .01
         self.x = 2.
-        self.Rww = .000001
-        self.Rvv = .09
+        self.Rww = 1e-6
+        self.Rvv = 9e-2
         self.log = []
         self.va = np.vectorize(self.a)
         self.vc = np.vectorize(self.c)
         self.bignsubx = 1
         self.kappa = 1
         self.bk = self.bignsubx + self.kappa
+        self.vAcurl = np.vectorize(self.Acurl)
+        self.vCcurl = np.vectorize(self.Ccurl)
+        self.nsamp = 250
 
     def a(self, x, w):
         return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + w
@@ -27,11 +30,18 @@ class Jazwinski1():
     def C(self, x):
         return 2 * x + 3 * x ** 2
 
-    def vfX(self, xhat, Ptil):
+    def X(self, xhat, Ptil):
         return [xhat, xhat + math.sqrt(self.bk * Ptil), xhat - math.sqrt(self.bk * Ptil)]
 
-    def vfXhat(self, X, Rww):
+    def Xhat(self, X, Rww):
         return [X[0], X[1] + self.kappa * math.sqrt(Rww), X[2] - self.kappa * math.sqrt(Rww)]
+
+    def Acurl(self, x, w):
+        return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + w
+
+    def Ccurl(self, y, xi):
+        return np.exp(-np.log(2. * np.pi * self.Rvv) / 2. - (y - xi**2 - xi**3)**2 / (2. * self.Rvv))
+
 
     def steps(self):
         for tstep in range(self.tsteps):
@@ -49,8 +59,8 @@ class Jazwinski2():
         self.tsteps = 151
         self.dt = .01
         self.x = np.array([2., .05, .04])
-        self.Rww = np.diag([0, 0, 0])
-        self.Rvv = .09
+        self.Rww = np.diag([1e-6, 0, 0])
+        self.Rvv = 9e-2
         self.log = []
 
     def a(self, x, w):

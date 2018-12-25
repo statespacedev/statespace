@@ -1,4 +1,8 @@
 
+181225
+
+refactoring complete, auto build-test-deploy working
+
 181216
 
 testing gitlab

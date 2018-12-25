@@ -25,11 +25,12 @@ in ubuntu, install or upgrade os-level dependencies
     sudo apt-get -qq update -qy
     sudo apt-get -qq install -y python3.6 python3-venv python3-pip
 
-clone the git project, start a venv virtual environment, install the package
+clone the git project, start a virtual environment, install and test the package
 
     git clone git@gitlab.com:noahhsmith/statespace.git statespace
     cd statespace
     python3 -m venv venv
     . venv/bin/activate
     python3 setup.py install
+    pytest
 
