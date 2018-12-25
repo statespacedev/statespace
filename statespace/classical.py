@@ -82,8 +82,8 @@ class Classical():
             self.sim1_extended(s)
         if mode == 'adaptive':
             from sim import Sim1b
-            s = Sim1b(s)
-            self.sim1b_adaptive()
+            s = Sim1b()
+            self.sim1b_adaptive(s)
         innov = Innov(self.log)
         innov.plot_standard()
 
