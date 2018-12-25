@@ -1,7 +1,7 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
 import math
-from innov import Innov
+from innovations import Innovations
 
 class Particle():
     def __init__(self):
@@ -66,7 +66,7 @@ class Particle():
             ets[tk] = yts[tk] - yhatts[tk]
             xits[tk, :] = Particle.resample(xits[tk, :], Wits[tk, :])
 
-        innov = Innov(tts, ets)
+        innov = Innovations(tts, ets)
         innov.plot_standard(tts, xhatts, xtilts, yhatts)
 
     @staticmethod

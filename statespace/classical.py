@@ -1,7 +1,7 @@
 import numpy as np
-from innov import Innov
+from innovations import Innovations
 
-def ud_decomposition(M):
+def ud_factorization(M):
     assert np.allclose(M, M.T)
     n = M.shape[0]
     M = np.triu(M)
@@ -74,54 +74,54 @@ def bierman_observational_update(z, R, H, xin, Uin, Din):
 class Classical():
     def __init__(self, mode, plot=True):
         self.log = []
-        from sim import Sim1
-        s= Sim1()
+        from models import Jazwinski1
+        m = Jazwinski1()
         if mode == 'linearized':
-            self.sim1_linearized(s)
+            self.jazwinski_linearized(m)
         elif mode == 'extended':
-            self.sim1_extended(s)
+            self.jazwinski_extended(m)
         if mode == 'adaptive':
-            from sim import Sim1b
-            s = Sim1b()
-            self.sim1b_adaptive(s)
-        innov = Innov(self.log)
+            from models import Jazwinski2
+            m = Jazwinski2()
+            self.jazwinski_adaptive(m)
+        innov = Innovations(self.log)
         if plot: innov.plot_standard()
 
-    def sim1_linearized(self, s):
+    def jazwinski_linearized(self, m):
         xref, xhat, Ptil = 2., 2.2, .01
-        for step in s.steps():
+        for step in m.steps():
             xref = 2. + .067 * step[0]
-            xhat = s.a(xref, 0) + s.A(xref) * (xhat - xref)
-            Ptil = s.A(xref) * Ptil * s.A(xref)
-            Ree = s.C(xref) * Ptil * s.C(xref) + s.Rvv
-            K = Ptil * s.C(xref) / Ree
-            yhat = s.c(xref, 0) + s.C(xref) * (xhat - xref)
+            xhat = m.a(xref, 0) + m.A(xref) * (xhat - xref)
+            Ptil = m.A(xref) * Ptil * m.A(xref)
+            Ree = m.C(xref) * Ptil * m.C(xref) + m.Rvv
+            K = Ptil * m.C(xref) / Ree
+            yhat = m.c(xref, 0) + m.C(xref) * (xhat - xref)
             xhat = xhat + K * (step[2] - yhat)
-            Ptil = (1 - K * s.C(xref)) * Ptil
+            Ptil = (1 - K * m.C(xref)) * Ptil
             self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
 
-    def sim1_extended(self, s):
+    def jazwinski_extended(self, m):
         xref, xhat, Ptil = 2., 2.2, .01
-        for step in s.steps():
-            xhat = s.a(xhat, 0)
-            Ptil = s.A(xhat) * Ptil * s.A(xhat)
-            Ree = s.C(xhat) * Ptil * s.C(xhat) + s.Rvv
-            K = Ptil * s.C(xhat) / Ree
-            yhat = s.c(xhat, 0)
+        for step in m.steps():
+            xhat = m.a(xhat, 0)
+            Ptil = m.A(xhat) * Ptil * m.A(xhat)
+            Ree = m.C(xhat) * Ptil * m.C(xhat) + m.Rvv
+            K = Ptil * m.C(xhat) / Ree
+            yhat = m.c(xhat, 0)
             xhat = xhat + K * (step[2] - yhat)
-            Ptil = (1 - K * s.C(xhat)) * Ptil
+            Ptil = (1 - K * m.C(xhat)) * Ptil
             self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
 
-    def sim1b_adaptive(self, s):
+    def jazwinski_adaptive(self, m):
         xhat = [2.2, .055, .044]
         Ptil = 100. * np.eye(3)
-        U, D = ud_decomposition(Ptil)
-        for step in s.steps():
-            xhat = s.a(xhat, 0)
-            Phi = s.A(xhat)
-            xhat, U, D = thornton_temporal_update(xin=xhat, Phi=Phi, Uin=U, Din=D, Gin=np.eye(3), Q=s.Rww)
-            yhat = s.c(xhat, 0)
-            xhat, U, D = bierman_observational_update(z=step[2] - yhat, R=s.Rvv, H=s.C(xhat), xin=xhat, Uin=U, Din=D)
+        U, D = ud_factorization(Ptil)
+        for step in m.steps():
+            xhat = m.a(xhat, 0)
+            Phi = m.A(xhat)
+            xhat, U, D = thornton_temporal_update(xin=xhat, Phi=Phi, Uin=U, Din=D, Gin=np.eye(3), Q=m.Rww)
+            yhat = m.c(xhat, 0)
+            xhat, U, D = bierman_observational_update(z=step[2] - yhat, R=m.Rvv, H=m.C(xhat), xin=xhat, Uin=U, Din=D)
             self.log.append([step[0], xhat[0], yhat, step[1][0]-xhat[0], step[2]-yhat])
 
 if __name__ == "__main__":

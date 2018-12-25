@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-class Innov():
+class Innovations():
     def __init__(self, log):
         self.log = np.asarray(log)
         self.tts = self.log[:,0]

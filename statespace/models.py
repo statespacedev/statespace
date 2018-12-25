@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-class Sim1():
+class Jazwinski1():
     def __init__(self):
         self.tsteps = 151
         self.dt = .01
@@ -44,7 +44,7 @@ class Sim1():
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
 
-class Sim1b():
+class Jazwinski2():
     def __init__(self):
         self.tsteps = 151
         self.dt = .01
@@ -81,7 +81,7 @@ class Sim1b():
             yield (tsec, self.x, self.y)
 
 if __name__ == "__main__":
-    sim = Sim1()
+    sim = Jazwinski1()
     for step in sim.steps():
         print(step)
 
