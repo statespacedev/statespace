@@ -3,56 +3,37 @@ import math
 from innov import Innov
 
 class Modern():
-    def __init__(self):
+    def __init__(self, mode):
         self.log = []
-
-    def spbp1(self):
         from sim import Sim1
-        sim = Sim1()
-        dt = sim.dt
+        s = Sim1()
+        if mode == 'sigmapoint':
+            self.sim1_sigmapoint(s)
+        innov = Innov(self.log)
+        innov.plot_standard()
+
+    def sim1_sigmapoint(self, s):
         xhat, Ptil, bignsubx, kappa = 2.2, .01, 1, 1
         bk = bignsubx + kappa
         W = np.zeros((3,))
         W[:] = [kappa / float(bk), .5 / float(bk), .5 / float(bk)]
-        def vfa(vx): return vfx(vx, 0)
-
-        def vfc(vx):
-            return vfy(vx, 0)
-
-        def vfX(xhat, Ptil):
-            return [xhat, xhat + math.sqrt(bk * Ptil), xhat - math.sqrt(bk * Ptil)]
-
-        def Xhat(X, Rww):
-            return [X[0], X[1] + kappa * math.sqrt(Rww), X[2] - kappa * math.sqrt(Rww)]
-
-        for tk in range(1, n):
-            xts[tk] = fx(xts[tk - 1], wts[tk - 1])
-            yts[tk] = fy(xts[tk], vts[tk])
-
-            X = vfX(xhatts[tk-1], Ptilts[tk-1])
-            Xts[tk, :] = vfa(X)
-            xhatts[tk] = W @ Xts[tk, :]
-            Xtilts[tk, :] = Xts[tk, :] - xhatts[tk]
-            Ptilts[tk] = W @ np.power(Xtilts[tk, :], 2) + Rww
-
-            Xhatts[tk, :] = Xhat(Xts[tk, :], Rww)
-
-            Yts[tk, :] = vfc(Xhatts[tk, :])
-            yhatts[tk] = W @ Yts[tk, :]
-            ets[tk] = yts[tk] - yhatts[tk]
-
-            ksits[tk, :] = Yts[tk, :] - yhatts[tk]
-            Rksiksits[tk] = W @ np.power(ksits[tk, :], 2) + Rvv
-
-            RXtilksits[tk] = W @ np.multiply(Xtilts[tk, :], ksits[tk, :])
-            Kts[tk] = RXtilksits[tk] / Rksiksits[tk]
-
-            xhatts[tk] = xhatts[tk] + Kts[tk] * ets[tk]
-            Ptilts[tk] = Ptilts[tk] - Kts[tk] * Rksiksits[tk] * Kts[tk]
-            xtilts[tk] = xts[tk] - xhatts[tk]
-            self.log.append([tk, xhatts[tk], yhatts[tk], xtilts[tk], ets[tk]])
-        innov = Innov(self.log)
-        innov.plot_standard()
+        def vfX(xhat, Ptil):  return [xhat, xhat + math.sqrt(bk * Ptil), xhat - math.sqrt(bk * Ptil)]
+        def vfXhat(X, Rww): return [X[0], X[1] + kappa * math.sqrt(Rww), X[2] - kappa * math.sqrt(Rww)]
+        for step in s.steps():
+            X = s.va(vfX(xhat, Ptil), 0)
+            xhat = W @ X
+            Xtil = X - xhat
+            Ptil = W @ np.power(Xtil, 2) + s.Rww
+            Xhat = vfXhat(X, s.Rww)
+            Y = s.vc(Xhat, 0)
+            yhat = W @ Y
+            ksi = Y - yhat
+            Rksiksi = W @ np.power(ksi, 2) + s.Rvv
+            RXtilksi = W @ np.multiply(Xtil, ksi)
+            K = RXtilksi / Rksiksi
+            xhat = xhat + K * (step[2] - yhat)
+            Ptil = Ptil - K * Rksiksi * K
+            self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
 
     def spbp2(self):
         n = 150
@@ -160,6 +141,4 @@ class Modern():
         innov.abp(tts, xhatts, xtilts, yhatts)
 
 if __name__ == "__main__":
-    mod = Modern()
-    mod.spbp1()
-    mod.spbp2()
+    Modern('sigmapoint')

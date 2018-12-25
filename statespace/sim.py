@@ -9,6 +9,8 @@ class Sim1():
         self.Rww = .000001
         self.Rvv = .09
         self.log = []
+        self.va = np.vectorize(self.a)
+        self.vc = np.vectorize(self.c)
 
     def a(self, x, w):
         return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + w
