@@ -1,4 +1,8 @@
 
+181226
+
+modern adaptive is working for jazwinski now. refactoring and clarifying seems to have cleared things up. onward to particle adaptive.
+
 181225
 
 refactoring complete, auto build-test-deploy working

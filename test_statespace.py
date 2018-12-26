@@ -23,6 +23,10 @@ def test_modern_001():
     tmp = modern.Modern('sigmapoint', plot=False)
     assert(tmp.log[-1][1] > lo and tmp.log[-1][1] < hi)
 
+def test_modern_002():
+    tmp = modern.Modern('sigmapoint2', plot=False)
+    assert(tmp.log[-1][1] > lo and tmp.log[-1][1] < hi)
+
 from statespace import particle
 
 def test_particle_001():

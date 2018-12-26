@@ -2,11 +2,7 @@
 
 [notes](https://gitlab.com/noahhsmith/statespace/blob/master/docs/readme.md)
 
-uncertainty, confidence, knowledge
-
-their evolution with time and various processes, including noise and observations
-
-risk and the cost of errors
+uncertainty and confidence, their evolution with time, noise, and observations, risk and the cost of errors
 
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 
@@ -20,12 +16,12 @@ risk and the cost of errors
 
 [A Demon of Our Own Design: Markets, Hedge Funds, and the Perils of Financial Innovation, Richard Bookstaber](http://a.co/4FvnyfB)
 
-in ubuntu, install or upgrade os-level dependencies
+ubuntu dependencies
 
     sudo apt-get -qq update -qy
     sudo apt-get -qq install -y python3.6 python3-venv python3-pip
 
-clone the git project, start a virtual environment, install and test the package
+clone, virtual environment, install and test
 
     git clone git@gitlab.com:noahhsmith/statespace.git statespace
     cd statespace
