@@ -12,10 +12,6 @@ uncertainty and confidence, their evolution with time, noise, and observations, 
 
 [Stochastic Processes and Filtering Theory, Andrew H. Jazwinski](http://a.co/cm5zfQu) 
 
-[Capital Ideas: The Improbable Origins of Modern Wall Street, Peter L. Bernstein](http://a.co/1Y1DR9p)
-
-[A Demon of Our Own Design: Markets, Hedge Funds, and the Perils of Financial Innovation, Richard Bookstaber](http://a.co/4FvnyfB)
-
 ubuntu dependencies
 
     sudo apt-get -qq update -qy

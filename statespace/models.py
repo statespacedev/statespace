@@ -58,19 +58,23 @@ class Jazwinski1():
 
 class Jazwinski2():
     def __init__(self):
-        self.tsteps = 151
+        self.tsteps = 1501
         self.dt = .01
         self.x = np.array([2., .05, .04])
-        self.Rww = np.diag([1e-6, 0, 0])
+        self.Rww = np.diag([0, 0, 0])
         self.Rvv = 9e-2
         self.log = []
-        # self.va = np.vectorize(self.a)
-        # self.vc = np.vectorize(self.c)
-        self.bignsubx = 3
-        self.kappa = 1
-        self.k0 = self.bignsubx + self.kappa
-        self.k1 = self.kappa / float(self.k0)
-        self.k2 = 1 / float(2 * self.k0)
+        self.n = 3
+        self.kappa = 0
+        self.alpha = 1
+        self.beta = 2
+        self.nk = self.n + self.kappa
+        self.lam = self.alpha**2 * self.nk - self.n
+        self.nl = self.n + self.lam
+        self.W0y = self.lam / float(self.nl)
+        self.W0 = self.W0y + (1 - self.alpha**2 + self.beta)
+        self.k1 = self.lam / float(self.nl)
+        self.k2 = 1 / float(2 * self.nl)
 
     def a(self, x, w):
         return np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]]) + w
@@ -91,12 +95,12 @@ class Jazwinski2():
     def X(self, x, P):
         X = np.zeros([3, 7])
         X[:, 0] = x
-        X[:, 1] = x + np.array([math.sqrt(self.k0 * P[0, 0]), 0, 0])
-        X[:, 2] = x + np.array([0, math.sqrt(self.k0 * P[1, 1]), 0])
-        X[:, 3] = x + np.array([0, 0, math.sqrt(self.k0 * P[2, 2])])
-        X[:, 4] = x - np.array([math.sqrt(self.k0 * P[0, 0]), 0, 0])
-        X[:, 5] = x - np.array([0, math.sqrt(self.k0 * P[1, 1]), 0])
-        X[:, 6] = x - np.array([0, 0, math.sqrt(self.k0 * P[2, 2])])
+        X[:, 1] = x + np.array([math.sqrt(self.nl * P[0, 0]), 0, 0])
+        X[:, 2] = x + np.array([0, math.sqrt(self.nl * P[1, 1]), 0])
+        X[:, 3] = x + np.array([0, 0, math.sqrt(self.nl * P[2, 2])])
+        X[:, 4] = x - np.array([math.sqrt(self.nl * P[0, 0]), 0, 0])
+        X[:, 5] = x - np.array([0, math.sqrt(self.nl * P[1, 1]), 0])
+        X[:, 6] = x - np.array([0, 0, math.sqrt(self.nl * P[2, 2])])
         return X
 
     def va(self, X):
@@ -106,12 +110,12 @@ class Jazwinski2():
     def Xhat(self, X, Rww):
         Xhat = np.zeros([3, 7])
         Xhat[:, 0] = X[:, 0]
-        Xhat[:, 1] = X[:, 1] + np.array([self.kappa * math.sqrt(Rww[0, 0]), 0, 0])
-        Xhat[:, 2] = X[:, 2] + np.array([0, self.kappa * math.sqrt(Rww[1, 1]), 0])
-        Xhat[:, 3] = X[:, 3] + np.array([0, 0, self.kappa * math.sqrt(Rww[2, 2])])
-        Xhat[:, 4] = X[:, 4] - np.array([self.kappa * math.sqrt(Rww[0, 0]), 0, 0])
-        Xhat[:, 5] = X[:, 5] - np.array([0, self.kappa * math.sqrt(Rww[1, 1]), 0])
-        Xhat[:, 6] = X[:, 6] - np.array([0, 0, self.kappa * math.sqrt(Rww[2, 2])])
+        Xhat[:, 1] = X[:, 1] + np.array([self.nl * math.sqrt(Rww[0, 0]), 0, 0])
+        Xhat[:, 2] = X[:, 2] + np.array([0, self.nl * math.sqrt(Rww[1, 1]), 0])
+        Xhat[:, 3] = X[:, 3] + np.array([0, 0, self.nl * math.sqrt(Rww[2, 2])])
+        Xhat[:, 4] = X[:, 4] - np.array([self.nl * math.sqrt(Rww[0, 0]), 0, 0])
+        Xhat[:, 5] = X[:, 5] - np.array([0, self.nl * math.sqrt(Rww[1, 1]), 0])
+        Xhat[:, 6] = X[:, 6] - np.array([0, 0, self.nl * math.sqrt(Rww[2, 2])])
         return Xhat
 
     def vc(self, Xhat):

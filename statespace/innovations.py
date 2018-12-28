@@ -37,11 +37,12 @@ class Innovations():
         return
 
     def plot_standard(self):
-        plt.subplot(3, 2, 1), plt.plot(self.tts, self.log[:,1], linewidth=self.lw), plt.ylabel('xhat')
-        plt.subplot(3, 2, 2), plt.plot(self.tts, self.log[:,3], linewidth=self.lw), plt.ylabel('err')
-        plt.subplot(3, 2, 3), plt.plot(self.tts, self.log[:,2], linewidth=self.lw), plt.ylabel('yhat')
-        plt.subplot(3, 2, 4), plt.plot(self.tts, self.log[:,4], linewidth=self.lw), plt.ylabel('innov')
-        plt.subplot(3, 2, 5), plt.plot(self.tts, self.autocorr1(self.ets), linewidth=self.lw), plt.ylabel('autocorr')
+        x1 = 3
+        plt.subplot(3, 2, 1), plt.plot(self.tts[x1:], self.log[x1:,1], linewidth=self.lw), plt.ylabel('xhat')
+        plt.subplot(3, 2, 2), plt.plot(self.tts[x1:], self.log[x1:,3], linewidth=self.lw), plt.ylabel('err')
+        plt.subplot(3, 2, 3), plt.plot(self.tts[x1:], self.log[x1:,2], linewidth=self.lw), plt.ylabel('yhat')
+        plt.subplot(3, 2, 4), plt.plot(self.tts[x1:], self.log[x1:,4], linewidth=self.lw), plt.ylabel('innov')
+        plt.subplot(3, 2, 5), plt.plot(self.tts[x1:], self.autocorr1(self.ets)[x1:], linewidth=self.lw), plt.ylabel('autocorr')
         plt.show()
 
     def abp(self, tts, xhatts, xtilts, yhatts):

@@ -113,7 +113,7 @@ class Classical():
             self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
 
     def jazwinski_adaptive(self, m):
-        xhat = np.array([2.2, .055, .044])
+        xhat = np.array([2, .055, .044])
         Ptil = 1. * np.eye(3)
         U, D = ud_factorization(Ptil)
         for step in m.steps():
@@ -125,6 +125,6 @@ class Classical():
             self.log.append([step[0], xhat[0], yhat, step[1][0]-xhat[0], step[2]-yhat])
 
 if __name__ == "__main__":
-    # Classical('linearized')
-    # Classical('extended')
+    Classical('linearized')
+    Classical('extended')
     Classical('adaptive')
