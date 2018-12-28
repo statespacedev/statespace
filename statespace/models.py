@@ -61,20 +61,20 @@ class Jazwinski2():
         self.tsteps = 1501
         self.dt = .01
         self.x = np.array([2., .05, .04])
-        self.Rww = np.diag([0, 0, 0])
+        self.Rww = 1e-9 * np.eye(3)
         self.Rvv = 9e-2
         self.log = []
         self.n = 3
-        self.kappa = 0
+        self.kappa = 1
         self.alpha = 1
         self.beta = 2
         self.nk = self.n + self.kappa
         self.lam = self.alpha**2 * self.nk - self.n
         self.nl = self.n + self.lam
-        self.W0y = self.lam / float(self.nl)
-        self.W0 = self.W0y + (1 - self.alpha**2 + self.beta)
         self.k1 = self.lam / float(self.nl)
         self.k2 = 1 / float(2 * self.nl)
+        self.W0y = self.lam / float(self.nl)
+        self.W0 = self.lam / float(self.nl) + (1 - self.alpha**2 + self.beta)
 
     def a(self, x, w):
         return np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]]) + w
@@ -93,36 +93,47 @@ class Jazwinski2():
         return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])
 
     def X(self, x, P):
+        C = np.linalg.cholesky(P)
         X = np.zeros([3, 7])
         X[:, 0] = x
-        X[:, 1] = x + np.array([math.sqrt(self.nl * P[0, 0]), 0, 0])
-        X[:, 2] = x + np.array([0, math.sqrt(self.nl * P[1, 1]), 0])
-        X[:, 3] = x + np.array([0, 0, math.sqrt(self.nl * P[2, 2])])
-        X[:, 4] = x - np.array([math.sqrt(self.nl * P[0, 0]), 0, 0])
-        X[:, 5] = x - np.array([0, math.sqrt(self.nl * P[1, 1]), 0])
-        X[:, 6] = x - np.array([0, 0, math.sqrt(self.nl * P[2, 2])])
+        X[:, 1] = x + math.sqrt(self.nl) * C.T[:, 0]
+        X[:, 2] = x + math.sqrt(self.nl) * C.T[:, 1]
+        X[:, 3] = x + math.sqrt(self.nl) * C.T[:, 2]
+        X[:, 4] = x - math.sqrt(self.nl) * C.T[:, 0]
+        X[:, 5] = x - math.sqrt(self.nl) * C.T[:, 1]
+        X[:, 6] = x - math.sqrt(self.nl) * C.T[:, 2]
         return X
+
+    def Xhat(self, X, Rww):
+        C = np.linalg.cholesky(Rww)
+        Xhat = np.zeros([3, 7])
+        Xhat[:, 0] = X[:, 0]
+        Xhat[:, 1] = X[:, 1] + self.nl * C.T[:, 0]
+        Xhat[:, 2] = X[:, 2] + self.nl * C.T[:, 1]
+        Xhat[:, 3] = X[:, 3] + self.nl * C.T[:, 2]
+        Xhat[:, 4] = X[:, 4] + self.nl * C.T[:, 0]
+        Xhat[:, 5] = X[:, 5] + self.nl * C.T[:, 1]
+        Xhat[:, 6] = X[:, 6] + self.nl * C.T[:, 2]
+        return Xhat
 
     def va(self, X):
         for i in range(7): X[:, i] = self.a(X[:, i], 0)
         return X
 
-    def Xhat(self, X, Rww):
-        Xhat = np.zeros([3, 7])
-        Xhat[:, 0] = X[:, 0]
-        Xhat[:, 1] = X[:, 1] + np.array([self.nl * math.sqrt(Rww[0, 0]), 0, 0])
-        Xhat[:, 2] = X[:, 2] + np.array([0, self.nl * math.sqrt(Rww[1, 1]), 0])
-        Xhat[:, 3] = X[:, 3] + np.array([0, 0, self.nl * math.sqrt(Rww[2, 2])])
-        Xhat[:, 4] = X[:, 4] - np.array([self.nl * math.sqrt(Rww[0, 0]), 0, 0])
-        Xhat[:, 5] = X[:, 5] - np.array([0, self.nl * math.sqrt(Rww[1, 1]), 0])
-        Xhat[:, 6] = X[:, 6] - np.array([0, 0, self.nl * math.sqrt(Rww[2, 2])])
-        return Xhat
-
     def vc(self, Xhat):
         Y = np.zeros(7)
-        for i in range(7):
-            Y[i] = self.c(Xhat[:, i], 0)
+        for i in range(7): Y[i] = self.c(Xhat[:, i], 0)
         return Y
+
+    def Xtil(self, X, W):
+        Xtil = np.zeros((3, 7))
+        for i in range(7): Xtil[:, i] = X[:, i] - W @ X.T
+        return Xtil
+
+    def ksi(self, Y, W):
+        ksi = np.zeros((1, 7))
+        for i in range(7): ksi[0, i] = Y[i] - W @ Y.T
+        return ksi
 
     def steps(self):
         for tstep in range(self.tsteps):

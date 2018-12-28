@@ -30,19 +30,21 @@ class Modern():
             self.log.append([step[0], W @ X, W @ Y, step[1] - W @ X, step[2] - W @ Y])
 
     def jazwinski_sigmapoint2(self, m):
-        xhat = np.array([2, .055, .044])
-        Ptil = 1. * np.eye(3)
+        xhat = np.array([2.0, .055, .044])
+        Ptil = .1 * np.eye(3)
         W = np.array([m.k1, m.k2, m.k2, m.k2, m.k2, m.k2, m.k2])
-        Wy = np.array([m.W0y, m.k2, m.k2, m.k2, m.k2, m.k2, m.k2])
+        Wy = np.array([m.k1, m.k2, m.k2, m.k2, m.k2, m.k2, m.k2])
+        # Wy = np.array([1/7, 1/7, 1/7, 1/7, 1/7, 1/7, 1/7])
         for step in m.steps():
             X = m.va(m.X(xhat, Ptil))
+            Ptil = m.Xtil(X, W) @ np.diag(W) @ m.Xtil(X, W).T + m.Rww
             Y = m.vc(m.Xhat(X, m.Rww))
-            Rksiksi = (Y - W @ Y) @ np.diag(W) @ (Y - W @ Y).T + m.Rvv
-            RXtilksi = (X.T - W @ X.T).T @ np.diag(W) @ (Y - W @ Y)
-            K = RXtilksi / Rksiksi
+            Rksiksi = m.ksi(Y, Wy) @ np.diag(Wy) @ m.ksi(Y, Wy).T + m.Rvv
+            RXtilksi = m.Xtil(X, W) @ np.diag(W) @ m.ksi(Y, Wy).T
+            K = np.squeeze(np.asarray(RXtilksi / Rksiksi))
             xhat = W @ X.T + K * (step[2] - Wy @ Y)
-            Ptil = Ptil - K @ (Rksiksi * K.T)
-            self.log.append([step[0], (W @ X.T)[0], Wy @ Y, step[1][0] - (W @ X.T)[0], step[2] - Wy @ Y])
+            # Ptil = Ptil - K @ K.T * Rksiksi
+            self.log.append([step[0], xhat[0], Wy @ Y, step[1][0] - xhat[0], step[2] - Wy @ Y])
 
 if __name__ == "__main__":
     # Modern('sigmapoint')

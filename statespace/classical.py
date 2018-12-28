@@ -125,6 +125,6 @@ class Classical():
             self.log.append([step[0], xhat[0], yhat, step[1][0]-xhat[0], step[2]-yhat])
 
 if __name__ == "__main__":
-    Classical('linearized')
-    Classical('extended')
+    # Classical('linearized')
+    # Classical('extended')
     Classical('adaptive')

@@ -10,8 +10,6 @@ uncertainty and confidence, their evolution with time, noise, and observations, 
 
 [Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
 
-[Stochastic Processes and Filtering Theory, Andrew H. Jazwinski](http://a.co/cm5zfQu) 
-
 ubuntu dependencies
 
     sudo apt-get -qq update -qy
