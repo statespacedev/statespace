@@ -1,5 +1,6 @@
 import numpy as np
 from innovations import Innovations
+import models
 
 def ud_factorization(M):
     assert np.allclose(M, M.T)
@@ -74,21 +75,21 @@ def bierman_observational_update(z, R, H, xin, Uin, Din):
 class Classical():
     def __init__(self, mode, plot=True):
         self.log = []
-        from models import Jazwinski1
-        m = Jazwinski1()
-        if mode == 'linearized':
-            self.jazwinski_linearized(m)
-        elif mode == 'extended':
-            self.jazwinski_extended(m)
-        elif mode == 'adaptive':
-            from models import Jazwinski2
-            m = Jazwinski2()
-            self.jazwinski_adaptive(m)
+        if mode == 'kf':
+            m = models.Jazwinski1()
+            self.kf(m)
+        elif mode == 'ekf1':
+            m = models.Jazwinski1()
+            self.ekf1(m)
+        elif mode == 'ekf2':
+            m = models.Jazwinski2()
+            self.ekf2(m)
         innov = Innovations(self.log)
         if plot: innov.plot_standard()
 
-    def jazwinski_linearized(self, m):
-        xref, xhat, Ptil = 2., 2.2, .01
+    def kf(self, m):
+        xhat = 2.2
+        Ptil = .01
         for step in m.steps():
             xref = 2. + .067 * step[0]
             xhat = m.a(xref, 0) + m.A(xref) * (xhat - xref)
@@ -100,8 +101,9 @@ class Classical():
             Ptil = (1 - K * m.C(xref)) * Ptil
             self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
 
-    def jazwinski_extended(self, m):
-        xref, xhat, Ptil = 2., 2.2, .01
+    def ekf1(self, m):
+        xhat = 2.2
+        Ptil = .01
         for step in m.steps():
             xhat = m.a(xhat, 0)
             Ptil = m.A(xhat) * Ptil * m.A(xhat)
@@ -112,19 +114,17 @@ class Classical():
             Ptil = (1 - K * m.C(xhat)) * Ptil
             self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
 
-    def jazwinski_adaptive(self, m):
+    def ekf2(self, m):
         xhat = np.array([2, .055, .044])
         Ptil = 1. * np.eye(3)
         U, D = ud_factorization(Ptil)
         for step in m.steps():
-            xhat = m.a(xhat, 0)
-            Phi = m.A(xhat)
-            xhat, U, D = thornton_temporal_update(xin=xhat, Phi=Phi, Uin=U, Din=D, Gin=np.eye(3), Q=m.Rww)
+            xhat, U, D = thornton_temporal_update(xin=m.a(xhat, 0), Phi=m.A(xhat), Uin=U, Din=D, Gin=np.eye(3), Q=np.diag(m.Rww))
             yhat = m.c(xhat, 0)
             xhat, U, D = bierman_observational_update(z=step[2] - yhat, R=m.Rvv, H=m.C(xhat), xin=xhat, Uin=U, Din=D)
             self.log.append([step[0], xhat[0], yhat, step[1][0]-xhat[0], step[2]-yhat])
 
 if __name__ == "__main__":
-    # Classical('linearized')
-    # Classical('extended')
-    Classical('adaptive')
+    Classical('kf')
+    Classical('ekf1')
+    Classical('ekf2')
