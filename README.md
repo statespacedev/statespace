@@ -15,12 +15,12 @@ ubuntu dependencies
     sudo apt-get -qq update -qy
     sudo apt-get -qq install -y python3.6 python3-venv python3-pip
 
-clone, virtual environment, install and test
+clone-install-test
 
     git clone git@gitlab.com:noahhsmith/statespace.git statespace
     cd statespace
     python3 -m venv venv
     . venv/bin/activate
-    pip install -e .
+    python3 setup.py develop
     pytest
-
+    python3 statespace --demo
