@@ -24,7 +24,7 @@ def resample(xi, Wi):
     return xhati
 
 def roughen(x):
-    return x + .005 * np.random.randn(x.size)
+    return x + .1 * np.random.randn(x.size)
 
 def normalize(W):
     return W / sum(W)
@@ -56,10 +56,9 @@ class Particle():
     def pf2(self, m):
         xhat = np.array([2.0, .055, .044])
         x = xhat + np.sqrt(m.Rww) * np.random.randn(m.nsamp, 3)
-        W = np.apply_along_axis(normalize, 0, np.ones((m.nsamp, 3)))
+        W = np.ones((m.nsamp, 3)) / m.nsamp
         for step in m.steps():
-            for j in range(3): x[:, j] = resample(x[:, j], W[:, j])
-            for j in range(1, 3): x[:, j] = roughen(x[:, j])
+            x[:, 0], x[:, 1], x[:, 2] = resample(x[:, 0], W[:, 0]), roughen(x[:, 1]), roughen(x[:, 2])
             x[:, 0] = np.apply_along_axis(m.Apf, 1, x)
             W[:, 0] = normalize(m.Cpf(step[2], x[:, 0]))
             yhat = m.c(xhat, 0)

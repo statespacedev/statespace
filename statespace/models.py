@@ -145,16 +145,7 @@ class Jazwinski2():
         return (1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2
 
     def Cpf(self, y, x):
-        f1 = -np.log(2. * np.pi * self.Rvv) / 2.
-        f2 = np.power(y - np.power(x, 2) - np.power(x, 3), 2) / (2. * self.Rvv)
-        res = np.exp(f1 - f2)
-        med = np.median(res[res > 0])
-        res[res == 0] = med
-        res[res == np.nan] = med
-        if np.any(res == 0) or not np.all(np.isfinite(res)):
-            a=1
-        return res
-
+        return np.exp(-np.log(2. * np.pi * self.Rvv) / 2. - (y - x**2 - x**3)**2 / (2. * self.Rvv))
 
     def steps(self):
         for tstep in range(self.tsteps):
