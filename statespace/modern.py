@@ -18,8 +18,8 @@ class Modern():
         xhat, Ptil = 2.2, .01
         W = np.array([m.k1, m.k2, m.k2])
         for step in m.steps():
-            X = m.va(m.X(xhat, Ptil), 0)
-            Y = m.vc(m.Xhat(X, m.Rww), 0)
+            X = m.va(m.X(xhat, Ptil))
+            Y = m.vc(m.Xhat(X, m.Rww))
             Rksiksi = W @ np.power(Y - W @ Y, 2) + m.Rvv
             RXtilksi = W @ np.multiply(X - W @ X, Y - W @ Y)
             K = RXtilksi / Rksiksi
@@ -44,6 +44,6 @@ class Modern():
             self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
 if __name__ == "__main__":
-    # Modern('ukf1')
+    Modern('ukf1')
     Modern('ukf2')
 

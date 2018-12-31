@@ -75,10 +75,7 @@ def bierman_observational_update(z, R, H, xin, Uin, Din):
 class Classical():
     def __init__(self, mode, plot=True):
         self.log = []
-        if mode == 'kf':
-            m = models.Jazwinski1()
-            self.kf(m)
-        elif mode == 'ekf1':
+        if mode == 'ekf1':
             m = models.Jazwinski1()
             self.ekf1(m)
         elif mode == 'ekf2':
@@ -87,29 +84,15 @@ class Classical():
         innov = Innovations(self.log)
         if plot: innov.plot_standard()
 
-    def kf(self, m):
-        xhat = 2.2
-        Ptil = .01
-        for step in m.steps():
-            xref = 2. + .067 * step[0]
-            xhat = m.a(xref, 0) + m.A(xref) * (xhat - xref)
-            Ptil = m.A(xref) * Ptil * m.A(xref)
-            Ree = m.C(xref) * Ptil * m.C(xref) + m.Rvv
-            K = Ptil * m.C(xref) / Ree
-            yhat = m.c(xref, 0) + m.C(xref) * (xhat - xref)
-            xhat = xhat + K * (step[2] - yhat)
-            Ptil = (1 - K * m.C(xref)) * Ptil
-            self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
-
     def ekf1(self, m):
         xhat = 2.2
         Ptil = .01
         for step in m.steps():
-            xhat = m.a(xhat, 0)
+            xhat = m.a(xhat)
             Ptil = m.A(xhat) * Ptil * m.A(xhat)
             Ree = m.C(xhat) * Ptil * m.C(xhat) + m.Rvv
             K = Ptil * m.C(xhat) / Ree
-            yhat = m.c(xhat, 0)
+            yhat = m.c(xhat)
             xhat = xhat + K * (step[2] - yhat)
             Ptil = (1 - K * m.C(xhat)) * Ptil
             self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
@@ -119,12 +102,11 @@ class Classical():
         Ptil = 1. * np.eye(3)
         U, D = ud_factorization(Ptil)
         for step in m.steps():
-            xhat, U, D = thornton_temporal_update(xin=m.a(xhat, 0), Phi=m.A(xhat), Uin=U, Din=D, Gin=np.eye(3), Q=np.diag(m.Rww))
-            yhat = m.c(xhat, 0)
+            xhat, U, D = thornton_temporal_update(xin=m.a(xhat), Phi=m.A(xhat), Uin=U, Din=D, Gin=np.eye(3), Q=np.diag(m.Rww))
+            yhat = m.c(xhat)
             xhat, U, D = bierman_observational_update(z=step[2] - yhat, R=m.Rvv, H=m.C(xhat), xin=xhat, Uin=U, Din=D)
             self.log.append([step[0], xhat[0], yhat, step[1][0]-xhat[0], step[2]-yhat])
 
 if __name__ == "__main__":
-    Classical('kf')
     Classical('ekf1')
     Classical('ekf2')

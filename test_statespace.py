@@ -1,8 +1,6 @@
 import sys
 sys.path.append('statespace')
-import classical
-import modern
-import particle
+import classical, modern, particle
 
 tol1 = 1.
 

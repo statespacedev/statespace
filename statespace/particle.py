@@ -66,5 +66,5 @@ class Particle():
             self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
 if __name__ == "__main__":
-    # Particle('pf1')
+    Particle('pf1')
     Particle('pf2')

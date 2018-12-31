@@ -20,10 +20,10 @@ class Jazwinski1():
         # self.vCcurl = np.vectorize(self.Ccurl)
         self.nsamp = 250
 
-    def a(self, x, w):
+    def a(self, x, w=0):
         return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + w
 
-    def c(self, x, v):
+    def c(self, x, v=0):
         return x ** 2 + x ** 3 + v
 
     def A(self, x):
@@ -76,10 +76,10 @@ class Jazwinski2():
         self.W0 = self.lam / float(self.nl) + (1 - self.alpha**2 + self.beta)
         self.nsamp = 250
 
-    def a(self, x, w):
+    def a(self, x, w=0):
         return np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]]) + w
 
-    def c(self, x, v):
+    def c(self, x, v=0):
         return x[0] ** 2 + x[0] ** 3 + v
 
     def A(self, x):

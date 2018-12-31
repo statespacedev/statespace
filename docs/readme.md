@@ -1,21 +1,17 @@
 
+
+181230
+
+particle adaptive jazwinksi. focus is parameter-roughening.
+
 181226
 
-modern adaptive is working for jazwinski now. refactoring and clarifying seems to have cleared things up. onward to particle adaptive.
+ukf adaptive jazwinski. focus is tuning the sampling part of sample-and-propagate.
 
 181225
 
-refactoring complete, auto build-test-deploy working
-
-181216
-
-testing gitlab
+auto build-test-deploy
 
 180910
 
-demonstration of covariance numerical instability using just the jazwinski tracking problem with two additional states for model-parameter estimation - first plot is direct ekf, second plot is ud factorized ekf
-
-![direct](images/direct.png) 
-![ud](images/udfactoring.png)
-
-
+ekf adaptive jazwinski. ud-factorization required for numerical stability.
