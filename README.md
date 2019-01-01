@@ -10,13 +10,10 @@ uncertainty and confidence, their evolution with time, noise, and observations, 
 
 [Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
 
-ubuntu dependencies
+automated build-test-deploy to [pypi](https://pypi.org/project/statespace) is mostly a placeholder, ubuntu clone-install-develop of the [repo](https://gitlab.com/noahhsmith/statespace) is assumed for now.
 
     sudo apt-get -qq update -qy
     sudo apt-get -qq install -y python3.6 python3-venv python3-pip
-
-clone-install-test
-
     git clone git@gitlab.com:noahhsmith/statespace.git statespace
     cd statespace
     python3 -m venv venv
