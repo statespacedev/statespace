@@ -1,8 +1,10 @@
 <img src="https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/ekf.png" align="center" width="480" height="360"/>
 
-[notes](https://gitlab.com/noahhsmith/statespace/blob/master/docs/readme.md)
+[![pipeline](https://gitlab.com/noahhsmith/starid/badges/master/pipeline.svg)](https://gitlab.com/noahhsmith/statespace/pipelines)
+[![pypi](https://img.shields.io/badge/pypi-latest-brightgreen.svg)](https://pypi.org/project/statespace/)
+[![blog](https://img.shields.io/badge/blog-latest-brightgreen.svg)](https://gitlab.com/noahhsmith/statespace/blob/master/docs/readme.md)
 
-uncertainty and confidence, their evolution with time, noise, and observations, risk and the cost of errors
+uncertainty and confidence, distributions, their evolution with time, noise, and observations, tracking and detection, decisions, risk and the cost of errors
 
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 
