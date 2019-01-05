@@ -11,14 +11,15 @@ class Jazwinski1():
         self.log = []
         self.va = np.vectorize(self.a)
         self.vc = np.vectorize(self.c)
-        self.bignsubx = 1
-        self.kappa = 1
-        self.k0 = self.bignsubx + self.kappa
-        self.k1 = self.kappa / float(self.k0)
-        self.k2 = 1 / float(2 * self.k0)
-        # self.vAcurl = np.vectorize(self.Acurl)
-        # self.vCcurl = np.vectorize(self.Ccurl)
+        bignsubx = 1
+        kappa = 1
+        k0 = bignsubx + kappa
+        k1 = kappa / float(k0)
+        k2 = 1 / float(2 * k0)
         self.nsamp = 250
+        self.W = np.array([k1, k2, k2])
+        self.k0 = k0
+        self.kappa = kappa
 
     def a(self, x, w=0):
         return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + w
@@ -62,19 +63,24 @@ class Jazwinski2():
         self.x = np.array([2., .05, .04])
         self.Rww = 1e-9 * np.array([1, 1, 1])
         self.Rvv = 9e-2
+        self.Sw = np.linalg.cholesky(np.diag(self.Rww))
+        self.Sv = np.linalg.cholesky(np.diag(self.Rvv * np.array([1])))
         self.log = []
-        self.n = 3
-        self.kappa = 1
-        self.alpha = 1
-        self.beta = 2
-        self.nk = self.n + self.kappa
-        self.lam = self.alpha**2 * self.nk - self.n
-        self.nl = self.n + self.lam
-        self.k1 = self.lam / float(self.nl)
-        self.k2 = 1 / float(2 * self.nl)
-        self.W0y = self.lam / float(self.nl)
-        self.W0 = self.lam / float(self.nl) + (1 - self.alpha**2 + self.beta)
         self.nsamp = 250
+        n = 3
+        kappa = 1
+        alpha = 1
+        beta = 2
+        lam = alpha**2 * (n + kappa) - n
+        wi = 1 / float(2 * (n + lam))
+        w0m = lam / float(n + lam)
+        w0c = lam / float(n + lam) + (1 - alpha**2 + beta)
+        self.Wm = np.array([w0m, wi, wi, wi, wi, wi, wi])
+        self.Wc = np.array([w0c, wi, wi, wi, wi, wi, wi])
+        self.nlroot = math.sqrt(n + lam)
+        self.Xtil = np.zeros((3, 7))
+        self.Ytil = np.zeros((1, 7))
+        self.Pxy = np.zeros((3, 1))
 
     def a(self, x, w=0):
         return np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]]) + w
@@ -92,35 +98,27 @@ class Jazwinski2():
     def C(self, x):
         return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])
 
-    def X(self, x, P):
-        C = np.linalg.cholesky(P)
+    def X(self, x, C):
         X = np.zeros([3, 7])
         X[:, 0] = x
-        X[:, 1] = x + math.sqrt(self.nl) * C.T[:, 0]
-        X[:, 2] = x + math.sqrt(self.nl) * C.T[:, 1]
-        X[:, 3] = x + math.sqrt(self.nl) * C.T[:, 2]
-        X[:, 4] = x - math.sqrt(self.nl) * C.T[:, 0]
-        X[:, 5] = x - math.sqrt(self.nl) * C.T[:, 1]
-        X[:, 6] = x - math.sqrt(self.nl) * C.T[:, 2]
+        X[:, 1] = x + self.nlroot * C.T[:, 0]
+        X[:, 2] = x + self.nlroot * C.T[:, 1]
+        X[:, 3] = x + self.nlroot * C.T[:, 2]
+        X[:, 4] = x - self.nlroot * C.T[:, 0]
+        X[:, 5] = x - self.nlroot * C.T[:, 1]
+        X[:, 6] = x - self.nlroot * C.T[:, 2]
         return X
 
-    def Xhat(self, X, Rww):
+    def Xhat(self, X):
         Xhat = np.zeros([3, 7])
         Xhat[:, 0] = X[:, 0]
-        Xhat[:, 1] = X[:, 1] + np.array([self.kappa * math.sqrt(Rww[0]), 0, 0])
-        Xhat[:, 2] = X[:, 2] + np.array([0, self.kappa * math.sqrt(Rww[1]), 0])
-        Xhat[:, 3] = X[:, 3] + np.array([0, 0, self.kappa * math.sqrt(Rww[2])])
-        Xhat[:, 4] = X[:, 4] - np.array([self.kappa * math.sqrt(Rww[0]), 0, 0])
-        Xhat[:, 5] = X[:, 5] - np.array([0, self.kappa * math.sqrt(Rww[1]), 0])
-        Xhat[:, 6] = X[:, 6] - np.array([0, 0, self.kappa * math.sqrt(Rww[2])])
+        Xhat[:, 1] = X[:, 1] + self.nlroot * self.Sw.T[:, 0]
+        Xhat[:, 2] = X[:, 2] + self.nlroot * self.Sw.T[:, 1]
+        Xhat[:, 3] = X[:, 3] + self.nlroot * self.Sw.T[:, 2]
+        Xhat[:, 4] = X[:, 4] - self.nlroot * self.Sw.T[:, 0]
+        Xhat[:, 5] = X[:, 5] - self.nlroot * self.Sw.T[:, 1]
+        Xhat[:, 6] = X[:, 6] - self.nlroot * self.Sw.T[:, 2]
         return Xhat
-        # C = np.linalg.cholesky(Rww)
-        # Xhat[:, 1] = X[:, 1] + self.nl * C.T[:, 0]
-        # Xhat[:, 2] = X[:, 2] + self.nl * C.T[:, 1]
-        # Xhat[:, 3] = X[:, 3] + self.nl * C.T[:, 2]
-        # Xhat[:, 4] = X[:, 4] + self.nl * C.T[:, 0]
-        # Xhat[:, 5] = X[:, 5] + self.nl * C.T[:, 1]
-        # Xhat[:, 6] = X[:, 6] + self.nl * C.T[:, 2]
 
     def va(self, X):
         for i in range(7): X[:, i] = self.a(X[:, i], 0)
