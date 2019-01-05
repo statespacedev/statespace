@@ -5,16 +5,16 @@ import models
 class Modern():
     def __init__(self, mode, plot=True):
         self.log = []
-        if mode == 'ukf1':
+        if mode == 'spkf1':
             m = models.Jazwinski1()
-            self.ukf1(m)
-        elif mode == 'ukf2':
+            self.spkf1(m)
+        elif mode == 'spkf2':
             m = models.Jazwinski2()
-            self.ukf2(m)
+            self.spkf2(m)
         innov = Innovations(self.log)
         if plot: innov.plot_standard()
 
-    def ukf1(self, m):
+    def spkf1(self, m):
         xhat, Ptil = 2.2, .01
         W = np.array([m.k1, m.k2, m.k2])
         for step in m.steps():
@@ -28,7 +28,7 @@ class Modern():
             Ptil = W @ np.power(X - W @ X, 2) + m.Rww - K * Rksiksi * K
             self.log.append([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
 
-    def ukf2(self, m):
+    def spkf2(self, m):
         xhat = np.array([2.0, .055, .044])
         Ptil = .1 * np.eye(3)
         W = np.array([m.k1, m.k2, m.k2, m.k2, m.k2, m.k2, m.k2])
@@ -44,6 +44,6 @@ class Modern():
             self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
 if __name__ == "__main__":
-    Modern('ukf1')
-    Modern('ukf2')
+    Modern('spkf1')
+    Modern('spkf2')
 
