@@ -7,6 +7,6 @@
 
 2004, SPKF, Merwe, [pdf](2004%20merwe.pdf)
 
-2006, ReBEL bayesian estimation, [clone](https://gitlab.com/noahhsmith/statespace/tree/master/docs/papers/rebel)
+2006, ReBEL bayesian estimation, [clone](https://gitlab.com/noahhsmith/statespace/tree/master/docs/rebel)
 
 2008, EKF software appendix, Grewal, [pdf](2008%20grewal.pdf)
