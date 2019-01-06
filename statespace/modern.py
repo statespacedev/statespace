@@ -29,10 +29,10 @@ def temporal_update(xhat, S, m):
     for i in range(7): m.Xtil[:, i] = X[:, i] - xhat
     q, r = np.linalg.qr(np.concatenate([math.sqrt(m.Wc[1]) * m.Xtil[:, 1:], m.Sw], 1))
     S = cholupdate(r.T[0:3, 0:3], m.Wc[0] * m.Xtil[:, 0])
-    Y = m.vc(m.Xhat(X))
-    return xhat, S, Y
+    return xhat, S, X
 
-def observational_update(xhat, S, m, Y, obs):
+def observational_update(xhat, S, m, X, obs):
+    Y = m.vc(m.Xhat(X))
     yhat = m.Wm @ Y.T
     for i in range(7): m.Ytil[0, i] = Y[i] - yhat
     q, r = np.linalg.qr(np.concatenate([math.sqrt(m.Wc[1]) * m.Ytil[:, 1:], m.Sv], 1))
@@ -76,8 +76,8 @@ class Modern():
         xhat = np.array([2.0, .055, .044])
         S = np.linalg.cholesky(.1 * np.eye(3))
         for step in m.steps():
-            xhat, S, Y = temporal_update(xhat=xhat, S=S, m=m)
-            xhat, S, yhat = observational_update(xhat=xhat, S=S, m=m, Y=Y, obs=step[2])
+            xhat, S, X = temporal_update(xhat=xhat, S=S, m=m)
+            xhat, S, yhat = observational_update(xhat=xhat, S=S, m=m, X=X, obs=step[2])
             self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
 if __name__ == "__main__":
