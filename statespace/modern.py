@@ -23,6 +23,28 @@ def choldowndate(R,z):
         R[k, k] = rbar
     return R
 
+def temporal_update(xhat, S, m):
+    X = m.va(m.X(xhat, S))
+    xhat = m.Wm @ X.T
+    for i in range(7): m.Xtil[:, i] = X[:, i] - xhat
+    q, r = np.linalg.qr(np.concatenate([math.sqrt(m.Wc[1]) * m.Xtil[:, 1:], m.Sw], 1))
+    S = cholupdate(r.T[0:3, 0:3], m.Wc[0] * m.Xtil[:, 0])
+    Y = m.vc(m.Xhat(X))
+    return xhat, S, Y
+
+def observational_update(xhat, S, m, Y, obs):
+    yhat = m.Wm @ Y.T
+    for i in range(7): m.Ytil[0, i] = Y[i] - yhat
+    q, r = np.linalg.qr(np.concatenate([math.sqrt(m.Wc[1]) * m.Ytil[:, 1:], m.Sv], 1))
+    Sy = cholupdate(r.T[0:1, 0:1], m.Wc[0] * m.Ytil[:, 0])
+    for i in range(7): m.Pxy[:, 0] = m.Pxy[:, 0] + m.Wc[i] * m.Xtil[:, i] * m.Ytil.T[i, :]
+    if Sy[0, 0] < math.sqrt(10) or Sy[0, 0] > math.sqrt(1000): Sy[0, 0] = math.sqrt(1000)
+    K = m.Pxy / Sy[0, 0] ** 2
+    U = K * Sy
+    xhat = xhat + K[:, 0] * (obs - yhat)
+    S = choldowndate(S, U)
+    return xhat, S, yhat
+
 class Modern():
     def __init__(self, mode, plot=True):
         self.log = []
@@ -32,9 +54,6 @@ class Modern():
         elif mode == 'spkf2':
             m = models.Jazwinski2()
             self.spkf2(m)
-        elif mode == 'spkf2b':
-            m = models.Jazwinski2()
-            self.spkf2b(m)
         innov = Innovations(self.log)
         if plot: innov.plot_standard()
 
@@ -57,24 +76,10 @@ class Modern():
         xhat = np.array([2.0, .055, .044])
         S = np.linalg.cholesky(.1 * np.eye(3))
         for step in m.steps():
-            X = m.va(m.X(xhat, S))
-            xhat = m.Wm @ X.T
-            for i in range(7): m.Xtil[:, i] = X[:, i] - xhat
-            q, r = np.linalg.qr(np.concatenate([math.sqrt(m.Wc[1]) * m.Xtil[:, 1:], m.Sw], 1))
-            S = cholupdate(r.T[0:3, 0:3], m.Wc[0] * m.Xtil[:, 0])
-            Y = m.vc(m.Xhat(X))
-            yhat = m.Wm @ Y.T
-            for i in range(7): m.Ytil[0, i] = Y[i] - yhat
-            q, r = np.linalg.qr(np.concatenate([math.sqrt(m.Wc[1]) * m.Ytil[:, 1:], m.Sv], 1))
-            Sy = cholupdate(r.T[0:1, 0:1], m.Wc[0] * m.Ytil[:, 0])
-            for i in range(7): m.Pxy[:, 0] = m.Pxy[:, 0] + m.Wc[i] * m.Xtil[:, i] * m.Ytil.T[i, :]
-            if Sy[0, 0] < math.sqrt(10) or Sy[0, 0] > math.sqrt(1000): Sy[0, 0] = math.sqrt(1000)
-            K = m.Pxy / Sy[0, 0]**2
-            U = K * Sy
-            xhat = xhat + K[:, 0] * (step[2] - yhat)
-            S = choldowndate(S, U)
+            xhat, S, Y = temporal_update(xhat=xhat, S=S, m=m)
+            xhat, S, yhat = observational_update(xhat=xhat, S=S, m=m, Y=Y, obs=step[2])
             self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
 if __name__ == "__main__":
-    Modern('spkf1')
+    # Modern('spkf1')
     Modern('spkf2')

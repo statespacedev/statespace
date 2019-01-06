@@ -21,7 +21,7 @@ def ud_factorization(M):
     d[0] = M[0, 0]
     return U, np.diag(d)
 
-def thornton_temporal_update(xin, Phi, Uin, Din, Gin, Q):
+def temporal_update(xin, Uin, Din, Phi, Gin, Q): # thornton
     x, U, D = Phi @ xin, Uin, Din
     n, r = 3, 3
     G = Gin
@@ -49,11 +49,11 @@ def thornton_temporal_update(xin, Phi, Uin, Din, Gin, Q):
                     G[j, k] = G[j, k] - U[j, i] * G[i, k]
     return x, U, D
 
-def bierman_observational_update(z, R, H, xin, Uin, Din):
+def observational_update(xin, Uin, Din, R, H, yhat, obs): # bierman
     x, U, D = xin, Uin, Din
     a = U.T @ H.T
     b = D @ a
-    dz = z  # z - H @ xin
+    dz = obs - yhat  # z - H @ xin
     alpha = R
     gamma = 1 / alpha
     for j in range(3):
@@ -70,7 +70,7 @@ def bierman_observational_update(z, R, H, xin, Uin, Din):
                 b[i] = b[i] + b[j] * beta
     dzs = gamma * dz
     x = x + dzs * b
-    return x, U, D
+    return x, U, D, yhat
 
 class Classical():
     def __init__(self, mode, plot=True):
@@ -116,13 +116,11 @@ class Classical():
 
     def ekf2(self, m):
         xhat = np.array([2, .055, .044])
-        Ptil = 1. * np.eye(3)
-        U, D = ud_factorization(Ptil)
+        U, D = ud_factorization(1. * np.eye(3))
         for step in m.steps():
-            xhat, U, D = thornton_temporal_update(xin=m.a(xhat), Phi=m.A(xhat), Uin=U, Din=D, Gin=np.eye(3), Q=np.diag(m.Rww))
-            yhat = m.c(xhat)
-            xhat, U, D = bierman_observational_update(z=step[2] - yhat, R=m.Rvv, H=m.C(xhat), xin=xhat, Uin=U, Din=D)
-            self.log.append([step[0], xhat[0], yhat, step[1][0]-xhat[0], step[2]-yhat])
+            xhat, U, D = temporal_update(xin=m.a(xhat), Uin=U, Din=D, Phi=m.A(xhat), Gin=np.eye(3), Q=np.diag(m.Rww))
+            xhat, U, D, yhat = observational_update(xin=xhat, Uin=U, Din=D, R=m.Rvv, H=m.C(xhat), yhat=m.c(xhat), obs=step[2])
+            self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
 if __name__ == "__main__":
     Classical('ekf1')
