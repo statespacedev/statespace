@@ -3,6 +3,8 @@ import numpy as np
 from scipy.linalg.blas import drot, drotg
 from innovations import Innovations
 import models
+
+
 # np.seterr(all='raise')
 
 def cholupdate(R, z):
@@ -12,16 +14,18 @@ def cholupdate(R, z):
         drot(R[k, :], z, c, s, overwrite_x=True, overwrite_y=True)
     return R
 
-def choldowndate(R,z):
+
+def choldowndate(R, z):
     n = R.shape[0]
     for k in range(n):
-        if (R[k, k] - z[k])*(R[k, k] + z[k]) < 0: return R
-        rbar = np.sqrt((R[k, k] - z[k])*(R[k, k] + z[k]))
-        for j in range(k+1, n):
-            R[k, j] = 1./rbar * (R[k, k]*R[k, j] - z[k]*z[j])
-            z[j] = 1./R[k, k] * (rbar*z[j] - z[k]*R[k, j])
+        if (R[k, k] - z[k]) * (R[k, k] + z[k]) < 0: return R
+        rbar = np.sqrt((R[k, k] - z[k]) * (R[k, k] + z[k]))
+        for j in range(k + 1, n):
+            R[k, j] = 1. / rbar * (R[k, k] * R[k, j] - z[k] * z[j])
+            z[j] = 1. / R[k, k] * (rbar * z[j] - z[k] * R[k, j])
         R[k, k] = rbar
     return R
+
 
 def temporal_update(xhat, S, m):
     X = m.va(m.X(xhat, S))
@@ -31,7 +35,8 @@ def temporal_update(xhat, S, m):
     S = cholupdate(r.T[0:3, 0:3], m.Wc[0] * m.Xtil[:, 0])
     return xhat, S, X
 
-def observational_update(xhat, S, m, X, obs):
+
+def observational_update(xhat, S, X, obs, m):
     Y = m.vc(m.Xhat(X))
     yhat = m.Wm @ Y.T
     for i in range(7): m.Ytil[0, i] = Y[i] - yhat
@@ -44,6 +49,7 @@ def observational_update(xhat, S, m, X, obs):
     xhat = xhat + K[:, 0] * (obs - yhat)
     S = choldowndate(S, U)
     return xhat, S, yhat
+
 
 class Modern():
     def __init__(self, mode, plot=True):
@@ -77,8 +83,9 @@ class Modern():
         S = np.linalg.cholesky(.1 * np.eye(3))
         for step in m.steps():
             xhat, S, X = temporal_update(xhat=xhat, S=S, m=m)
-            xhat, S, yhat = observational_update(xhat=xhat, S=S, m=m, X=X, obs=step[2])
+            xhat, S, yhat = observational_update(xhat=xhat, S=S, X=X, obs=step[2], m=m)
             self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
+
 
 if __name__ == "__main__":
     # Modern('spkf1')

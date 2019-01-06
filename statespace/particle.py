@@ -4,6 +4,7 @@ import math
 from innovations import Innovations
 import models
 
+
 def resample(xi, Wi):
     tmp = []
     for i in range(xi.size):
@@ -23,11 +24,14 @@ def resample(xi, Wi):
     assert xhati.size == xi.size
     return xhati
 
+
 def roughen(x):
     return x + .1 * np.random.randn(x.size)
 
+
 def normalize(W):
     return W / sum(W)
+
 
 class Particle():
     def __init__(self, mode, plot=True):
@@ -64,6 +68,7 @@ class Particle():
             yhat = m.c(xhat, 0)
             xhat = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
             self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
+
 
 if __name__ == "__main__":
     Particle('pf1')

@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+
 class Jazwinski1():
     def __init__(self):
         self.tsteps = 151
@@ -43,7 +44,7 @@ class Jazwinski1():
         return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + math.sqrt(self.Rww) * np.random.randn(self.nsamp)
 
     def Cpf(self, y, x):
-        return np.exp(-np.log(2. * np.pi * self.Rvv) / 2. - (y - x**2 - x**3)**2 / (2. * self.Rvv))
+        return np.exp(-np.log(2. * np.pi * self.Rvv) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.Rvv))
 
     def steps(self):
         for tstep in range(self.tsteps):
@@ -55,6 +56,7 @@ class Jazwinski1():
             if tstep == 0: continue
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
+
 
 class Jazwinski2():
     def __init__(self):
@@ -71,16 +73,18 @@ class Jazwinski2():
         kappa = 1
         alpha = 1
         beta = 2
-        lam = alpha**2 * (n + kappa) - n
+        lam = alpha ** 2 * (n + kappa) - n
         wi = 1 / float(2 * (n + lam))
         w0m = lam / float(n + lam)
-        w0c = lam / float(n + lam) + (1 - alpha**2 + beta)
+        w0c = lam / float(n + lam) + (1 - alpha ** 2 + beta)
         self.Wm = np.array([w0m, wi, wi, wi, wi, wi, wi])
         self.Wc = np.array([w0c, wi, wi, wi, wi, wi, wi])
         self.nlroot = math.sqrt(n + lam)
         self.Xtil = np.zeros((3, 7))
         self.Ytil = np.zeros((1, 7))
         self.Pxy = np.zeros((3, 1))
+        self.G = np.eye(3)
+        self.Q = np.diag(self.Rww)
 
     def a(self, x, w=0):
         return np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]]) + w
@@ -143,7 +147,7 @@ class Jazwinski2():
         return (1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2
 
     def Cpf(self, y, x):
-        return np.exp(-np.log(2. * np.pi * self.Rvv) / 2. - (y - x**2 - x**3)**2 / (2. * self.Rvv))
+        return np.exp(-np.log(2. * np.pi * self.Rvv) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.Rvv))
 
     def steps(self):
         for tstep in range(self.tsteps):
@@ -156,8 +160,8 @@ class Jazwinski2():
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
 
+
 if __name__ == "__main__":
     sim = Jazwinski1()
     for step in sim.steps():
         print(step)
-

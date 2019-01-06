@@ -2,6 +2,7 @@ import numpy as np
 from innovations import Innovations
 import models
 
+
 def ud_factorization(M):
     assert np.allclose(M, M.T)
     n = M.shape[0]
@@ -21,7 +22,9 @@ def ud_factorization(M):
     d[0] = M[0, 0]
     return U, np.diag(d)
 
-def temporal_update(xin, Uin, Din, Phi, Gin, Q): # thornton
+
+def temporal_update(xin, Uin, Din, m):  # thornton
+    Phi, Gin, Q = m.A(xin), m.G, m.Q
     x, U, D = Phi @ xin, Uin, Din
     n, r = 3, 3
     G = Gin
@@ -49,7 +52,9 @@ def temporal_update(xin, Uin, Din, Phi, Gin, Q): # thornton
                     G[j, k] = G[j, k] - U[j, i] * G[i, k]
     return x, U, D
 
-def observational_update(xin, Uin, Din, R, H, yhat, obs): # bierman
+
+def observational_update(xin, Uin, Din, obs, m):  # bierman
+    R, H, yhat = m.Rvv, m.C(xin), m.c(xin)
     x, U, D = xin, Uin, Din
     a = U.T @ H.T
     b = D @ a
@@ -71,6 +76,7 @@ def observational_update(xin, Uin, Din, R, H, yhat, obs): # bierman
     dzs = gamma * dz
     x = x + dzs * b
     return x, U, D, yhat
+
 
 class Classical():
     def __init__(self, mode, plot=True):
@@ -99,7 +105,7 @@ class Classical():
             yhat = m.c(xref, 0) + m.C(xref) * (xhat - xref)
             xhat = xhat + K * (step[2] - yhat)
             Ptil = (1 - K * m.C(xref)) * Ptil
-            self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
+            self.log.append([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
 
     def ekf1(self, m):
         xhat = 2.2
@@ -112,15 +118,16 @@ class Classical():
             yhat = m.c(xhat)
             xhat = xhat + K * (step[2] - yhat)
             Ptil = (1 - K * m.C(xhat)) * Ptil
-            self.log.append([step[0], xhat, yhat, step[1]-xhat, step[2]-yhat])
+            self.log.append([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
 
     def ekf2(self, m):
         xhat = np.array([2, .055, .044])
         U, D = ud_factorization(1. * np.eye(3))
         for step in m.steps():
-            xhat, U, D = temporal_update(xin=m.a(xhat), Uin=U, Din=D, Phi=m.A(xhat), Gin=np.eye(3), Q=np.diag(m.Rww))
-            xhat, U, D, yhat = observational_update(xin=xhat, Uin=U, Din=D, R=m.Rvv, H=m.C(xhat), yhat=m.c(xhat), obs=step[2])
+            xhat, U, D = temporal_update(xin=m.a(xhat), Uin=U, Din=D, m=m)
+            xhat, U, D, yhat = observational_update(xin=xhat, Uin=U, Din=D, obs=step[2], m=m)
             self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
+
 
 if __name__ == "__main__":
     Classical('ekf1')

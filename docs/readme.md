@@ -1,6 +1,6 @@
 190105
 
-spkf adaptive jazwinksi improved using square-root filtering, qr-factorizaion, cholesky-factor update and downdate. improved numerical stability and scaled sampling is pretty clearly working correctly. still a question with the observation cholesky-factor and gain for scalar observations updates. with an adhoc stabilizer on the observation cholesky-factor, it's working well overall.
+spkf adaptive jazwinksi switched to square-root filtering, qr-factorizaion, cholesky-factor update and downdate. improved numerical stability and scaled sampling is pretty clearly working correctly. still a question and the observation cholesky-factor and gain for scalar observations updates. with an adhoc stabilizer on the observation cholesky-factor, it's working well overall.
 
 181230
 
