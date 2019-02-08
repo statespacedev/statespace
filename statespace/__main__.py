@@ -6,4 +6,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.demo:
         from classical import Classical
-        Classical('ekf2')
+        res = Classical('ekf2')
+        print(res.log[-1])

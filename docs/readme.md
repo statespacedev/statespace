@@ -1,3 +1,7 @@
+190208
+
+running in a docker container
+
 190105
 
 spkf adaptive jazwinksi switched to square-root filtering, qr-factorizaion, cholesky-factor update and downdate. improved numerical stability and scaled sampling is pretty clearly working correctly. still a question around scalar-obs and the obs cholesky-factor and gain. with an adhoc stabilizer on the obs cholesky-factor, it's working well overall.
