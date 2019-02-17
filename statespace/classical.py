@@ -130,5 +130,6 @@ class Classical():
 
 
 if __name__ == "__main__":
-    Classical('ekf1')
-    Classical('ekf2')
+    Classical('kf')
+    # Classical('ekf1')
+    # Classical('ekf2')
