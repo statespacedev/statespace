@@ -1,6 +1,36 @@
 import math
 import numpy as np
 
+class Linear():
+    def __init__(self):
+        self.tsteps = 201
+        self.dt = .1
+        self.x = 2.5 + math.sqrt(1e-12) * np.random.randn()
+        self.Rww = 1e-4
+        self.Rvv = 4
+        self.log = []
+        v = math.sqrt(self.Rvv) * np.random.randn()
+        self.y = 2 * self.x + v
+        self.log.append([0, self.x, self.y])
+        self.u = 300e-6
+
+    def steps(self):
+        for tstep in range(1, self.tsteps):
+            tsec = tstep * self.dt
+            w = math.sqrt(self.Rww) * np.random.randn()
+            v = math.sqrt(self.Rvv) * np.random.randn()
+            self.x = .97 * self.x + 100 * self.u + w
+            self.y = 2 * self.x + v
+            self.log.append([tsec, self.x, self.y])
+            yield (tsec, self.x, self.y)
+
+    def plot(self):
+        log = np.asarray(self.log)
+        import matplotlib.pyplot as plt
+        lw = 1
+        plt.subplot(2, 1, 1), plt.plot(log[:, 0], log[:, 1], linewidth=lw), plt.ylabel('x')
+        plt.subplot(2, 1, 2), plt.plot(log[:, 0], log[:, 2], linewidth=lw), plt.ylabel('y')
+        plt.show()
 
 class Jazwinski1():
     def __init__(self):
@@ -160,8 +190,11 @@ class Jazwinski2():
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
 
-
-if __name__ == "__main__":
-    sim = Jazwinski1()
+def main():
+    sim = Linear()
     for step in sim.steps():
         print(step)
+    sim.plot()
+
+if __name__ == "__main__":
+    main()

@@ -4,12 +4,11 @@ import math
 
 
 class Innovations():
-    def __init__(self, log):
-        self.log = np.asarray(log)
+    def __init__(self, log, x1=3):
+        self.log = np.asarray(log[x1:])
         self.tts = self.log[:, 0]
         self.ets = self.log[:, 4]
-        self.zmw()
-        self.lw = 1
+        self.genzmw()
 
     def autocorr1(self, x):
         n = x.size
@@ -24,7 +23,7 @@ class Innovations():
         ac = np.correlate(x, x, mode='full')
         return ac[ac.size // 2:]
 
-    def zmw(self):
+    def genzmw(self):
         self.mhate = np.mean(self.ets)
         self.Rhatee = np.mean(np.power(self.ets, 2))
         n = len(self.ets)
@@ -32,16 +31,13 @@ class Innovations():
         self.iszeromean = True
         if abs(self.mhate) > self.tau:
             self.iszeromean = False
-        return self.autocorr1(self.ets)
-
-    def wssr(self):
-        return
+        self.zmw = self.autocorr1(self.ets)
 
     def plot_standard(self):
-        x1 = 3
-        plt.subplot(3, 2, 1), plt.plot(self.tts[x1:], self.log[x1:, 1], linewidth=self.lw), plt.ylabel('xhat')
-        plt.subplot(3, 2, 2), plt.plot(self.tts[x1:], self.log[x1:, 3], linewidth=self.lw), plt.ylabel('err')
-        plt.subplot(3, 2, 3), plt.plot(self.tts[x1:], self.log[x1:, 2], linewidth=self.lw), plt.ylabel('yhat')
-        plt.subplot(3, 2, 4), plt.plot(self.tts[x1:], self.log[x1:, 4], linewidth=self.lw), plt.ylabel('innov')
-        plt.subplot(3, 2, 5), plt.plot(self.tts[x1:], self.autocorr1(self.ets)[x1:], linewidth=self.lw), plt.ylabel('autocorr')
+        lw = 1
+        plt.subplot(3, 2, 1), plt.plot(self.tts, self.log[:, 1], linewidth=lw), plt.ylabel('xhat')
+        plt.subplot(3, 2, 2), plt.plot(self.tts, self.log[:, 3], linewidth=lw), plt.ylabel('err')
+        plt.subplot(3, 2, 3), plt.plot(self.tts, self.log[:, 2], linewidth=lw), plt.ylabel('yhat')
+        plt.subplot(3, 2, 4), plt.plot(self.tts, self.log[:, 4], linewidth=lw), plt.ylabel('innov')
+        plt.subplot(3, 2, 5), plt.plot(self.tts, self.zmw, linewidth=lw), plt.ylabel('autocorr')
         plt.show()

@@ -4,15 +4,20 @@ import classical, modern, particle
 
 tol1 = 1.
 
+
 def test_classical_00():
-    tmp = classical.Classical('kf', plot=False)
+    tmp = classical.Classical('kf1', plot=False)
     assert(abs(tmp.log[-1][3]) < tol1)
 
 def test_classical_01():
-    tmp = classical.Classical('ekf1', plot=False)
+    tmp = classical.Classical('kf2', plot=False)
     assert(abs(tmp.log[-1][3]) < tol1)
 
 def test_classical_02():
+    tmp = classical.Classical('ekf1', plot=False)
+    assert(abs(tmp.log[-1][3]) < tol1)
+
+def test_classical_03():
     tmp = classical.Classical('ekf2', plot=False)
     assert(abs(tmp.log[-1][3]) < tol1)
 

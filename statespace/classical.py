@@ -81,9 +81,12 @@ def observational_update(xin, Uin, Din, obs, m):  # bierman
 class Classical():
     def __init__(self, mode, plot=True):
         self.log = []
-        if mode == 'kf':
+        if mode == 'kf1':
+            m = models.Linear()
+            self.kf1(m)
+        elif mode == 'kf2':
             m = models.Jazwinski1()
-            self.kf(m)
+            self.kf2(m)
         elif mode == 'ekf1':
             m = models.Jazwinski1()
             self.ekf1(m)
@@ -93,7 +96,20 @@ class Classical():
         innov = Innovations(self.log)
         if plot: innov.plot_standard()
 
-    def kf(self, m):
+    def kf1(self, m):
+        xhat = 2.5
+        Ptil = 50e-4
+        for step in m.steps():
+            xhat = .97 * xhat + 100 * m.u
+            Ptil = .94 * Ptil + m.Rww
+            Ree = 4 * Ptil + 4
+            K = 2 * Ptil / Ree
+            yhat = 2 * xhat
+            xhat = xhat + K * (step[2] - yhat)
+            Ptil = Ptil / (Ptil + 1)
+            self.log.append([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+
+    def kf2(self, m):
         xhat = 2.2
         Ptil = .01
         for step in m.steps():
@@ -130,6 +146,7 @@ class Classical():
 
 
 if __name__ == "__main__":
-    Classical('kf')
+    Classical('kf1')
+    # Classical('kf2')
     # Classical('ekf1')
     # Classical('ekf2')
