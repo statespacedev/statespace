@@ -5,8 +5,8 @@ class Linear():
     def __init__(self):
         self.tsteps = 201
         self.dt = .1
-        self.x = 2.5 + math.sqrt(1e-12) * np.random.randn()
-        self.Rww = 1e-4
+        self.x = 2.5 + math.sqrt(1e-6) * np.random.randn()
+        self.Rww = 1e-5
         self.Rvv = 4
         self.log = []
         v = math.sqrt(self.Rvv) * np.random.randn()
