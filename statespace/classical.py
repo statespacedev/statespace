@@ -2,7 +2,6 @@ import numpy as np
 from innovations import Innovations
 import models
 
-
 def ud_factorization(M):
     assert np.allclose(M, M.T)
     n = M.shape[0]
