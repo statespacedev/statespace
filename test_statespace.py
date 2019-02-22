@@ -30,9 +30,9 @@ def test_modern_02():
     assert(abs(tmp.log[-1][3]) < tol1)
 
 def test_particle_01():
-    tmp = particle.Particle('pf1', plot=False)
+    tmp = particle.Particle('pf1')
     assert(abs(tmp.log[-1][3]) < tol1)
 
 def test_particle_02():
-    tmp = particle.Particle('pf2', plot=False)
+    tmp = particle.Particle('pf2')
     assert(abs(tmp.log[-1][3]) < tol1)
