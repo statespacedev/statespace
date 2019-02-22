@@ -3,7 +3,7 @@ import numpy as np
 import math
 from innovations import Innovations
 import models
-from pymc3.plots import kdeplot
+from pymc3.plots.kdeplot import fast_kde
 
 def resample(xi, Wi):
     tmp = []
@@ -34,16 +34,19 @@ def normalize(W):
 
 
 class Particle():
-    def __init__(self, mode, plot=True):
+    def __init__(self, mode, innov=False, pmfs=False):
         self.log = []
+        self.pmfs1 = []
+        self.pmfs2 = []
         if mode == 'pf1':
             m = models.Jazwinski1()
             self.pf1(m)
         if mode == 'pf2':
             m = models.Jazwinski2()
             self.pf2(m)
-        innov = Innovations(self.log)
-        if plot: innov.plot_standard()
+        self.innov = Innovations(self.log)
+        if innov: self.innov.plot_standard()
+        if pmfs: self.pmfs()
 
     def pf1(self, m):
         xhat = 2.05
@@ -56,6 +59,26 @@ class Particle():
             yhat = m.c(xhat, 0)
             xhat = W @ x
             self.log.append([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+            self.pmfupdate(m, step, x)
+
+    def pmfupdate(self, m, step, x):
+        pmf, xmin, xmax = fast_kde(m.Apf(step[1]))
+        self.pmfs1.append([step[0], np.linspace(xmin, xmax, len(pmf)), pmf / np.sum(pmf)])
+        pmf, xmin, xmax = fast_kde(x)
+        self.pmfs2.append([step[0], np.linspace(xmin, xmax, len(pmf)), pmf / np.sum(pmf)])
+
+    def pmfs(self):
+        from mpl_toolkits import mplot3d
+        import matplotlib.pyplot as plt
+        ax = plt.axes(projection='3d')
+        for rec in self.pmfs1:
+            y = rec[0] * np.ones(len(rec[1]))
+            ax.plot3D(rec[1], y, rec[2], c='g', linewidth=1)
+        for rec in self.pmfs2:
+            y = rec[0] * np.ones(len(rec[1]))
+            ax.plot3D(rec[1], y, rec[2], c='b', linewidth=1)
+        plt.show()
+        return
 
     def pf2(self, m):
         xhat = np.array([2.0, .055, .044])
@@ -71,5 +94,5 @@ class Particle():
 
 
 if __name__ == "__main__":
-    Particle('pf1')
-    Particle('pf2')
+    Particle('pf1', pmfs=True)
+    # Particle('pf2')
