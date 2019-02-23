@@ -3,7 +3,7 @@ import numpy as np
 import math
 from innovations import Innovations
 import models
-from pymc3.plots.kdeplot import fast_kde
+
 
 def resample(xi, Wi):
     tmp = []
@@ -36,8 +36,7 @@ def normalize(W):
 class Particle():
     def __init__(self, mode, innov=False, pmfs=False):
         self.log = []
-        self.pmfs1 = []
-        self.pmfs2 = []
+        self.pmfs = []
         if mode == 'pf1':
             m = models.Jazwinski1()
             self.pf1(m)
@@ -46,11 +45,11 @@ class Particle():
             self.pf2(m)
         self.innov = Innovations(self.log)
         if innov: self.innov.plot_standard()
-        if pmfs: self.pmfs()
+        if pmfs: self.pmfsfinal()
 
     def pf1(self, m):
         xhat = 2.05
-        x = xhat + math.sqrt(m.Rww) * np.random.randn(m.nsamp)
+        x = xhat + math.sqrt(1e-5) * np.random.randn(m.nsamp)
         W = normalize(np.ones(m.nsamp))
         for step in m.steps():
             x = resample(x, W)
@@ -62,23 +61,28 @@ class Particle():
             self.pmfupdate(m, step, x)
 
     def pmfupdate(self, m, step, x):
-        pmf, xmin, xmax = fast_kde(m.Apf(step[1]))
-        self.pmfs1.append([step[0], np.linspace(xmin, xmax, len(pmf)), pmf / np.sum(pmf)])
+        from pymc3.plots.kdeplot import fast_kde
+        pmft, xmint, xmaxt = fast_kde(m.Apf(step[1]))
         pmf, xmin, xmax = fast_kde(x)
-        self.pmfs2.append([step[0], np.linspace(xmin, xmax, len(pmf)), pmf / np.sum(pmf)])
+        self.pmfs.append([step[0], np.linspace(xmint, xmaxt, len(pmft)), pmft / np.sum(pmft), np.linspace(xmin, xmax, len(pmf)), pmf / np.sum(pmf)])
 
-    def pmfs(self):
+    def pmfsfinal(self):
         from mpl_toolkits import mplot3d
         import matplotlib.pyplot as plt
+        est = []
+        for rec in self.pmfs:
+            est.append([rec[0], rec[1][np.argmax(rec[2])], 0., rec[3][np.argmax(rec[4])], 0.])
+        est = np.asarray(est)
         ax = plt.axes(projection='3d')
-        for rec in self.pmfs1:
+        tlim = 100
+        ax.plot3D(est[:tlim,1], est[:tlim,0], est[:tlim,2], c='r', linewidth=1)
+        ax.plot3D(est[:tlim,3], est[:tlim,0], est[:tlim,4], c='r', linewidth=1)
+        for rec in self.pmfs[:tlim]:
             y = rec[0] * np.ones(len(rec[1]))
             ax.plot3D(rec[1], y, rec[2], c='g', linewidth=1)
-        for rec in self.pmfs2:
-            y = rec[0] * np.ones(len(rec[1]))
-            ax.plot3D(rec[1], y, rec[2], c='b', linewidth=1)
+            y = rec[0] * np.ones(len(rec[3]))
+            ax.plot3D(rec[3], y, rec[4], c='b', linewidth=1)
         plt.show()
-        return
 
     def pf2(self, m):
         xhat = np.array([2.0, .055, .044])
@@ -94,5 +98,5 @@ class Particle():
 
 
 if __name__ == "__main__":
-    Particle('pf1', pmfs=True)
+    Particle('pf1', pmfs=1, innov=0)
     # Particle('pf2')
