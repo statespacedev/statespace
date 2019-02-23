@@ -12,22 +12,33 @@ class PMF():
         pmf, xmin, xmax = fast_kde(x)
         self.log.append([step[0], np.linspace(xmint, xmaxt, len(pmft)), pmft / np.sum(pmft), np.linspace(xmin, xmax, len(pmf)), pmf / np.sum(pmf)])
 
-    def plot(self):
+    def kld1(self, x1, x2):
+        def kli(a, b):
+            return np.sum(np.multiply(a, np.log(a)) - np.multiply(a, np.log(b)), axis=0)
+        x1 = 1.0 * x1 / np.sum(x1, axis=0)
+        x2 = 1.0 * x2 / np.sum(x2, axis=0)
+        return (kli(x1, x2) + kli(x2, x1)) / 2
+
+    def kld2(self, x1, x2):
+        from scipy.stats import entropy
+        return entropy(x1, x2)
+
+    def plot(self, tlim = 100):
         from mpl_toolkits import mplot3d
         import matplotlib.pyplot as plt
         est = []
-        for rec in self.log:
-            est.append([rec[0], rec[1][np.argmax(rec[2])], 0., rec[3][np.argmax(rec[4])], 0.])
+        for rec in self.log: est.append([rec[0], rec[1][np.argmax(rec[2])], 0., rec[3][np.argmax(rec[4])], 0.])
         est = np.asarray(est)
         ax = plt.axes(projection='3d')
-        tlim = 100
         ax.plot3D(est[:tlim,1], est[:tlim,0], est[:tlim,2], c='r', linewidth=1)
         ax.plot3D(est[:tlim,3], est[:tlim,0], est[:tlim,4], c='r', linewidth=1)
         for rec in self.log[:tlim]:
-            y = rec[0] * np.ones(len(rec[1]))
-            ax.plot3D(rec[1], y, rec[2], c='g', linewidth=1)
-            y = rec[0] * np.ones(len(rec[3]))
-            ax.plot3D(rec[3], y, rec[4], c='b', linewidth=1)
+            ax.plot3D(rec[1], rec[0] * np.ones(len(rec[1])), rec[2], c='g', linewidth=1)
+            ax.plot3D(rec[3], rec[0] * np.ones(len(rec[3])), rec[4], c='b', linewidth=1)
+        plt.title('kl-divergence, %.1E' % (self.kld1(est[:tlim, 1], est[:tlim, 3])))
+        ax.set_xlabel('x')
+        ax.set_ylabel('t')
+        ax.set_zlabel('p')
         plt.show()
 
 class Innovations():

@@ -1,13 +1,17 @@
 
 190223
 
+kl-divergence distance-measure for pf evaluation.
+
 ![pf1](images/pf1.png)
 
-implement kl-divergence distance-measure for pf performance eval.
+![pf2](images/pf2.png)
+
+![pf3](images/pf3.png)
 
 190105
 
-ukf adaptive jazwinksi switched to square-root filtering, qr-factorizaion, cholesky-factor update and downdate. improved numerical stability and scaled sampling is pretty clearly working correctly. still a question around scalar-obs and the obs cholesky-factor and gain. with an adhoc stabilizer on the obs cholesky-factor, it's working well overall.
+ukf adaptive jazwinksi switched to square-root filtering, qr-factorizaion, cholesky-factor update and downdate. improved numerical stability and scaled sampling is clear. still a question around scalar-obs and the obs cholesky-factor and gain. with an adhoc stabilizer on the obs cholesky-factor it's working well overall.
 
 181230
 

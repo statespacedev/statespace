@@ -45,7 +45,7 @@ class Particle():
 
     def pf1(self, m):
         xhat = 2.05
-        x = xhat + math.sqrt(1e-5) * np.random.randn(m.nsamp)
+        x = xhat + math.sqrt(1e-4) * np.random.randn(m.nsamp)
         W = normalize(np.ones(m.nsamp))
         for step in m.steps():
             x = resample(x, W)
@@ -69,5 +69,5 @@ class Particle():
             self.innov.update([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
 if __name__ == "__main__":
-    Particle('pf1', pmfs=0, innov=1)
-    Particle('pf2', innov=1)
+    Particle('pf1', pmfs=1, innov=0)
+    # Particle('pf2', innov=1)
