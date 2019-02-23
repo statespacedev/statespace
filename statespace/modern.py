@@ -1,11 +1,8 @@
 import math
 import numpy as np
 from scipy.linalg.blas import drot, drotg
-from innovations import Innovations
+from performance import Innovations
 import models
-
-
-# np.seterr(all='raise')
 
 def cholupdate(R, z):
     n = z.shape[0]
@@ -13,7 +10,6 @@ def cholupdate(R, z):
         c, s = drotg(R[k, k], z[k])
         drot(R[k, :], z, c, s, overwrite_x=True, overwrite_y=True)
     return R
-
 
 def choldowndate(R, z):
     n = R.shape[0]
@@ -26,7 +22,6 @@ def choldowndate(R, z):
         R[k, k] = rbar
     return R
 
-
 def temporal_update(xhat, S, m):
     X = m.va(m.X(xhat, S))
     xhat = m.Wm @ X.T
@@ -34,7 +29,6 @@ def temporal_update(xhat, S, m):
     q, r = np.linalg.qr(np.concatenate([math.sqrt(m.Wc[1]) * m.Xtil[:, 1:], m.Sw], 1))
     S = cholupdate(r.T[0:3, 0:3], m.Wc[0] * m.Xtil[:, 0])
     return xhat, S, X
-
 
 def observational_update(xhat, S, X, obs, m):
     Y = m.vc(m.Xhat(X))
@@ -50,18 +44,16 @@ def observational_update(xhat, S, X, obs, m):
     S = choldowndate(S, U)
     return xhat, S, yhat
 
-
 class Modern():
     def __init__(self, mode, plot=True):
-        self.log = []
+        self.innov = Innovations()
         if mode == 'spkf1':
             m = models.Jazwinski1()
             self.spkf1(m)
         elif mode == 'spkf2':
             m = models.Jazwinski2()
             self.spkf2(m)
-        innov = Innovations(self.log)
-        if plot: innov.plot_standard()
+        if plot: self.innov.plot()
 
     def spkf1(self, m):
         xhat = 2.2
@@ -76,7 +68,7 @@ class Modern():
             yhat = m.W @ Y
             xhat = m.W @ X + K * (step[2] - m.W @ Y)
             Ptil = Ptil - K * Rksiksi * K
-            self.log.append([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+            self.innov.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
 
     def spkf2(self, m):
         xhat = np.array([2.0, .055, .044])
@@ -84,9 +76,8 @@ class Modern():
         for step in m.steps():
             xhat, S, X = temporal_update(xhat=xhat, S=S, m=m)
             xhat, S, yhat = observational_update(xhat=xhat, S=S, X=X, obs=step[2], m=m)
-            self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
-
+            self.innov.update([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
 if __name__ == "__main__":
-    # Modern('spkf1')
+    Modern('spkf1')
     Modern('spkf2')

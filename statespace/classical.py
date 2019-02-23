@@ -1,5 +1,5 @@
 import numpy as np
-from innovations import Innovations
+from performance import Innovations
 import models
 
 def ud_factorization(M):
@@ -79,7 +79,7 @@ def observational_update(xin, Uin, Din, obs, m):  # bierman
 
 class Classical():
     def __init__(self, mode, plot=True):
-        self.log = []
+        self.innov = Innovations()
         if mode == 'kf1':
             m = models.Linear()
             self.kf1(m)
@@ -92,8 +92,7 @@ class Classical():
         elif mode == 'ekf2':
             m = models.Jazwinski2()
             self.ekf2(m)
-        innov = Innovations(self.log)
-        if plot: innov.plot_standard()
+        if plot: self.innov.plot()
 
     def kf1(self, m):
         xhat = 2.5
@@ -106,7 +105,7 @@ class Classical():
             yhat = 2 * xhat
             xhat = xhat + K * (step[2] - yhat)
             Ptil = Ptil / (Ptil + 1)
-            self.log.append([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+            self.innov.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
 
     def kf2(self, m):
         xhat = 2.2
@@ -120,7 +119,7 @@ class Classical():
             yhat = m.c(xref, 0) + m.C(xref) * (xhat - xref)
             xhat = xhat + K * (step[2] - yhat)
             Ptil = (1 - K * m.C(xref)) * Ptil
-            self.log.append([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+            self.innov.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
 
     def ekf1(self, m):
         xhat = 2.2
@@ -133,7 +132,7 @@ class Classical():
             yhat = m.c(xhat)
             xhat = xhat + K * (step[2] - yhat)
             Ptil = (1 - K * m.C(xhat)) * Ptil
-            self.log.append([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+            self.innov.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
 
     def ekf2(self, m):
         xhat = np.array([2, .055, .044])
@@ -141,11 +140,11 @@ class Classical():
         for step in m.steps():
             xhat, U, D = temporal_update(xin=m.a(xhat), Uin=U, Din=D, m=m)
             xhat, U, D, yhat = observational_update(xin=xhat, Uin=U, Din=D, obs=step[2], m=m)
-            self.log.append([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
+            self.innov.update([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
 
 if __name__ == "__main__":
     Classical('kf1')
-    # Classical('kf2')
-    # Classical('ekf1')
-    # Classical('ekf2')
+    Classical('kf2')
+    Classical('ekf1')
+    Classical('ekf2')
