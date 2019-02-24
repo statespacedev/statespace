@@ -105,7 +105,7 @@ class Classical():
             yhat = 2 * xhat
             xhat = xhat + K * (step[2] - yhat)
             Ptil = Ptil / (Ptil + 1)
-            self.innov.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+            self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
     def kf2(self, m):
         xhat = 2.2
@@ -119,7 +119,7 @@ class Classical():
             yhat = m.c(xref, 0) + m.C(xref) * (xhat - xref)
             xhat = xhat + K * (step[2] - yhat)
             Ptil = (1 - K * m.C(xref)) * Ptil
-            self.innov.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+            self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
     def ekf1(self, m):
         xhat = 2.2
@@ -132,7 +132,7 @@ class Classical():
             yhat = m.c(xhat)
             xhat = xhat + K * (step[2] - yhat)
             Ptil = (1 - K * m.C(xhat)) * Ptil
-            self.innov.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+            self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
     def ekf2(self, m):
         xhat = np.array([2, .055, .044])
@@ -140,7 +140,7 @@ class Classical():
         for step in m.steps():
             xhat, U, D = temporal_update(xin=m.a(xhat), Uin=U, Din=D, m=m)
             xhat, U, D, yhat = observational_update(xin=xhat, Uin=U, Din=D, obs=step[2], m=m)
-            self.innov.update([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
+            self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
 
 if __name__ == "__main__":

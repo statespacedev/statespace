@@ -68,7 +68,7 @@ class Modern():
             yhat = m.W @ Y
             xhat = m.W @ X + K * (step[2] - m.W @ Y)
             Ptil = Ptil - K * Rksiksi * K
-            self.innov.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+            self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
     def spkf2(self, m):
         xhat = np.array([2.0, .055, .044])
@@ -76,7 +76,7 @@ class Modern():
         for step in m.steps():
             xhat, S, X = temporal_update(xhat=xhat, S=S, m=m)
             xhat, S, yhat = observational_update(xhat=xhat, S=S, X=X, obs=step[2], m=m)
-            self.innov.update([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
+            self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
 if __name__ == "__main__":
     Modern('spkf1')

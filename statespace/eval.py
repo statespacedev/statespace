@@ -6,17 +6,27 @@ class Ensemble():
     def __init__(self):
         self.log = []
 
-    def update(self, dists):
-        for rec in dists.log:
-            xmaps = rec[3][np.argmax(rec[4])]
-            self.log.append(xmaps)
+    def update(self, distslog):
+        for rec in distslog:
+            truval, trupmf = rec[1], rec[2]
+            maptru = truval[np.argmax(trupmf)]
+            estval, estpmf = rec[3], rec[4]
+            mapest = estval[np.argmax(estpmf)]
+            self.log.append([maptru, mapest])
 
     def plot(self):
+        log = np.asarray(self.log)
         from pymc3.plots.kdeplot import fast_kde
         import matplotlib.pyplot as plt
-        xmappmf, xmapmin, xmapmax = fast_kde(self.log)
+        maptrupmf, maptrumin, maptrumax = fast_kde(log[:, 0])
+        mapestpmf, mapestmin, mapestmax = fast_kde(log[:, 1])
+        maptruval = np.linspace(maptrumin, maptrumax, len(maptrupmf))
+        mapestval = np.linspace(mapestmin, mapestmax, len(mapestpmf))
+        maptrupmf = maptrupmf / sum(mapestpmf)
+        mapestpmf = mapestpmf / sum(mapestpmf)
         plt.figure()
-        plt.plot(np.linspace(xmapmin, xmapmax, len(xmappmf)), xmappmf / np.sum(xmappmf))
+        plt.plot(maptruval, maptrupmf, 'g')
+        plt.plot(mapestval, mapestpmf, 'b')
         plt.show()
         pass
 
@@ -24,11 +34,15 @@ class Dists():
     def __init__(self):
         self.log = []
 
-    def update(self, m, step, x):
+    def update(self, t, tru, est):
         from pymc3.plots.kdeplot import fast_kde
-        pmft, xmint, xmaxt = fast_kde(m.Apf(step[1]))
-        pmf, xmin, xmax = fast_kde(x)
-        self.log.append([step[0], np.linspace(xmint, xmaxt, len(pmft)), pmft / np.sum(pmft), np.linspace(xmin, xmax, len(pmf)), pmf / np.sum(pmf)])
+        trupmf, trumin, trumax = fast_kde(tru)
+        estpmf, estmin, estmax = fast_kde(est)
+        truval = np.linspace(trumin, trumax, len(trupmf))
+        estval = np.linspace(estmin, estmax, len(estpmf))
+        trupmf = trupmf / sum(trupmf)
+        estpmf = estpmf / sum(estpmf)
+        self.log.append([t, truval, trupmf, estval, estpmf])
 
     def kld1(self, x1, x2):
         def kli(a, b): return np.sum(np.multiply(a, np.log(a)) - np.multiply(a, np.log(b)), axis=0)
@@ -64,8 +78,8 @@ class Innovs():
     def __init__(self):
         self.log = []
 
-    def update(self, rec):
-        self.log.append(rec)
+    def update(self, t, xhat, yhat, err, inn):
+        self.log.append([t, xhat, yhat, err, inn])
 
     def autocorr1(self, x):
         n = x.size

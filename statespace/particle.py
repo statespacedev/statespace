@@ -33,7 +33,7 @@ class Particle():
             for i in range(100):
                 m = models.Jazwinski1()
                 self.pf1(m)
-                self.ens.update(self.dists)
+                self.ens.update(distslog=self.dists.log)
             self.ens.plot()
         if mode == 'pf1':
             m = models.Jazwinski1()
@@ -54,8 +54,8 @@ class Particle():
             W = normalize(m.Cpf(step[2], x))
             yhat = m.c(xhat, 0)
             xhat = W @ x
-            self.innovs.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
-            self.dists.update(m, step, x)
+            self.innovs.update(t=step[0], xhat=xhat, yhat=yhat, err=step[1] - xhat, inn=step[2] - yhat)
+            self.dists.update(t=step[0], tru=m.Apf(step[1]), est=x)
 
     def pf2(self, m):
         xhat = np.array([2.0, .055, .044])
@@ -67,7 +67,7 @@ class Particle():
             W[:, 0] = normalize(m.Cpf(step[2], x[:, 0]))
             yhat = m.c(xhat, 0)
             xhat = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
-            self.innovs.update([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
+            self.innovs.update(t=step[0], xhat=xhat[0], yhat=yhat, err=step[1][0] - xhat[0], inn=step[2] - yhat)
 
 def roughen(x):
     return x + .1 * np.random.randn(x.size)
@@ -76,6 +76,6 @@ def normalize(W):
     return W / sum(W)
 
 if __name__ == "__main__":
-    # Particle('test')
-    Particle('pf1', dists=1, innovs=0)
+    Particle('test')
+    # Particle('pf1', dists=1, innovs=0)
     # Particle('pf2', innovs=1)
