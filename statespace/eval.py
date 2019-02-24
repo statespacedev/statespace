@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-class PMF():
+class Dists():
     def __init__(self):
         self.log = []
 
@@ -41,7 +41,7 @@ class PMF():
         ax.set_zlabel('p')
         plt.show()
 
-class Innovations():
+class Innovs():
     def __init__(self):
         self.log = []
 

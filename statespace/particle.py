@@ -1,7 +1,7 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
 import math
-from performance import Innovations, PMF
+from eval import Innovs, Dists
 import models
 
 
@@ -31,17 +31,17 @@ def normalize(W):
     return W / sum(W)
 
 class Particle():
-    def __init__(self, mode, innov=False, pmfs=False):
-        self.innov = Innovations()
-        self.pmf = PMF()
+    def __init__(self, mode, innovs=False, dists=False):
+        self.innovs = Innovs()
+        self.dists = Dists()
         if mode == 'pf1':
             m = models.Jazwinski1()
             self.pf1(m)
         if mode == 'pf2':
             m = models.Jazwinski2()
             self.pf2(m)
-        if innov: self.innov.plot()
-        if pmfs: self.pmf.plot()
+        if innovs: self.innovs.plot()
+        if dists: self.dists.plot()
 
     def pf1(self, m):
         xhat = 2.05
@@ -53,8 +53,8 @@ class Particle():
             W = normalize(m.Cpf(step[2], x))
             yhat = m.c(xhat, 0)
             xhat = W @ x
-            self.innov.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
-            self.pmf.update(m, step, x)
+            self.innovs.update([step[0], xhat, yhat, step[1] - xhat, step[2] - yhat])
+            self.dists.update(m, step, x)
 
     def pf2(self, m):
         xhat = np.array([2.0, .055, .044])
@@ -66,8 +66,8 @@ class Particle():
             W[:, 0] = normalize(m.Cpf(step[2], x[:, 0]))
             yhat = m.c(xhat, 0)
             xhat = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
-            self.innov.update([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
+            self.innovs.update([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
 if __name__ == "__main__":
-    Particle('pf1', pmfs=1, innov=0)
-    # Particle('pf2', innov=1)
+    Particle('pf1', dists=1, innovs=0)
+    # Particle('pf2', innovs=1)

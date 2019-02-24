@@ -1,5 +1,5 @@
 import numpy as np
-from performance import Innovations
+from eval import Innovs
 import models
 
 def ud_factorization(M):
@@ -79,7 +79,7 @@ def observational_update(xin, Uin, Din, obs, m):  # bierman
 
 class Classical():
     def __init__(self, mode, plot=True):
-        self.innov = Innovations()
+        self.innov = Innovs()
         if mode == 'kf1':
             m = models.Linear()
             self.kf1(m)
