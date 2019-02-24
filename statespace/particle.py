@@ -1,7 +1,7 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
 import math
-from eval import Innovs, Dists
+from eval import Innovs, Dists, Ensemble
 import models
 
 
@@ -24,28 +24,29 @@ def resample(xi, Wi):
     assert xhati.size == xi.size
     return xhati
 
-def roughen(x):
-    return x + .1 * np.random.randn(x.size)
-
-def normalize(W):
-    return W / sum(W)
-
 class Particle():
     def __init__(self, mode, innovs=False, dists=False):
         self.innovs = Innovs()
         self.dists = Dists()
+        self.ens = Ensemble()
+        if mode == 'test':
+            for i in range(100):
+                m = models.Jazwinski1()
+                self.pf1(m)
+                self.ens.update(self.dists)
+            self.ens.plot()
         if mode == 'pf1':
             m = models.Jazwinski1()
             self.pf1(m)
+            if dists: self.dists.plot()
         if mode == 'pf2':
             m = models.Jazwinski2()
             self.pf2(m)
         if innovs: self.innovs.plot()
-        if dists: self.dists.plot()
 
     def pf1(self, m):
         xhat = 2.05
-        x = xhat + math.sqrt(1e-4) * np.random.randn(m.nsamp)
+        x = xhat + math.sqrt(1e-2) * np.random.randn(m.nsamp)
         W = normalize(np.ones(m.nsamp))
         for step in m.steps():
             x = resample(x, W)
@@ -68,6 +69,13 @@ class Particle():
             xhat = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
             self.innovs.update([step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat])
 
+def roughen(x):
+    return x + .1 * np.random.randn(x.size)
+
+def normalize(W):
+    return W / sum(W)
+
 if __name__ == "__main__":
+    # Particle('test')
     Particle('pf1', dists=1, innovs=0)
     # Particle('pf2', innovs=1)

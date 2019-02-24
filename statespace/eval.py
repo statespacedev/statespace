@@ -2,6 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+class Ensemble():
+    def __init__(self):
+        self.log = []
+
+    def update(self, dists):
+        for rec in dists.log:
+            xmaps = rec[3][np.argmax(rec[4])]
+            self.log.append(xmaps)
+
+    def plot(self):
+        from pymc3.plots.kdeplot import fast_kde
+        import matplotlib.pyplot as plt
+        xmappmf, xmapmin, xmapmax = fast_kde(self.log)
+        plt.figure()
+        plt.plot(np.linspace(xmapmin, xmapmax, len(xmappmf)), xmappmf / np.sum(xmappmf))
+        plt.show()
+        pass
+
 class Dists():
     def __init__(self):
         self.log = []
@@ -23,11 +41,13 @@ class Dists():
         return entropy(x1, x2)
 
     def plot(self, tlim = 100):
+        from pymc3.plots.kdeplot import fast_kde
         from mpl_toolkits import mplot3d
         import matplotlib.pyplot as plt
         est = []
         for rec in self.log: est.append([rec[0], rec[1][np.argmax(rec[2])], 0., rec[3][np.argmax(rec[4])], 0.])
         est = np.asarray(est)
+        plt.figure()
         ax = plt.axes(projection='3d')
         ax.plot3D(est[:tlim,1], est[:tlim,0], est[:tlim,2], c='r', linewidth=1)
         ax.plot3D(est[:tlim,3], est[:tlim,0], est[:tlim,4], c='r', linewidth=1)
