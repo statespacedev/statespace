@@ -13,8 +13,7 @@ class Dists():
         self.log.append([step[0], np.linspace(xmint, xmaxt, len(pmft)), pmft / np.sum(pmft), np.linspace(xmin, xmax, len(pmf)), pmf / np.sum(pmf)])
 
     def kld1(self, x1, x2):
-        def kli(a, b):
-            return np.sum(np.multiply(a, np.log(a)) - np.multiply(a, np.log(b)), axis=0)
+        def kli(a, b): return np.sum(np.multiply(a, np.log(a)) - np.multiply(a, np.log(b)), axis=0)
         x1 = 1.0 * x1 / np.sum(x1, axis=0)
         x2 = 1.0 * x2 / np.sum(x2, axis=0)
         return (kli(x1, x2) + kli(x2, x1)) / 2
