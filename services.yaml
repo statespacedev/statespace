@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: statespace
+  namespace: default
+  labels:
+    run: statespace
+spec:
+  ports:
+      - protocol: TCP
+        port: 5000
+        targetPort: 5000
+  selector:
+    run: statespace
+  type: ClusterIP

@@ -26,3 +26,16 @@ automated build-test-deploy to [pypi](https://pypi.org/project/statespace) is mo
     python3 setup.py develop
     pytest
     python3 statespace --demo
+
+gcloud stuff
+
+    gcloud auth login
+    gcloud projects list
+    source cloud.env
+    gcloud config set project statespace-233406
+    gcloud beta container --project $PROJECT clusters create $CLUSTER --zone $ZONE
+    kubectl create -f services.yaml
+    kubectl create -f ingress.yaml && kubectl create -f deployments.yaml && kubectl create -f secrets.yaml
+    
+    
+    
