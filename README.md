@@ -27,7 +27,7 @@ automated build-test-deploy to [pypi](https://pypi.org/project/statespace) is mo
     pytest
     python3 statespace --demo
 
-gcloud stuff
+cloud stuff
 
     gcloud auth login
     gcloud projects list
