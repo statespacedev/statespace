@@ -1,4 +1,4 @@
-<img src="https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf2.png" align="center" width="480" height="360"/>
+<img src="https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf2-small.png"/>
 
 [![pipeline](https://gitlab.com/noahhsmith/starid/badges/master/pipeline.svg)](https://gitlab.com/noahhsmith/statespace/pipelines)
 [![pypi](https://img.shields.io/badge/pypi-latest-brightgreen.svg)](https://pypi.org/project/statespace/)
