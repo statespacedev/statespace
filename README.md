@@ -13,7 +13,7 @@ uncertainty and confidence, distributions, their evolution with time, noise, and
 
 [Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
 
-google-cloud-platform automated build-test-deploy to kubernetes-engine is the focus at the moment, using cloud-source [repo](https://source.cloud.google.com/statespace-229611/statespace) and cloud-build along the way.
+current focus is automated build-test-deploy to kubernetes-engine using cloud-source and cloud-build along the way.
 
 automated build-test-deploy to [pypi](https://pypi.org/project/statespace) is mostly a placeholder, ubuntu clone-install-develop of gitlab [repo](https://gitlab.com/noahhsmith/statespace) is assumed for now.
 
