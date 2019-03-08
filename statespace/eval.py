@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-class Ensemble():
+class DistsEnsemble():
     def __init__(self):
         self.log = []
 

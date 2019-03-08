@@ -2,8 +2,25 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-class Linear():
-    def __init__(self, signal=300.):
+class RccircuitEnsemble():
+    def __init__(self, signal, title):
+        self.signal = signal
+        self.title = title
+        self.runs = []
+
+    def plot(self):
+        lw = 1
+        plt.figure()
+        for run in self.runs:
+            log = np.asarray(run.log)
+            plt.subplot(2, 1, 1)
+            plt.plot(log[:, 0], log[:, 1], linewidth=lw, color='b', alpha=.25), plt.ylabel('x')
+            if self.title: plt.title(self.title)
+            plt.subplot(2, 1, 2)
+            plt.plot(log[:, 0], log[:, 2], linewidth=lw, color='b', alpha=.25), plt.ylabel('y')
+
+class Rccircuit():
+    def __init__(self, signal):
         self.u = signal * 1e-6 # amps step-function input
         self.tsteps = 201
         self.dt = .1
@@ -28,6 +45,7 @@ class Linear():
     def plot(self):
         log = np.asarray(self.log)
         lw = 1
+        plt.figure()
         plt.subplot(2, 1, 1), plt.plot(log[:, 0], log[:, 1], linewidth=lw), plt.ylabel('x')
         plt.subplot(2, 1, 2), plt.plot(log[:, 0], log[:, 2], linewidth=lw), plt.ylabel('y')
 
@@ -189,14 +207,18 @@ class Jazwinski2():
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
 
-def rccircuit(signal=None):
-    sim = Linear()
-    if not signal == None: sim = Linear(signal)
-    for step in sim.steps():
-        print(step)
-    sim.plot()
+def rccircuit(runs, signal, title=None):
+    ens = RccircuitEnsemble(signal, title)
+    for runndx in range(runs):
+        sim = Rccircuit(signal)
+        for step in sim.steps():
+            continue
+        ens.runs.append(sim)
+    return ens
 
 if __name__ == "__main__":
-    rccircuit()
-    rccircuit(signal=0.)
+    enssig = rccircuit(runs=10, signal=300., title='signal')
+    ensnoise = rccircuit(runs=10, signal=0., title='noise')
+    enssig.plot()
+    ensnoise.plot()
     plt.show()

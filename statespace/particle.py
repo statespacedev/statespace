@@ -1,7 +1,7 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
 import math
-from eval import Innovs, Dists, Ensemble
+from eval import Innovs, Dists, DistsEnsemble
 import models
 
 
@@ -28,7 +28,7 @@ class Particle():
     def __init__(self, mode, innovs=False, dists=False):
         self.innovs = Innovs()
         self.dists = Dists()
-        self.ens = Ensemble()
+        self.ens = DistsEnsemble()
         if mode == 'test':
             for i in range(100):
                 m = models.Jazwinski1()

@@ -81,7 +81,7 @@ class Classical():
     def __init__(self, mode, plot=True):
         self.innov = Innovs()
         if mode == 'kf1':
-            m = models.Linear()
+            m = models.Rccircuit(signal=300.)
             self.kf1(m)
         elif mode == 'kf2':
             m = models.Jazwinski1()
