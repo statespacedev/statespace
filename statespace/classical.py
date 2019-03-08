@@ -144,7 +144,7 @@ class Classical():
 
 
 if __name__ == "__main__":
-    Classical('kf1')
-    Classical('kf2')
-    Classical('ekf1')
-    Classical('ekf2')
+    Classical('kf1', plot=True)
+    # Classical('kf2')
+    # Classical('ekf1')
+    # Classical('ekf2')

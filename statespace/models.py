@@ -1,8 +1,10 @@
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Linear():
-    def __init__(self):
+    def __init__(self, signal=300.):
+        self.u = signal * 1e-6 # amps step-function input
         self.tsteps = 201
         self.dt = .1
         self.x = 2.5 + math.sqrt(1e-6) * np.random.randn()
@@ -12,7 +14,6 @@ class Linear():
         v = math.sqrt(self.Rvv) * np.random.randn()
         self.y = 2 * self.x + v
         self.log.append([0, self.x, self.y])
-        self.u = 300e-6
 
     def steps(self):
         for tstep in range(1, self.tsteps):
@@ -26,11 +27,9 @@ class Linear():
 
     def plot(self):
         log = np.asarray(self.log)
-        import matplotlib.pyplot as plt
         lw = 1
         plt.subplot(2, 1, 1), plt.plot(log[:, 0], log[:, 1], linewidth=lw), plt.ylabel('x')
         plt.subplot(2, 1, 2), plt.plot(log[:, 0], log[:, 2], linewidth=lw), plt.ylabel('y')
-        plt.show()
 
 class Jazwinski1():
     def __init__(self):
@@ -190,11 +189,14 @@ class Jazwinski2():
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
 
-def main():
+def rccircuit(signal=None):
     sim = Linear()
+    if not signal == None: sim = Linear(signal)
     for step in sim.steps():
         print(step)
     sim.plot()
 
 if __name__ == "__main__":
-    main()
+    rccircuit()
+    rccircuit(signal=0.)
+    plt.show()
