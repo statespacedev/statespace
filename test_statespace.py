@@ -5,7 +5,7 @@ import classical, modern, particle
 tol1 = 1.
 
 def test_classical_00():
-    tmp = classical.Classical('kf1', plot=False)
+    tmp = classical.Classical('rccircuit', plot=False)
     assert(abs(tmp.innov.log[-1][3]) < tol1)
 
 def test_classical_01():

@@ -2,7 +2,33 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
+class DistsEns():
+    def __init__(self):
+        self.log = []
 
+    def update(self, distslog):
+        for rec in distslog:
+            truval, trupmf = rec[1], rec[2]
+            maptru = truval[np.argmax(trupmf)]
+            estval, estpmf = rec[3], rec[4]
+            mapest = estval[np.argmax(estpmf)]
+            self.log.append([maptru, mapest])
+
+    def plot(self):
+        log = np.asarray(self.log)
+        from pymc3.plots.kdeplot import fast_kde
+        import matplotlib.pyplot as plt
+        maptrupmf, maptrumin, maptrumax = fast_kde(log[:, 0])
+        mapestpmf, mapestmin, mapestmax = fast_kde(log[:, 1])
+        maptruval = np.linspace(maptrumin, maptrumax, len(maptrupmf))
+        mapestval = np.linspace(mapestmin, mapestmax, len(mapestpmf))
+        maptrupmf = maptrupmf / sum(mapestpmf)
+        mapestpmf = mapestpmf / sum(mapestpmf)
+        plt.figure()
+        plt.plot(maptruval, maptrupmf, 'g')
+        plt.plot(mapestval, mapestpmf, 'b')
+        plt.show()
+        pass
 
 class Dists():
     def __init__(self):

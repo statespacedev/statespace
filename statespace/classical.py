@@ -80,9 +80,9 @@ def observational_update(xin, Uin, Din, obs, m):  # bierman
 class Classical():
     def __init__(self, mode, plot=True):
         self.innov = Innovs()
-        if mode == 'kf1':
+        if mode == 'rccircuit':
             m = models.Rccircuit(signal=300.)
-            self.kf1(m)
+            self.rccircuit(m)
         elif mode == 'kf2':
             m = models.Jazwinski1()
             self.kf2(m)
@@ -94,7 +94,7 @@ class Classical():
             self.ekf2(m)
         if plot: self.innov.plot()
 
-    def kf1(self, m):
+    def rccircuit(self, m):
         xhat = 2.5
         Ptil = 50e-4
         for step in m.steps():
@@ -142,9 +142,11 @@ class Classical():
             xhat, U, D, yhat = observational_update(xin=xhat, Uin=U, Din=D, obs=step[2], m=m)
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
-
-if __name__ == "__main__":
-    Classical('kf1', plot=True)
+def main():
+    Classical('rccircuit', plot=True)
     # Classical('kf2')
     # Classical('ekf1')
     # Classical('ekf2')
+
+if __name__ == "__main__":
+    main()
