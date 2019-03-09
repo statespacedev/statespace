@@ -1,9 +1,9 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
 import math
-from eval import Innovs, Dists, DistsEnsemble
+from eval import Innovs, Dists
+from ensembles import DistsEnsemble
 import models
-
 
 def resample(xi, Wi):
     tmp = []
