@@ -78,10 +78,11 @@ def observational_update(xin, Uin, Din, obs, m):  # bierman
 
 
 class Classical():
-    def __init__(self, mode, plot=True):
+    def __init__(self, mode, plot=True, signal=None):
         self.innov = Innovs()
         if mode == 'rccircuit':
-            m = models.Rccircuit(signal=300.)
+            if signal == None: signal = 300.
+            m = models.Rccircuit(signal=signal)
             self.rccircuit(m)
         elif mode == 'kf2':
             m = models.Jazwinski1()
@@ -105,7 +106,7 @@ class Classical():
             yhat = 2 * xhat
             xhat = xhat + K * (step[2] - yhat)
             Ptil = Ptil / (Ptil + 1)
-            self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
+            self.innov.update2(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat, Ree, Ptil)
 
     def kf2(self, m):
         xhat = 2.2

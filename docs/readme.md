@@ -1,4 +1,10 @@
 
+190310
+
+decision-function-based detector is go. simplest possible case - linear rc-circuit system-model and linear kalman filter tracker. log-likelihood decision function for detection - output is shown below on the x-axis. green curves are with a signal present, blue curves are noise-only, ensembles of 100 runs each for signal case and noise case
+
+ ![decision-function](images/decision-function.png)
+
 <a name="190223"/>190223
 
 kl-divergence for evaluating sequential monte-carlo - demonstrated below by three pf's in action during the first second of the jazwinksi problem - start-up and convergence. these are 100 hz dist-curves - each dist-curve is a kernel-density-estimate combining hundreds of monte-carlo samples, the fundamental-particles - green dist-curves for truth, blue dist-curves for pf. state-estimates are two red curves on the x,t-plane beneath the dist-curves.

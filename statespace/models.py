@@ -6,7 +6,7 @@ class Rccircuit():
 
     def __init__(self, signal):
         self.u = signal * 1e-6 # amps step-function input
-        self.tsteps = 201
+        self.tsteps = 301
         self.dt = .1
         self.x = 2.5 + math.sqrt(1e-6) * np.random.randn()
         self.Rww = 1e-5

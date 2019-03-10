@@ -81,6 +81,9 @@ class Innovs():
     def update(self, t, xhat, yhat, err, inn):
         self.log.append([t, xhat, yhat, err, inn])
 
+    def update2(self, t, xhat, yhat, err, inn, Ree, Ptil):
+        self.log.append([t, xhat, yhat, err, inn, Ree, Ptil])
+
     def autocorr1(self, x):
         n = x.size
         ac = np.zeros([n, 1])
@@ -94,7 +97,10 @@ class Innovs():
         ac = np.correlate(x, x, mode='full')
         return ac[ac.size // 2:]
 
-    def genzmw(self):
+    def finalize(self):
+        self.log = np.asarray(self.log)
+        self.tts = self.log[:, 0]
+        self.ets = self.log[:, 4]
         self.mhate = np.mean(self.ets)
         self.Rhatee = np.mean(np.power(self.ets, 2))
         n = len(self.ets)
@@ -104,11 +110,8 @@ class Innovs():
             self.iszeromean = False
         self.zmw = self.autocorr1(self.ets)
 
-    def plot(self, x1=3):
-        self.log = np.asarray(self.log[x1:])
-        self.tts = self.log[:, 0]
-        self.ets = self.log[:, 4]
-        self.genzmw()
+    def plot(self):
+        self.finalize()
         lw = 1
         plt.subplot(3, 2, 1), plt.plot(self.tts, self.log[:, 1], linewidth=lw), plt.ylabel('xhat')
         plt.subplot(3, 2, 2), plt.plot(self.tts, self.log[:, 3], linewidth=lw), plt.ylabel('err')
