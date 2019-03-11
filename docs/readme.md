@@ -1,9 +1,11 @@
 
 190310
 
-decision-function-based detector is go. simplest possible case - linear rc-circuit system-model and linear kalman filter tracker. log-likelihood decision function for detection - output is shown below on the x-axis. green curves are with a signal present, blue curves are noise-only, ensembles of 100 runs each for signal case and noise case
+decision-function-based detector is go. simplest possible case - linear rc-circuit system-model and linear kalman-filter tracker. log-likelihood decision function for detection, ensembles of 100 runs each for signal case and noise case. output curves shown in the first plot - green signal, blue noise-only. roc curves in the second plot. 
 
- ![decision-function](images/decision-function.png)
+![](images/rccircdecfuncs.png)
+ 
+![](images/rccircroc.png)
 
 <a name="190223"/>190223
 
