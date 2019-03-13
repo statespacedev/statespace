@@ -8,7 +8,9 @@ stages:
 pages:
   stage: pages
   script:
-  - cp -r README.md public/readme.md
+  - mkdir .public
+  - cp -r * .public
+  - mv .public public
   artifacts:
     paths:
     - public
