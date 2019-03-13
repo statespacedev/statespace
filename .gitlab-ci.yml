@@ -2,9 +2,6 @@
 pages:
   stage: pages
   script:
-  - mkdir .public
-  - cp -r public/index.html .public
-  - mv .public public
   artifacts:
     paths:
     - public
