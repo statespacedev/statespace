@@ -1,4 +1,3 @@
-image: python:3.6-slim
 
 stages:
   - pages
@@ -9,7 +8,7 @@ stages:
 pages:
   stage: pages
   script:
-  - cp -r README.md public
+  - cp -r README.md public/readme.md
   artifacts:
     paths:
     - public
@@ -18,6 +17,7 @@ pages:
 
 build:
   stage: build
+  image: python:3.6-slim
   artifacts:
     paths:
       - dist/
@@ -26,6 +26,7 @@ build:
 
 test:
   stage: test
+  image: python:3.6-slim
   dependencies:
     - build
   script:
@@ -34,6 +35,7 @@ test:
 
 deploy_staging:
   stage: deploy
+  image: python:3.6-slim
   variables:
     TWINE_USERNAME: $STAGING_USERNAME
     TWINE_PASSWORD: $STAGING_PASSWORD
@@ -52,6 +54,7 @@ deploy_staging:
 
 deploy_production:
   stage: deploy
+  image: python:3.6-slim
   variables:
     TWINE_USERNAME: $PRODUCTION_USERNAME
     TWINE_PASSWORD: $PRODUCTION_PASSWORD
@@ -67,3 +70,4 @@ deploy_production:
   script:
     - pip install twine
     - twine upload dist/*
+
