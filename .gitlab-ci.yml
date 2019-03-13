@@ -2,11 +2,14 @@
 pages:
   stage: pages
   script:
+    - mkdir .public
+    - cp -r public/index.html .public
+    - mv .public public
   artifacts:
     paths:
     - public
   only:
-  - master
+    - master
 
 stages:
   - pages
@@ -21,7 +24,7 @@ build:
     paths:
       - dist/
   script:
-   - python setup.py sdist
+    - python setup.py sdist
 
 test:
   stage: test
