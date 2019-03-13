@@ -1,10 +1,4 @@
 
-stages:
-  - pages
-  - build
-  - test
-  - deploy
-
 pages:
   stage: pages
   script:
@@ -16,6 +10,11 @@ pages:
     - public
   only:
   - master
+
+stages:
+  - build
+  - test
+  - deploy
 
 build:
   stage: build
