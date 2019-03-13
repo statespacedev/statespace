@@ -12,6 +12,7 @@ pages:
   - master
 
 stages:
+  - pages
   - build
   - test
   - deploy
