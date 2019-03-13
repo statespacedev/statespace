@@ -1,9 +1,20 @@
 image: python:3.6-slim
 
 stages:
+  - pages
   - build
   - test
   - deploy
+
+pages:
+  stage: pages
+  script:
+  - cp -r README.md public
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
 
 build:
   stage: build
