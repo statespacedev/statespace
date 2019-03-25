@@ -2,7 +2,7 @@
 
 190325
 
-(structural time series = state space) [stuff from google](https://medium.com/tensorflow/structural-time-series-modeling-in-tensorflow-probability-344edac24083). going through the first [ref](papers/2015%20broderson.pdf) - basic skeleton for bringing aerospace stuff into a picture bizpeople understand and want... good step on the path towards a solutions firm.
+(structural time series = state space) [stuff from google](https://medium.com/tensorflow/structural-time-series-modeling-in-tensorflow-probability-344edac24083). going through the first [ref](papers/2015%20broderson.pdf) - basic skeleton for bringing aerospace stuff into a picture bizpeople understand and want... good step on the path towards a solutions company.
 
 190310
 
