@@ -11,5 +11,7 @@
 
 2008, EKF software appendix, Grewal, [pdf](papers/2008%20grewal.pdf)
 
+2009, Structural time series models and the kalman filter, Jalles, [pdf](papers/2009%20jalles.pdf)
+
 2015, Inferring causal impact using bayesian structural time-series models, Broderson, [pdf](papers/2015%20broderson.pdf)
 
