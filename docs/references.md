@@ -10,3 +10,6 @@
 2006, ReBEL bayesian estimation, Merwe, [clone](https://gitlab.com/noahhsmith/statespace/tree/master/docs/rebel)
 
 2008, EKF software appendix, Grewal, [pdf](papers/2008%20grewal.pdf)
+
+2015, Inferring causal impact using bayesian structural time-series models, Broderson, [pdf](papers/2015%20broderson.pdf)
+

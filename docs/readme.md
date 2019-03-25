@@ -1,4 +1,9 @@
 
+
+190325
+
+(structural time series = state space) [stuff from google](https://medium.com/tensorflow/structural-time-series-modeling-in-tensorflow-probability-344edac24083). going through the first [ref](papers/2015%20broderson.pdf) - basic skeleton for bringing aerospace stuff into a picture bizpeople understand and want... good step on the path towards a solutions firm.
+
 190310
 
 decision-function-based detector is go. simplest possible case - linear rc-circuit system-model and linear kalman-filter tracker. log-likelihood decision function for detection, ensembles of 100 runs each for signal case and noise case. output curves shown in the first plot - green signal, blue noise-only. roc curves in the second plot. 
