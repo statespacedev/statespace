@@ -22,6 +22,18 @@ kl-divergence for evaluating sequential monte-carlo - demonstrated below by thre
 
 ![pf3](images/pf3.png)
 
+190215
+
+cloud stuff
+
+    gcloud auth login
+    gcloud projects list
+    source cloud.env
+    gcloud config set project statespace-233406
+    gcloud beta container --project $PROJECT clusters create $CLUSTER --zone $ZONE
+    kubectl create -f services.yaml
+    kubectl create -f ingress.yaml && kubectl create -f deployments.yaml && kubectl create -f secrets.yaml
+
 190105
 
 ukf adaptive jazwinksi switched to square-root filtering, qr-factorization, cholesky-factor update and downdate. improved numerical stability and scaled sampling is clear. still a question around scalar-obs and the obs cholesky-factor and gain. with an adhoc stabilizer on the obs cholesky-factor it's working well overall.

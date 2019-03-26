@@ -7,6 +7,8 @@
 
 uncertainty and confidence, distributions, their evolution with time, noise, and observations, tracking and detection, decisions, risk and the cost of errors, model-based systems, sample-and-propagate, sequential monte-carlo, markov-chain monte-carlo
 
+[https://www.linkedin.com/in/noahhsmith/](https://www.linkedin.com/in/noahhsmith/)
+
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 
 [Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, James V. Candy](http://a.co/gp4upXd)
@@ -15,9 +17,7 @@ uncertainty and confidence, distributions, their evolution with time, noise, and
 
 [Forecasting, Structural Time Series Models and the Kalman Filter, Andrew C. Harvey](https://www.amazon.com/gp/product/B00HWWPIGA?pf_rd_p=1581d9f4-062f-453c-b69e-0f3e00ba2652&pf_rd_r=PHQ557DVZPMHWD1HKHTN)
 
-current focus is automated build-test-deploy to kubernetes-engine using cloud-source and cloud-build along the way.
-
-automated build-test-deploy to [pypi](https://pypi.org/project/statespace) is mostly a placeholder, ubuntu clone-install-develop of gitlab [repo](https://gitlab.com/noahhsmith/statespace) is assumed for now.
+current focus is build-test-deploy to kubernetes-engine using cloud-source and cloud-build along the way. build-test-deploy to [pypi](https://pypi.org/project/statespace) is mostly a placeholder, ubuntu clone-install-develop of gitlab [repo](https://gitlab.com/noahhsmith/statespace) is assumed for now.
 
     sudo apt-get -qq update -qy
     sudo apt-get -qq install -y python3.6 python3-venv python3-pip
@@ -29,15 +29,6 @@ automated build-test-deploy to [pypi](https://pypi.org/project/statespace) is mo
     pytest
     python3 statespace --demo
 
-cloud stuff
-
-    gcloud auth login
-    gcloud projects list
-    source cloud.env
-    gcloud config set project statespace-233406
-    gcloud beta container --project $PROJECT clusters create $CLUSTER --zone $ZONE
-    kubectl create -f services.yaml
-    kubectl create -f ingress.yaml && kubectl create -f deployments.yaml && kubectl create -f secrets.yaml
     
     
     
