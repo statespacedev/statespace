@@ -1,4 +1,7 @@
 
+190331
+
+concise [motivation piece](https://www.linkedin.com/pulse/shape-uncertainty-noah-smith/) posted on linkedin.
 
 190325
 
