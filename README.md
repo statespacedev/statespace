@@ -7,8 +7,6 @@
 
 uncertainty and confidence, distributions, their evolution with time, noise, and observations, tracking and detection, decisions, risk and the cost of errors, model-based systems, sample-and-propagate, sequential monte-carlo, markov-chain monte-carlo
 
-[https://www.linkedin.com/in/noahhsmith/](https://www.linkedin.com/in/noahhsmith/)
-
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 
 [Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, James V. Candy](http://a.co/gp4upXd)
@@ -29,6 +27,7 @@ current focus is build-test-deploy to kubernetes-engine using cloud-source and c
     pytest
     python3 statespace --demo
 
+[noah smith](https://www.linkedin.com/in/noahhsmith) - [statespace.dev](https://statespace.dev)
     
     
     
