@@ -1,6 +1,6 @@
 import numpy as np
-from eval import Innovs
-import models
+from decisions import Innovs
+import statespacemodels
 
 def ud_factorization(M):
     assert np.allclose(M, M.T)
@@ -82,16 +82,16 @@ class Classical():
         self.innov = Innovs()
         if mode == 'rccircuit':
             if signal == None: signal = 300.
-            m = models.Rccircuit(signal=signal)
+            m = statespacemodels.Rccircuit(signal=signal)
             self.rccircuit(m)
         elif mode == 'kf2':
-            m = models.Jazwinski1()
+            m = statespacemodels.Jazwinski1()
             self.kf2(m)
         elif mode == 'ekf1':
-            m = models.Jazwinski1()
+            m = statespacemodels.Jazwinski1()
             self.ekf1(m)
         elif mode == 'ekf2':
-            m = models.Jazwinski2()
+            m = statespacemodels.Jazwinski2()
             self.ekf2(m)
         if plot: self.innov.plot()
 

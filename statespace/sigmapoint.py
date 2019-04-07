@@ -1,8 +1,8 @@
 import math
 import numpy as np
 from scipy.linalg.blas import drot, drotg
-from eval import Innovs
-import models
+from decisions import Innovs
+import statespacemodels
 
 def cholupdate(R, z):
     n = z.shape[0]
@@ -48,10 +48,10 @@ class Modern():
     def __init__(self, mode, plot=True):
         self.innov = Innovs()
         if mode == 'spkf1':
-            m = models.Jazwinski1()
+            m = statespacemodels.Jazwinski1()
             self.spkf1(m)
         elif mode == 'spkf2':
-            m = models.Jazwinski2()
+            m = statespacemodels.Jazwinski2()
             self.spkf2(m)
         if plot: self.innov.plot()
 
