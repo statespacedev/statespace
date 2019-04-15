@@ -13,6 +13,8 @@
 
 [Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
 
+[Time Series Analysis by State Space Methods, James Durbin](https://www.amazon.com/Time-Analysis-State-Space-Methods/dp/019964117X)
+
 [Forecasting, Structural Time Series Models and the Kalman Filter, Andrew C. Harvey](https://www.amazon.com/gp/product/B00HWWPIGA?pf_rd_p=1581d9f4-062f-453c-b69e-0f3e00ba2652&pf_rd_r=PHQ557DVZPMHWD1HKHTN)
 
 current focus is build-test-deploy to kubernetes-engine using cloud-source and cloud-build along the way. build-test-deploy to [pypi](https://pypi.org/project/statespace) is mostly a placeholder, ubuntu clone-install-develop of gitlab [repo](https://gitlab.com/noahhsmith/statespace) is assumed for now.
