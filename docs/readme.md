@@ -1,4 +1,8 @@
 
+190414
+
+presentation [statespace.dev](https://statespace.dev/) has gone live.
+
 190331
 
 concise [motivation piece](https://www.linkedin.com/pulse/shape-uncertainty-noah-smith/) posted on linkedin.
