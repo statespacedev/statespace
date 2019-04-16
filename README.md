@@ -5,15 +5,15 @@
 [![blog](https://img.shields.io/badge/blog-latest-brightgreen.svg)](https://gitlab.com/noahhsmith/statespace/blob/master/docs/readme.md)
 [![references](https://img.shields.io/badge/references-latest-brightgreen.svg)](https://gitlab.com/noahhsmith/statespace/blob/master/docs/references.md)
 
-[statespace.dev](https://statespace.dev/) - uncertainty and confidence, distributions, their evolution with time, noise, and observations, tracking and detection, decisions, risk and the cost of errors, model-based systems, sample-and-propagate, sequential monte-carlo, markov-chain monte-carlo
+uncertainty and confidence, distributions, their evolution with time, noise, and observations, tracking and detection, decisions, risk and the cost of errors, model-based systems, sample-and-propagate, sequential monte-carlo, markov-chain monte-carlo
 
 [The Flaw of Averages: Why We Underestimate Risk in the Face of Uncertainty, Sam L. Savage](http://a.co/cDDBO9p)
 
 [Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, James V. Candy](http://a.co/gp4upXd)
 
-[Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
-
 [Time Series Analysis by State Space Methods, James Durbin](https://www.amazon.com/Time-Analysis-State-Space-Methods/dp/019964117X)
+
+[Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
 
 [Forecasting, Structural Time Series Models and the Kalman Filter, Andrew C. Harvey](https://www.amazon.com/gp/product/B00HWWPIGA?pf_rd_p=1581d9f4-062f-453c-b69e-0f3e00ba2652&pf_rd_r=PHQ557DVZPMHWD1HKHTN)
 
