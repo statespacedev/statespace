@@ -1,4 +1,8 @@
 
+190418
+
+brief [lit-review](https://www.linkedin.com/pulse/google-state-space-noah-smith/) posted on linkedin. 
+
 190414
 
 presentation [statespace.dev](https://statespace.dev/) has gone live.
