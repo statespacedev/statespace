@@ -3,3 +3,5 @@ scipy
 matplotlib
 pytest
 pymc3
+tf-nightly
+tfp-nightly
