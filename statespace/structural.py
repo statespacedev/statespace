@@ -19,11 +19,11 @@ def main():
 
 class Structural():
     def __init__(self, mode):
+        tf.reset_default_graph()
         if mode == 'maunaloa':
             self.fsteps = 12 * 10
             self.tvec = np.arange('1966-01', '2019-02', dtype='datetime64[M]')
             self.ts = maunaloa()
-            tf.reset_default_graph()
             trend = tfp.sts.LocalLinearTrend(observed_time_series=self.ts)
             seasonal = tfp.sts.Seasonal(num_seasons=12, num_steps_per_season=1, observed_time_series=self.ts)
             self.model = tfp.sts.Sum([trend, seasonal], observed_time_series=self.ts)
@@ -32,7 +32,6 @@ class Structural():
             self.tvec = np.arange('2014-01-01', '2014-02-26', dtype='datetime64[h]')
             self.ts = victoria1()
             ts2 = victoria2()
-            tf.reset_default_graph()
             hour_of_day_effect = tfp.sts.Seasonal(num_seasons=24, observed_time_series=self.ts)
             day_of_week_effect = tfp.sts.Seasonal(num_seasons=7, num_steps_per_season=24, observed_time_series=self.ts)
             temperature_effect = tfp.sts.LinearRegression(design_matrix=tf.reshape(ts2 - np.mean(ts2), (-1, 1)))
