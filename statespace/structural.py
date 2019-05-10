@@ -19,10 +19,11 @@ def main():
 
 class MaunaLoa():
     def __init__(self):
+        self.fsteps = 12 * 10
+        self.iters = 201
         self.tvec = np.arange('1966-01', '2019-02', dtype='datetime64[M]')
         self.ts1 = maunaloa()
-        self.forecaststeps = 12 * 10
-        self.ts1train = self.ts1[:-self.forecaststeps]
+        self.ts1train = self.ts1[:-self.fsteps]
         tf.reset_default_graph()
         trend = tfp.sts.LocalLinearTrend(observed_time_series=self.ts1train)
         seasonal = tfp.sts.Seasonal(num_seasons=12, num_steps_per_season=1, observed_time_series=self.ts1train)
@@ -30,31 +31,32 @@ class MaunaLoa():
 
     def train(self):
         with tf.variable_scope('sts_elbo', reuse=tf.AUTO_REUSE):
-            elbo_loss, variational_posteriors = tfp.sts.build_factored_variational_loss(self.model, observed_time_series=self.ts1train)
-        num_variational_steps = 201
-        train_vi = tf.train.AdamOptimizer(0.1).minimize(elbo_loss)
+            loss, posteriors = tfp.sts.build_factored_variational_loss(self.model, observed_time_series=self.ts1train)
+        trainer = tf.train.AdamOptimizer(0.1).minimize(loss)
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
-            for i in range(num_variational_steps):
-                _, elbo_ = sess.run((train_vi, elbo_loss))
-                if i % 20 == 0: print("{}, {}".format(i, elbo_))
-            self.samples = sess.run({k: q.sample(50) for k, q in variational_posteriors.items()})
-        for param in self.model.parameters: print("{}, {}, {}".format(param.name, np.mean(self.samples[param.name], axis=0), np.std(self.samples[param.name], axis=0)))
+            for i in range(self.iters):
+                _, cur = sess.run((trainer, loss))
+                if i % 20 == 0: print("{}, {}".format(i, cur))
+            self.samples = sess.run({k: q.sample(50) for k, q in posteriors.items()})
+        for param in self.model.parameters:
+            print("{}, {}, {}".format(param.name, np.mean(self.samples[param.name], axis=0), np.std(self.samples[param.name], axis=0)))
 
     def forecast(self):
         self.f = tfp.sts.forecast(self.model, observed_time_series=self.ts1train,
-                                  parameter_samples=self.samples, num_steps_forecast=self.forecaststeps)
+                                  parameter_samples=self.samples, num_steps_forecast=self.fsteps)
         with tf.Session() as sess:
             self.fm, self.fsc, self.fsa = sess.run((self.f.mean()[..., 0], self.f.stddev()[..., 0], self.f.sample(10)[..., 0]))
         plot_forecast(self.tvec, self.ts1, self.fm, self.fsc, self.fsa)
 
 class Victoria():
     def __init__(self):
+        self.fsteps = 24 * 7 * 2
+        self.iters = 201
         self.tvec = np.arange('2014-01-01', '2014-02-26', dtype='datetime64[h]')
         self.ts1 = victoria1()
         self.ts2 = victoria2()
-        self.forecaststeps = 24 * 7 * 2
-        self.ts1train = self.ts1[:-self.forecaststeps]
+        self.ts1train = self.ts1[:-self.fsteps]
         tf.reset_default_graph()
         hour_of_day_effect = tfp.sts.Seasonal(num_seasons=24, observed_time_series=self.ts1, name='hour_of_day_effect')
         day_of_week_effect = tfp.sts.Seasonal(num_seasons=7, num_steps_per_season=24, observed_time_series=self.ts1, name='day_of_week_effect')
@@ -64,20 +66,20 @@ class Victoria():
 
     def train(self):
         with tf.variable_scope('sts_elbo', reuse=tf.AUTO_REUSE):
-            elbo_loss, variational_posteriors = tfp.sts.build_factored_variational_loss(self.model, self.ts1train)
-        train_vi = tf.train.AdamOptimizer(0.1).minimize(elbo_loss)
-        num_variational_steps = 201
+            loss, posteriors = tfp.sts.build_factored_variational_loss(self.model, self.ts1train)
+        trainer = tf.train.AdamOptimizer(0.1).minimize(loss)
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
-            for i in range(num_variational_steps):
-                _, elbo_ = sess.run((train_vi, elbo_loss))
-                if i % 20 == 0: print("{}, {}".format(i, elbo_))
-            self.samples = sess.run({k: q.sample(50) for k, q in variational_posteriors.items()})
-        for param in self.model.parameters: print("{}, {}, {}".format(param.name, np.mean(self.samples[param.name], axis=0), np.std(self.samples[param.name], axis=0)))
+            for i in range(self.iters):
+                _, cur = sess.run((trainer, loss))
+                if i % 20 == 0: print("{}, {}".format(i, cur))
+            self.samples = sess.run({k: q.sample(50) for k, q in posteriors.items()})
+        for param in self.model.parameters:
+            print("{}, {}, {}".format(param.name, np.mean(self.samples[param.name], axis=0), np.std(self.samples[param.name], axis=0)))
 
     def forecast(self):
         self.f = tfp.sts.forecast(model=self.model, observed_time_series=self.ts1train,
-                                  parameter_samples=self.samples, num_steps_forecast=self.forecaststeps)
+                                  parameter_samples=self.samples, num_steps_forecast=self.fsteps)
         with tf.Session() as sess:
             fm, fsc, fsa = sess.run((self.f.mean()[..., 0], self.f.stddev()[..., 0], self.f.sample(10)[..., 0]))
         plot_forecast(self.tvec, self.ts1, fm, fsc, fsa)
