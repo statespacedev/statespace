@@ -22,16 +22,15 @@ class MaunaLoa():
         self.fsteps = 12 * 10
         self.iters = 201
         self.tvec = np.arange('1966-01', '2019-02', dtype='datetime64[M]')
-        self.ts1 = maunaloa()
-        self.ts1train = self.ts1[:-self.fsteps]
+        self.ts = maunaloa()
         tf.reset_default_graph()
-        trend = tfp.sts.LocalLinearTrend(observed_time_series=self.ts1train)
-        seasonal = tfp.sts.Seasonal(num_seasons=12, num_steps_per_season=1, observed_time_series=self.ts1train)
-        self.model = tfp.sts.Sum([trend, seasonal], observed_time_series=self.ts1train)
+        trend = tfp.sts.LocalLinearTrend(observed_time_series=self.ts)
+        seasonal = tfp.sts.Seasonal(num_seasons=12, num_steps_per_season=1, observed_time_series=self.ts)
+        self.model = tfp.sts.Sum([trend, seasonal], observed_time_series=self.ts)
 
     def train(self):
         with tf.variable_scope('sts_elbo', reuse=tf.AUTO_REUSE):
-            loss, posteriors = tfp.sts.build_factored_variational_loss(self.model, observed_time_series=self.ts1train)
+            loss, posteriors = tfp.sts.build_factored_variational_loss(self.model, observed_time_series=self.ts[:-self.fsteps])
         trainer = tf.train.AdamOptimizer(0.1).minimize(loss)
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
@@ -43,11 +42,10 @@ class MaunaLoa():
             print("{}, {}, {}".format(param.name, np.mean(self.samples[param.name], axis=0), np.std(self.samples[param.name], axis=0)))
 
     def forecast(self):
-        self.f = tfp.sts.forecast(self.model, observed_time_series=self.ts1train,
-                                  parameter_samples=self.samples, num_steps_forecast=self.fsteps)
+        f = tfp.sts.forecast(self.model, self.ts[:-self.fsteps], self.samples, self.fsteps)
         with tf.Session() as sess:
-            self.fm, self.fsc, self.fsa = sess.run((self.f.mean()[..., 0], self.f.stddev()[..., 0], self.f.sample(10)[..., 0]))
-        plot_forecast(self.tvec, self.ts1, self.fm, self.fsc, self.fsa)
+            fm, fsc, fsa = sess.run((f.mean()[..., 0], f.stddev()[..., 0], f.sample(10)[..., 0]))
+        plot_forecast(self.tvec, self.ts, fm, fsc, fsa)
 
 class Victoria():
     def __init__(self):
@@ -56,17 +54,16 @@ class Victoria():
         self.tvec = np.arange('2014-01-01', '2014-02-26', dtype='datetime64[h]')
         self.ts1 = victoria1()
         self.ts2 = victoria2()
-        self.ts1train = self.ts1[:-self.fsteps]
         tf.reset_default_graph()
-        hour_of_day_effect = tfp.sts.Seasonal(num_seasons=24, observed_time_series=self.ts1, name='hour_of_day_effect')
-        day_of_week_effect = tfp.sts.Seasonal(num_seasons=7, num_steps_per_season=24, observed_time_series=self.ts1, name='day_of_week_effect')
-        temperature_effect = tfp.sts.LinearRegression(design_matrix=tf.reshape(self.ts2 - np.mean(self.ts2), (-1, 1)), name='temperature_effect')
-        autoregressive = tfp.sts.Autoregressive(order=1, observed_time_series=self.ts1, name='autoregressive')
+        hour_of_day_effect = tfp.sts.Seasonal(num_seasons=24, observed_time_series=self.ts1)
+        day_of_week_effect = tfp.sts.Seasonal(num_seasons=7, num_steps_per_season=24, observed_time_series=self.ts1)
+        temperature_effect = tfp.sts.LinearRegression(design_matrix=tf.reshape(self.ts2 - np.mean(self.ts2), (-1, 1)))
+        autoregressive = tfp.sts.Autoregressive(order=1, observed_time_series=self.ts1)
         self.model = tfp.sts.Sum([hour_of_day_effect, day_of_week_effect, temperature_effect, autoregressive], observed_time_series=self.ts1)
 
     def train(self):
         with tf.variable_scope('sts_elbo', reuse=tf.AUTO_REUSE):
-            loss, posteriors = tfp.sts.build_factored_variational_loss(self.model, self.ts1train)
+            loss, posteriors = tfp.sts.build_factored_variational_loss(self.model, self.ts1[:-self.fsteps])
         trainer = tf.train.AdamOptimizer(0.1).minimize(loss)
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
@@ -78,10 +75,9 @@ class Victoria():
             print("{}, {}, {}".format(param.name, np.mean(self.samples[param.name], axis=0), np.std(self.samples[param.name], axis=0)))
 
     def forecast(self):
-        self.f = tfp.sts.forecast(model=self.model, observed_time_series=self.ts1train,
-                                  parameter_samples=self.samples, num_steps_forecast=self.fsteps)
+        f = tfp.sts.forecast(self.model, self.ts1[:-self.fsteps], self.samples, self.fsteps)
         with tf.Session() as sess:
-            fm, fsc, fsa = sess.run((self.f.mean()[..., 0], self.f.stddev()[..., 0], self.f.sample(10)[..., 0]))
+            fm, fsc, fsa = sess.run((f.mean()[..., 0], f.stddev()[..., 0], f.sample(10)[..., 0]))
         plot_forecast(self.tvec, self.ts1, fm, fsc, fsa)
 
 def plot_forecast(x, y, forecast_mean, forecast_scale, forecast_samples):
