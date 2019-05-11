@@ -15,21 +15,14 @@ class Exp1():
     def __init__(self):
         self.ts = [float(rec[0]) for rec in nile()]
         self.y = [float(rec[1]) for rec in nile()]
+        self.prep()
         self.sigsqrepsilon = 15099.
         self.sigsqreta = 1469.1
-        self.a0 = 1120.
-        self.P0 = 1e4
-        self.prep()
+        self.a[0] = 1120.
+        self.P[0] = 1e4
 
     def filtering(self):
-        self.a[0] = self.a0
-        self.P[0] = self.P0
-        self.v[0] = self.y[0] - self.a[0]
-        self.F[0] = self.P[0] + self.sigsqrepsilon
-        self.K[0] = self.P[0] / self.F[0]
-        self.a[1] = self.a[0] + self.K[0] * self.v[0]
-        self.P[1] = self.P[0] * (1 - self.K[0]) + self.sigsqreta
-        for t in range(1, len(self.y)):
+        for t in range(0, len(self.y)):
             self.v[t] = self.y[t] - self.a[t]
             self.F[t] = self.P[t] + self.sigsqrepsilon
             self.K[t] = self.P[t] / self.F[t]
@@ -38,9 +31,6 @@ class Exp1():
                 self.P[t+1] = self.P[t] * (1 - self.K[t]) + self.sigsqreta
 
     def state_smoothing(self):
-        self.r[-1] = 0.
-        self.N[-1] = 0.
-        self.etatil[-1] = 0.
         for t in range(len(self.y) - 1, -1, -1):
             self.r[t-1] = (1 / self.F[t]) * self.v[t] + (1 - self.K[t]) * self.r[t]
             self.alphahat[t] = self.a[t] + self.P[t] * self.r[t-1]
