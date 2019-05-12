@@ -22,11 +22,11 @@ class Exp1():
         self.P[0] = 1e4
 
     def filtering(self):
-        for t in range(0, len(self.y)):
+        for t in range(len(self.y)):
             self.v[t] = self.y[t] - self.a[t]
             self.F[t] = self.P[t] + self.sigsqrepsilon
             self.K[t] = self.P[t] / self.F[t]
-            if not t == len(self.y) - 1:
+            if t < len(self.y) - 1:
                 self.a[t+1] = self.a[t] + self.K[t] * self.v[t]
                 self.P[t+1] = self.P[t] * (1 - self.K[t]) + self.sigsqreta
 
@@ -35,14 +35,14 @@ class Exp1():
             self.r[t-1] = (1 / self.F[t]) * self.v[t] + (1 - self.K[t]) * self.r[t]
             self.alphahat[t] = self.a[t] + self.P[t] * self.r[t-1]
             self.N[t-1] = (1 / self.F[t]) + (1 - self.K[t])**2 * self.N[t]
-            self.V[t] = self.P[t] - self.P[t]**2 * ((1 / self.F[t]) + (1 - self.K[t])**2 * self.N[t-1])
+            self.V[t] = self.P[t] - self.P[t]**2 * self.N[t-1]
 
     def disturbance_smoothing(self, y):
-        v = copy.deepcopy(y)
-        r = copy.deepcopy(y); r[-1] = 0.
-        epsilonhat = copy.deepcopy(y)
+        v = np.zeros(len(y))
+        r = np.zeros(len(y))
+        epsilonhat = np.zeros(len(y))
         for t in range(len(v)): v[t] = y[t] - self.a[t]
-        for t in range(len(r) - 2, -1, -1): r[t] = (1 / self.F[t]) * v[t] + (1 - self.K[t]) * r[t+1]
+        for t in range(len(r) - 1, -1, -1): r[t-1] = (1 / self.F[t]) * v[t] + (1 - self.K[t]) * r[t]
         for t in range(len(epsilonhat)):
             u = (1 / self.F[t]) * v[t] - self.K[t] * r[t]
             epsilonhat[t] = self.sigsqrepsilon * u
@@ -51,16 +51,23 @@ class Exp1():
     def simulation(self):
         self.epsilonplus = math.sqrt(self.sigsqrepsilon) * np.random.normal(0., 1., 100)
         self.etaplus = math.sqrt(self.sigsqreta) * np.random.normal(0., 1., 100)
-        self.alphaplus[0] = self.y[0]
-        for t in range(len(self.y)):
-            self.yplus[t] = self.alphaplus[t] + self.epsilonplus[t]
-            if t+1 < len(self.y)-2: self.alphaplus[t+1] = self.alphaplus[t] + self.etaplus[t]
-        self.epsilonhat = self.disturbance_smoothing(y=self.y)
-        self.epsilonhatplus = self.disturbance_smoothing(y=self.yplus)
+        self.epsilonhat = self.disturbance_smoothing(self.y)
+        self.epsilonhatplus = self.disturbance_smoothing(self.yplus())
         for t in range(len(self.y)):
             self.epsilontil[t] = self.epsilonplus[t] + (self.epsilonhat[t] - self.epsilonhatplus[t])
             self.alphatil[t] = self.y[t] - self.epsilontil[t]
-            if t+1 < len(self.y)-2: self.etatil[t] = self.alphatil[t+1] - self.alphatil[t]
+            if t < len(self.y) - 1:
+                self.etatil[t] = self.alphatil[t+1] - self.alphatil[t]
+
+    def yplus(self):
+        alphaplus = np.zeros(len(self.y))
+        yplus = np.zeros(len(self.y))
+        alphaplus[0] = self.y[0]
+        for t in range(len(self.y)):
+            yplus[t] = alphaplus[t] + self.epsilonplus[t]
+            if t < len(self.y) - 1:
+                alphaplus[t+1] = alphaplus[t] + self.etaplus[t]
+        return yplus
 
     def prep(self):
         self.a = np.zeros(len(self.y))
@@ -72,8 +79,6 @@ class Exp1():
         self.alphahat = np.zeros(len(self.y))
         self.N = np.zeros(len(self.y))
         self.V = np.zeros(len(self.y))
-        self.alphaplus = np.zeros(len(self.y))
-        self.yplus = np.zeros(len(self.y))
         self.epsilontil = np.zeros(len(self.y))
         self.alphatil = np.zeros(len(self.y))
         self.etatil = np.zeros(len(self.y))
