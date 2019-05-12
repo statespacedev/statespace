@@ -49,25 +49,22 @@ class Exp1():
         return epsilonhat
 
     def simulation(self):
-        self.epsilonplus = math.sqrt(self.sigsqrepsilon) * np.random.normal(0., 1., 100)
-        self.etaplus = math.sqrt(self.sigsqreta) * np.random.normal(0., 1., 100)
-        self.epsilonhat = self.disturbance_smoothing(self.y)
-        self.epsilonhatplus = self.disturbance_smoothing(self.yplus())
-        for t in range(len(self.y)):
-            self.epsilontil[t] = self.epsilonplus[t] + (self.epsilonhat[t] - self.epsilonhatplus[t])
-            self.alphatil[t] = self.y[t] - self.epsilontil[t]
-            if t < len(self.y) - 1:
-                self.etatil[t] = self.alphatil[t+1] - self.alphatil[t]
-
-    def yplus(self):
+        epsilonhat = self.disturbance_smoothing(self.y)
+        etaplus = math.sqrt(self.sigsqreta) * np.random.normal(0., 1., 100)
+        epsilonplus = math.sqrt(self.sigsqrepsilon) * np.random.normal(0., 1., 100)
         alphaplus = np.zeros(len(self.y))
         yplus = np.zeros(len(self.y))
         alphaplus[0] = self.y[0]
         for t in range(len(self.y)):
-            yplus[t] = alphaplus[t] + self.epsilonplus[t]
+            yplus[t] = alphaplus[t] + epsilonplus[t]
             if t < len(self.y) - 1:
-                alphaplus[t+1] = alphaplus[t] + self.etaplus[t]
-        return yplus
+                alphaplus[t + 1] = alphaplus[t] + etaplus[t]
+        epsilonplushat = self.disturbance_smoothing(yplus)
+        for t in range(len(self.y)):
+            self.epsilontil[t] = epsilonplus[t] + (epsilonhat[t] - epsilonplushat[t])
+            self.alphatil[t] = self.y[t] - self.epsilontil[t]
+            if t < len(self.y) - 1:
+                self.etatil[t] = self.alphatil[t+1] - self.alphatil[t]
 
     def prep(self):
         self.a = np.zeros(len(self.y))
@@ -81,7 +78,6 @@ class Exp1():
         self.V = np.zeros(len(self.y))
         self.epsilontil = np.zeros(len(self.y))
         self.alphatil = np.zeros(len(self.y))
-        self.etatil = np.zeros(len(self.y))
         self.etatil = np.zeros(len(self.y))
 
     def plot(self):
