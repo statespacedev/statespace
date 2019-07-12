@@ -1,7 +1,6 @@
-import structural
 import matplotlib.pyplot as plt
 import numpy as np
-import copy, math
+import math
 
 def main():
     e1 = Exp1()
@@ -10,6 +9,22 @@ def main():
     e1.simulation()
     e1.plot()
     plt.show()
+
+# inverse-gamma distributions of the disturbance variances sigsqrepsilon and sigsqreta
+class Params():
+    def __init__(self):
+        self.g1 = [3, .02]
+        self.g2 = [3, .02]
+
+    def path(self, epsilons, etas):
+        self.theta1 = [1e-2, 1e-5]
+        self.theta2 = [1e-2, 1e-5]
+        N = len(epsilons)
+        self.theta1[0] = self.theta1[0] + N / 2
+        self.theta2[0] = self.theta2[0] + N / 2
+        for j in range(1, N):
+            self.theta1[1] += .5 * epsilons[j]**2
+            self.theta2[1] += .5 * etas[j]**2
 
 class Exp1():
     def __init__(self):
