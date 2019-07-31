@@ -2,8 +2,6 @@ import math
 
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import pyplot as plt
-from pymc3.plots.kdeplot import fast_kde
 
 class DecisionsEns():
     def __init__(self):
@@ -42,6 +40,7 @@ class DecisionsEns():
         pass
 
     def decisionfunctionpmf(self, vals):
+        from pymc3.plots.kdeplot import fast_kde
         vals = np.append(vals, [self.globalmin, self.globalmax])
         pmf, min, max = fast_kde(vals, bw=4.5)
         x = np.linspace(min, max, len(pmf))
