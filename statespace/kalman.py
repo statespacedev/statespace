@@ -78,6 +78,7 @@ def observational_update(xin, Uin, Din, obs, m):  # bierman
 
 
 class Classical():
+    '''classical kalman filter.'''
     def __init__(self, mode, plot=True, signal=None):
         self.innov = Innovs()
         if mode == 'rccircuit':

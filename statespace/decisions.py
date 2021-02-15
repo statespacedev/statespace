@@ -1,5 +1,4 @@
 import math
-
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -75,6 +74,7 @@ class DecisionsEns():
         self.decisionfunctionsnoise.append(decisionfunction)
 
 class Decisions():
+    """framework for evaluating decisions."""
     def __init__(self, mode, tracker):
         self.mode = mode
         tracker.innov.finalize()

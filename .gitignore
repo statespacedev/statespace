@@ -5,3 +5,5 @@ build/*
 *egg-info*
 venv/*
 version
+/venv38/
+/docs/build/
