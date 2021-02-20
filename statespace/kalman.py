@@ -1,6 +1,6 @@
 import numpy as np
-from util2 import Innovs
-import util1
+from util import Innovs
+import examples
 
 def ud_factorization(M):
     assert np.allclose(M, M.T)
@@ -83,16 +83,16 @@ class Classical():
         self.innov = Innovs()
         if mode == 'rccircuit':
             if signal == None: signal = 300.
-            m = util1.Rccircuit(signal=signal)
+            m = examples.Rccircuit(signal=signal)
             self.rccircuit(m)
         elif mode == 'kf2':
-            m = util1.Jazwinski1()
+            m = examples.Jazwinski1()
             self.kf2(m)
         elif mode == 'ekf1':
-            m = util1.Jazwinski1()
+            m = examples.Jazwinski1()
             self.ekf1(m)
         elif mode == 'ekf2':
-            m = util1.Jazwinski2()
+            m = examples.Jazwinski2()
             self.ekf2(m)
         if plot: self.innov.plot()
 

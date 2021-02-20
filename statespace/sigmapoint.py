@@ -1,8 +1,8 @@
 import math
 import numpy as np
 from scipy.linalg.blas import drot, drotg
-from util2 import Innovs
-import util1
+from util import Innovs
+import examples
 
 def cholupdate(R, z):
     n = z.shape[0]
@@ -48,10 +48,10 @@ class Modern():
     def __init__(self, mode, plot=True):
         self.innov = Innovs()
         if mode == 'spkf1':
-            m = util1.Jazwinski1()
+            m = examples.Jazwinski1()
             self.spkf1(m)
         elif mode == 'spkf2':
-            m = util1.Jazwinski2()
+            m = examples.Jazwinski2()
             self.spkf2(m)
         if plot: self.innov.plot()
 
