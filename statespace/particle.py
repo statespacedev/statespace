@@ -1,8 +1,8 @@
 # monte carlo sampling processor, bootstrap particle filter
 import numpy as np
 import math
-from decisions import Innovs, Dists, DistsEns
-import statespacemodels
+from util2 import Innovs, Dists, DistsEns
+import util1
 
 def resample(xi, Wi):
     tmp = []
@@ -30,16 +30,16 @@ class Particle():
         self.ens = DistsEns()
         if mode == 'test':
             for i in range(100):
-                m = statespacemodels.Jazwinski1()
+                m = util1.Jazwinski1()
                 self.pf1(m)
                 self.ens.update(distslog=self.dists.log)
             self.ens.plot()
         if mode == 'pf1':
-            m = statespacemodels.Jazwinski1()
+            m = util1.Jazwinski1()
             self.pf1(m)
             if dists: self.dists.plot()
         if mode == 'pf2':
-            m = statespacemodels.Jazwinski2()
+            m = util1.Jazwinski2()
             self.pf2(m)
         if innovs: self.innovs.plot()
 

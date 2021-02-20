@@ -7,10 +7,10 @@ introduction
 
 this documentation is still in initial stages - while this notification is here, it's for sure not usable. 2021-02-15
 
-decisions.py
+kalman.py
 ==============
 
-.. automodule:: statespace.decisions
+.. automodule:: statespace.kalman
     :members:
 
 
