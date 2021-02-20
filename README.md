@@ -2,7 +2,7 @@
 
 [![pipeline](https://gitlab.com/noahhsmith/starid/badges/master/pipeline.svg)](https://gitlab.com/noahhsmith/statespace/pipelines)
 [![pypi](https://img.shields.io/badge/pypi-latest-brightgreen.svg)](https://pypi.org/project/statespace/)
-[![Documentation Status](https://readthedocs.org/projects/statespace/badge/?version=latest)](https://statespace.readthedocs.io/en/latest/?badge=latest)
+[![docs](https://readthedocs.org/projects/statespace/badge/?version=latest)](https://statespace.readthedocs.io/en/latest/?badge=latest)
 
 uncertainty and confidence, distributions, their evolution with time, noise, and observations, tracking and detection, decisions, risk and the cost of errors, model-based systems, sample-and-propagate, sequential monte-carlo, markov-chain monte-carlo
 
@@ -28,7 +28,64 @@ current focus is build-test-deploy to kubernetes-engine using cloud-source and c
     pytest
     python3 statespace --demo
 
-[noah smith](https://www.linkedin.com/in/noahhsmith) - [statespace.dev](https://statespace.dev)
-    
-    
+190418
+
+brief [lit-review](https://www.linkedin.com/pulse/google-state-space-noah-smith/) posted on linkedin. 
+
+190414
+
+presentation [statespace.dev](https://statespace.dev/) has gone live.
+
+190331
+
+concise [motivation piece](https://www.linkedin.com/pulse/shape-uncertainty-noah-smith/) posted on linkedin.
+
+190310
+
+decision-function-based detector is go. simplest possible case - linear rc-circuit system-model and linear kalman-filter tracker. log-likelihood decision function for detection, ensembles of 100 runs each for signal case and noise case. output curves shown in the first plot - green signal, blue noise-only. roc curves in the second plot. 
+
+![](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/rccircdecfuncs.png)
+ 
+![](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/rccircroc.png)
+
+<a name="190223">
+190223
+</a>
+
+kl-divergence for evaluating sequential monte-carlo - demonstrated below by three pf's in action during the first second of the jazwinksi problem - start-up and convergence. these are 100 hz dist-curves - each dist-curve is a kernel-density-estimate combining hundreds of monte-carlo samples, the fundamental-particles - green dist-curves for truth, blue dist-curves for pf. state-estimates are two red curves on the x,t-plane beneath the dist-curves.
+
+![pf1](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf1.png)
+
+![pf2](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf2.png)
+
+![pf3](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf3.png)
+
+190215
+
+cloud stuff
+
+    gcloud auth login
+    gcloud projects list
+    source cloud.env
+    gcloud config set project statespace-233406
+    gcloud beta container --project $PROJECT clusters create $CLUSTER --zone $ZONE
+    kubectl create -f services.yaml
+    kubectl create -f ingress.yaml && kubectl create -f deployments.yaml && kubectl create -f secrets.yaml
+
+190105
+
+ukf adaptive jazwinksi switched to square-root filtering, qr-factorization, cholesky-factor update and downdate. improved numerical stability and scaled sampling is clear. still a question around scalar-obs and the obs cholesky-factor and gain. with an adhoc stabilizer on the obs cholesky-factor it's working well overall.
+
+181230
+
+pf adaptive jazwinksi. parameter-roughening.
+
+181226
+
+ukf adaptive jazwinski. sample-and-propagate tuning.
+
+180910
+
+ekf adaptive jazwinski. ud-factorized square-root filtering required for numerical stability.
+
     
