@@ -5,6 +5,7 @@ import util
 import examples
 
 def cholupdate(R, z):
+    '''cholesky update.'''
     n = z.shape[0]
     for k in range(n):
         c, s = drotg(R[k, k], z[k])
@@ -12,6 +13,7 @@ def cholupdate(R, z):
     return R
 
 def choldowndate(R, z):
+    '''cholesky downdate.'''
     n = R.shape[0]
     for k in range(n):
         if (R[k, k] - z[k]) * (R[k, k] + z[k]) < 0: return R
@@ -23,6 +25,7 @@ def choldowndate(R, z):
     return R
 
 def temporal_update(xhat, S, m):
+    '''temporal update.'''
     X = m.va(m.X(xhat, S))
     xhat = m.Wm @ X.T
     for i in range(7): m.Xtil[:, i] = X[:, i] - xhat
@@ -31,6 +34,7 @@ def temporal_update(xhat, S, m):
     return xhat, S, X
 
 def observational_update(xhat, S, X, obs, m):
+    '''observational update.'''
     Y = m.vc(m.Xhat(X))
     yhat = m.Wm @ Y.T
     for i in range(7): m.Ytil[0, i] = Y[i] - yhat
@@ -45,17 +49,19 @@ def observational_update(xhat, S, X, obs, m):
     return xhat, S, yhat
 
 class Modern():
+    '''sigma-point or ukf filter. the run methods implement and perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     def __init__(self, mode, plot=True):
         self.innov = util.Innovs()
         if mode == 'spkf1':
             m = examples.Jazwinski1()
-            self.spkf1(m)
+            self.run_spkf1(m)
         elif mode == 'spkf2':
             m = examples.Jazwinski2()
-            self.spkf2(m)
+            self.run_spkf2(m)
         if plot: self.innov.plot()
 
-    def spkf1(self, m):
+    def run_spkf1(self, m):
+        '''sigma-point kalman filter 1.'''
         xhat = 2.2
         Ptil = .01
         for step in m.steps():
@@ -70,7 +76,8 @@ class Modern():
             Ptil = Ptil - K * Rksiksi * K
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
-    def spkf2(self, m):
+    def run_spkf2(self, m):
+        '''sigma-point kalman filter 2.'''
         xhat = np.array([2.0, .055, .044])
         S = np.linalg.cholesky(.1 * np.eye(3))
         for step in m.steps():
@@ -79,5 +86,5 @@ class Modern():
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
 if __name__ == "__main__":
-    Modern('spkf1')
+    # Modern('spkf1')
     Modern('spkf2')

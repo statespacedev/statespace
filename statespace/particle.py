@@ -1,9 +1,9 @@
-# monte carlo sampling processor, bootstrap particle filter
 import numpy as np
 import math
 import examples, util
 
 def resample(xi, Wi):
+    '''particle resampling.'''
     tmp = []
     for i in range(xi.size):
         tmp.append([xi[i], Wi[i]])
@@ -23,6 +23,7 @@ def resample(xi, Wi):
     return xhati
 
 class Particle():
+    '''particle filter. monte carlo sampling processor, bootstrap particle filter. the run methods implement and perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     def __init__(self, mode, innovs=False, dists=False):
         self.innovs = util.Innovs()
         self.dists = util.Dists()
@@ -30,19 +31,20 @@ class Particle():
         if mode == 'test':
             for i in range(100):
                 m = examples.Jazwinski1()
-                self.pf1(m)
+                self.run_pf1(m)
                 self.ens.update(distslog=self.dists.log)
             self.ens.plot()
         if mode == 'pf1':
             m = examples.Jazwinski1()
-            self.pf1(m)
+            self.run_pf1(m)
             if dists: self.dists.plot()
         if mode == 'pf2':
             m = examples.Jazwinski2()
-            self.pf2(m)
+            self.run_pf2(m)
         if innovs: self.innovs.plot()
 
-    def pf1(self, m):
+    def run_pf1(self, m):
+        '''particle filter 1.'''
         xhat = 2.05
         x = xhat + math.sqrt(1e-2) * np.random.randn(m.nsamp)
         W = normalize(np.ones(m.nsamp))
@@ -55,7 +57,8 @@ class Particle():
             self.innovs.update(t=step[0], xhat=xhat, yhat=yhat, err=step[1] - xhat, inn=step[2] - yhat)
             self.dists.update(t=step[0], tru=m.Apf(step[1]), est=x)
 
-    def pf2(self, m):
+    def run_pf2(self, m):
+        '''particle filter 2.'''
         xhat = np.array([2.0, .055, .044])
         x = xhat + np.sqrt(m.Rww) * np.random.randn(m.nsamp, 3)
         W = np.ones((m.nsamp, 3)) / m.nsamp
@@ -74,6 +77,6 @@ def normalize(W):
     return W / sum(W)
 
 if __name__ == "__main__":
-    Particle('test')
+    # Particle('test')
     # Particle('pf1', dists=1, innovs=0)
-    # Particle('pf2', innovs=1)
+    Particle('pf2', innovs=1)

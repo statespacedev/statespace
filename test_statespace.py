@@ -1,31 +1,31 @@
 import sys
 sys.path.append('statespace')
-import kalman, sigmapoint, particle
+import classical, modern, particle
 
 tol1 = 1.
 
 def test_classical_00():
-    tmp = kalman.Classical('rccircuit', plot=False)
+    tmp = classical.Classical('rccircuit', plot=False)
     assert(abs(tmp.innov.log[-1][3]) < tol1)
 
 def test_classical_01():
-    tmp = kalman.Classical('kf2', plot=False)
+    tmp = classical.Classical('kf2', plot=False)
     assert(abs(tmp.innov.log[-1][3]) < tol1)
 
 def test_classical_02():
-    tmp = kalman.Classical('ekf1', plot=False)
+    tmp = classical.Classical('ekf1', plot=False)
     assert(abs(tmp.innov.log[-1][3]) < tol1)
 
 def test_classical_03():
-    tmp = kalman.Classical('ekf2', plot=False)
+    tmp = classical.Classical('ekf2', plot=False)
     assert(abs(tmp.innov.log[-1][3]) < tol1)
 
 def test_modern_01():
-    tmp = sigmapoint.Modern('spkf1', plot=False)
+    tmp = modern.Modern('spkf1', plot=False)
     assert(abs(tmp.innov.log[-1][3]) < tol1)
 
 def test_modern_02():
-    tmp = sigmapoint.Modern('spkf2', plot=False)
+    tmp = modern.Modern('spkf2', plot=False)
     assert(abs(tmp.innov.log[-1][3]) < tol1)
 
 # def test_particle_01():

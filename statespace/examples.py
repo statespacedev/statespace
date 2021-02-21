@@ -34,7 +34,7 @@ class Rccircuit():
         plt.subplot(2, 1, 2), plt.plot(log[:, 0], log[:, 2], linewidth=lw), plt.ylabel('y')
 
 class Jazwinski1():
-    '''track a reentry vehicle. this example is working in all three realms - classical, modern, particle.'''
+    '''track a reentry vehicle. standard problem from Stochastic Processes and Filtering Theory, Jazwinski.'''
     def __init__(self):
         self.tsteps = 151
         self.dt = .01
@@ -91,7 +91,7 @@ class Jazwinski1():
 
 
 class Jazwinski2():
-    '''track a reentry vehicle. this example is working in all three realms - classical, modern, particle.'''
+    '''track a reentry vehicle. standard problem from Stochastic Processes and Filtering Theory, Jazwinski.'''
     def __init__(self):
         self.tsteps = 1501
         self.dt = .01

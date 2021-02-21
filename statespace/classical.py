@@ -90,7 +90,7 @@ class Classical():
             self.run_rccircuit(m)
         elif mode == 'kf2':
             m = Jazwinski1()
-            self.run_ekf2(m)
+            self.run_kf2(m)
         elif mode == 'ekf1':
             m = Jazwinski1()
             self.run_ekf1(m)
@@ -114,7 +114,7 @@ class Classical():
             self.innov.update2(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat, Ree, Ptil)
 
     def run_kf2(self, m):
-        '''kalman filter 2.'''
+        '''kalman filter.'''
         xhat = 2.2
         Ptil = .01
         for step in m.steps():
