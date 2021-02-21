@@ -2,6 +2,11 @@
    :maxdepth: 2
    :caption: Contents:
 
+introduction
+==================================================================================================================
+
+this project focuses on reference problems from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, Kalman Filtering: Theory and Practice, and Stochastic Processes and Filtering Theory - in particular, using numpy for matrix and vector manipulation.
+
 classical.py
 ==============
 
