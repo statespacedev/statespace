@@ -1,5 +1,8 @@
 import os, sys
+sys.path.insert(0, os.path.abspath('../../statespace'))
 sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('.'))
 project = 'Statespace'
 copyright = '2021, Noah Smith'
 author = 'Noah Smith'

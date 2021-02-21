@@ -1,7 +1,7 @@
 import math
 import numpy as np
 from scipy.linalg.blas import drot, drotg
-from util import Innovs
+import util
 import examples
 
 def cholupdate(R, z):
@@ -46,7 +46,7 @@ def observational_update(xhat, S, X, obs, m):
 
 class Modern():
     def __init__(self, mode, plot=True):
-        self.innov = Innovs()
+        self.innov = util.Innovs()
         if mode == 'spkf1':
             m = examples.Jazwinski1()
             self.spkf1(m)

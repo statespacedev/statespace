@@ -39,12 +39,13 @@ class DecisionsEns():
         pass
 
     def decisionfunctionpmf(self, vals):
-        from pymc3.plots.kdeplot import fast_kde
-        vals = np.append(vals, [self.globalmin, self.globalmax])
-        pmf, min, max = fast_kde(vals, bw=4.5)
-        x = np.linspace(min, max, len(pmf))
-        pmf = pmf / sum(pmf)
-        return x, pmf
+        pass
+        # from pymc3.plots.kdeplot import fast_kde
+        # vals = np.append(vals, [self.globalmin, self.globalmax])
+        # pmf, min, max = fast_kde(vals, bw=4.5)
+        # x = np.linspace(min, max, len(pmf))
+        # pmf = pmf / sum(pmf)
+        # return x, pmf
 
     def plot_roc(self):
         plt.figure()
@@ -74,7 +75,6 @@ class DecisionsEns():
         self.decisionfunctionsnoise.append(decisionfunction)
 
 class Decisions():
-    """framework for evaluating decisions."""
     def __init__(self, mode, tracker):
         self.mode = mode
         tracker.innov.finalize()
@@ -91,27 +91,6 @@ class Decisions():
             if ndx == 0: decisionfunction[0] = delta
             else: decisionfunction[ndx] = decisionfunction[ndx-1] + delta
         return decisionfunction
-
-def rccircuit(runs):
-    from kalman import Classical
-    ens = DecisionsEns()
-    for runndx in range(runs):
-        tracker = Classical(mode='rccircuit', plot=False, signal=300.)
-        dec = Decisions(mode='rccircuit', tracker=tracker)
-        ens.addsig(decisionfunction=dec.decisionfunction)
-        tracker = Classical(mode='rccircuit', plot=False, signal=0.)
-        dec = Decisions(mode='rccircuit', tracker=tracker)
-        ens.addnoise(decisionfunction=dec.decisionfunction)
-    ens.finalize()
-    return ens
-
-if __name__ == "__main__":
-    ens = rccircuit(runs=100)
-    ens.plot_decisionfunctions()
-    ens.plot_roc()
-    plt.show()
-    pass
-
 
 class Innovs():
     def __init__(self):
@@ -165,14 +144,15 @@ class Dists():
         self.log = []
 
     def update(self, t, tru, est):
-        from pymc3.plots.kdeplot import fast_kde
-        trupmf, trumin, trumax = fast_kde(tru)
-        estpmf, estmin, estmax = fast_kde(est)
-        truval = np.linspace(trumin, trumax, len(trupmf))
-        estval = np.linspace(estmin, estmax, len(estpmf))
-        trupmf = trupmf / sum(trupmf)
-        estpmf = estpmf / sum(estpmf)
-        self.log.append([t, truval, trupmf, estval, estpmf])
+        pass
+        # from pymc3.plots.kdeplot import fast_kde
+        # trupmf, trumin, trumax = fast_kde(tru)
+        # estpmf, estmin, estmax = fast_kde(est)
+        # truval = np.linspace(trumin, trumax, len(trupmf))
+        # estval = np.linspace(estmin, estmax, len(estpmf))
+        # trupmf = trupmf / sum(trupmf)
+        # estpmf = estpmf / sum(estpmf)
+        # self.log.append([t, truval, trupmf, estval, estpmf])
 
     def kld1(self, x1, x2):
         def kli(a, b): return np.sum(np.multiply(a, np.log(a)) - np.multiply(a, np.log(b)), axis=0)
@@ -202,7 +182,6 @@ class Dists():
         ax.set_zlabel('p')
         plt.show()
 
-
 class DistsEns():
     def __init__(self):
         self.log = []
@@ -216,17 +195,101 @@ class DistsEns():
             self.log.append([maptru, mapest])
 
     def plot(self):
-        log = np.asarray(self.log)
-        from pymc3.plots.kdeplot import fast_kde
-        import matplotlib.pyplot as plt
-        maptrupmf, maptrumin, maptrumax = fast_kde(log[:, 0])
-        mapestpmf, mapestmin, mapestmax = fast_kde(log[:, 1])
-        maptruval = np.linspace(maptrumin, maptrumax, len(maptrupmf))
-        mapestval = np.linspace(mapestmin, mapestmax, len(mapestpmf))
-        maptrupmf = maptrupmf / sum(mapestpmf)
-        mapestpmf = mapestpmf / sum(mapestpmf)
-        plt.figure()
-        plt.plot(maptruval, maptrupmf, 'g')
-        plt.plot(mapestval, mapestpmf, 'b')
-        plt.show()
         pass
+        # log = np.asarray(self.log)
+        # from pymc3.plots.kdeplot import fast_kde
+        # import matplotlib.pyplot as plt
+        # maptrupmf, maptrumin, maptrumax = fast_kde(log[:, 0])
+        # mapestpmf, mapestmin, mapestmax = fast_kde(log[:, 1])
+        # maptruval = np.linspace(maptrumin, maptrumax, len(maptrupmf))
+        # mapestval = np.linspace(mapestmin, mapestmax, len(mapestpmf))
+        # maptrupmf = maptrupmf / sum(mapestpmf)
+        # mapestpmf = mapestpmf / sum(mapestpmf)
+        # plt.figure()
+        # plt.plot(maptruval, maptrupmf, 'g')
+        # plt.plot(mapestval, mapestpmf, 'b')
+        # plt.show()
+        # pass
+
+
+class ModelsEnsemble():
+    def __init__(self, title):
+        self.title = title
+        self.runs = []
+
+    def runningmean(self, x, n):
+        ypadded = np.pad(x, (n // 2, n - 1 - n // 2), mode='edge')
+        return np.convolve(ypadded, np.ones((n,)) / n, mode='valid')
+
+    def finalize(self):
+        self.ensx = []
+        self.ensy = []
+        for log in self.runs:
+            log = np.asarray(log)
+            self.ensx.append(log[:, 1])
+            self.ensy.append(log[:, 2])
+        self.ensx = np.asarray(self.ensx)
+        self.ensy = np.asarray(self.ensy)
+        self.ensxmean = self.runningmean(np.mean(self.ensx, axis=0), 20)
+        self.ensymean = self.runningmean(np.mean(self.ensy, axis=0), 20)
+        self.ensxstd = self.runningmean(np.std(self.ensx, axis=0), 20)
+        self.ensystd = self.runningmean(np.std(self.ensy, axis=0), 20)
+        pass
+
+    def plot(self):
+        self.finalize()
+        lw = 1
+        plt.figure()
+        plt.subplot(2, 1, 1)
+        for log in self.runs:
+            log = np.asarray(log)
+            plt.plot(log[:, 0], log[:, 1], linewidth=lw, color='g', alpha=.25)
+            plt.plot(log[:, 0], self.ensxmean, linewidth=lw, color='b', alpha=.1)
+            plt.plot(log[:, 0], self.ensxmean + 1.96 * self.ensxstd, linewidth=lw, color='b', alpha=.05)
+            plt.plot(log[:, 0], self.ensxmean - 1.96 * self.ensxstd, linewidth=lw, color='b', alpha=.05)
+            plt.ylabel('x')
+            if self.title: plt.title(self.title)
+        plt.subplot(2, 1, 2)
+        for log in self.runs:
+            log = np.asarray(log)
+            plt.plot(log[:, 0], log[:, 2], linewidth=lw, color='g', alpha=.25)
+            plt.plot(log[:, 0], self.ensymean, linewidth=lw, color='b', alpha=.1)
+            plt.plot(log[:, 0], self.ensymean + 1.96 * self.ensystd, linewidth=lw, color='b', alpha=.05)
+            plt.plot(log[:, 0], self.ensymean - 1.96 * self.ensystd, linewidth=lw, color='b', alpha=.05)
+            plt.ylabel('y')
+
+def rccircuit(runs):
+    from classical import Classical
+    ens = DecisionsEns()
+    for runndx in range(runs):
+        tracker = Classical(mode='rccircuit', plot=False, signal=300.)
+        dec = Decisions(mode='rccircuit', tracker=tracker)
+        ens.addsig(decisionfunction=dec.decisionfunction)
+        tracker = Classical(mode='rccircuit', plot=False, signal=0.)
+        dec = Decisions(mode='rccircuit', tracker=tracker)
+        ens.addnoise(decisionfunction=dec.decisionfunction)
+    ens.finalize()
+    return ens
+
+def rccircuit_ensemble(runs, signal, title=None):
+    from examples import Rccircuit
+    ens = ModelsEnsemble(title)
+    for runndx in range(runs):
+        sim = Rccircuit(signal)
+        for step in sim.steps(): continue
+        ens.runs.append(sim.log)
+    return ens
+
+if __name__ == "__main__":
+    ens = rccircuit(runs=100)
+    ens.plot_decisionfunctions()
+    ens.plot_roc()
+    plt.show()
+
+    enssig = rccircuit_ensemble(runs=10, signal=300., title='signal')
+    ensnoise = rccircuit_ensemble(runs=10, signal=0., title='noise')
+    enssig.plot()
+    ensnoise.plot()
+    plt.show()
+    pass
+

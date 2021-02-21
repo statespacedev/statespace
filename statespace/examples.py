@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Rccircuit():
-
+    '''track an rc circuit.'''
     def __init__(self, signal):
         self.u = signal * 1e-6 # amps step-function input
         self.tsteps = 301
@@ -34,6 +34,7 @@ class Rccircuit():
         plt.subplot(2, 1, 2), plt.plot(log[:, 0], log[:, 2], linewidth=lw), plt.ylabel('y')
 
 class Jazwinski1():
+    '''track a reentry vehicle. this example is working in all three realms - classical, modern, particle.'''
     def __init__(self):
         self.tsteps = 151
         self.dt = .01
@@ -90,6 +91,7 @@ class Jazwinski1():
 
 
 class Jazwinski2():
+    '''track a reentry vehicle. this example is working in all three realms - classical, modern, particle.'''
     def __init__(self):
         self.tsteps = 1501
         self.dt = .01
@@ -191,63 +193,3 @@ class Jazwinski2():
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
 
-class ModelsEns():
-    def __init__(self, title):
-        self.title = title
-        self.runs = []
-
-    def runningmean(self, x, n):
-        ypadded = np.pad(x, (n // 2, n - 1 - n // 2), mode='edge')
-        return np.convolve(ypadded, np.ones((n,)) / n, mode='valid')
-
-    def finalize(self):
-        self.ensx = []
-        self.ensy = []
-        for log in self.runs:
-            log = np.asarray(log)
-            self.ensx.append(log[:, 1])
-            self.ensy.append(log[:, 2])
-        self.ensx = np.asarray(self.ensx)
-        self.ensy = np.asarray(self.ensy)
-        self.ensxmean = self.runningmean(np.mean(self.ensx, axis=0), 20)
-        self.ensymean = self.runningmean(np.mean(self.ensy, axis=0), 20)
-        self.ensxstd = self.runningmean(np.std(self.ensx, axis=0), 20)
-        self.ensystd = self.runningmean(np.std(self.ensy, axis=0), 20)
-        pass
-
-    def plot(self):
-        self.finalize()
-        lw = 1
-        plt.figure()
-        plt.subplot(2, 1, 1)
-        for log in self.runs:
-            log = np.asarray(log)
-            plt.plot(log[:, 0], log[:, 1], linewidth=lw, color='g', alpha=.25)
-            plt.plot(log[:, 0], self.ensxmean, linewidth=lw, color='b', alpha=.1)
-            plt.plot(log[:, 0], self.ensxmean + 1.96 * self.ensxstd, linewidth=lw, color='b', alpha=.05)
-            plt.plot(log[:, 0], self.ensxmean - 1.96 * self.ensxstd, linewidth=lw, color='b', alpha=.05)
-            plt.ylabel('x')
-            if self.title: plt.title(self.title)
-        plt.subplot(2, 1, 2)
-        for log in self.runs:
-            log = np.asarray(log)
-            plt.plot(log[:, 0], log[:, 2], linewidth=lw, color='g', alpha=.25)
-            plt.plot(log[:, 0], self.ensymean, linewidth=lw, color='b', alpha=.1)
-            plt.plot(log[:, 0], self.ensymean + 1.96 * self.ensystd, linewidth=lw, color='b', alpha=.05)
-            plt.plot(log[:, 0], self.ensymean - 1.96 * self.ensystd, linewidth=lw, color='b', alpha=.05)
-            plt.ylabel('y')
-
-def rccircuit(runs, signal, title=None):
-    ens = ModelsEns(title)
-    for runndx in range(runs):
-        sim = Rccircuit(signal)
-        for step in sim.steps(): continue
-        ens.runs.append(sim.log)
-    return ens
-
-if __name__ == "__main__":
-    enssig = rccircuit(runs=10, signal=300., title='signal')
-    ensnoise = rccircuit(runs=10, signal=0., title='noise')
-    enssig.plot()
-    ensnoise.plot()
-    plt.show()

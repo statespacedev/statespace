@@ -1,8 +1,9 @@
 import numpy as np
-from util import Innovs
-import examples
+from examples import Rccircuit, Jazwinski1, Jazwinski2
+import util
 
 def ud_factorization(M):
+    '''ud factorization.'''
     assert np.allclose(M, M.T)
     n = M.shape[0]
     M = np.triu(M)
@@ -22,7 +23,8 @@ def ud_factorization(M):
     return U, np.diag(d)
 
 
-def temporal_update(xin, Uin, Din, m):  # thornton
+def temporal_update(xin, Uin, Din, m):
+    '''thornton temporal update.'''
     Phi, Gin, Q = m.A(xin), m.G, m.Q
     x, U, D = Phi @ xin, Uin, Din
     n, r = 3, 3
@@ -52,7 +54,8 @@ def temporal_update(xin, Uin, Din, m):  # thornton
     return x, U, D
 
 
-def observational_update(xin, Uin, Din, obs, m):  # bierman
+def observational_update(xin, Uin, Din, obs, m):
+    '''bierman observation update.'''
     R, H, yhat = m.Rvv, m.C(xin), m.c(xin)
     x, U, D = xin, Uin, Din
     a = U.T @ H.T
@@ -78,25 +81,26 @@ def observational_update(xin, Uin, Din, obs, m):  # bierman
 
 
 class Classical():
-    '''classical kalman filter.'''
+    '''classical kalman filter. the run methods implement and perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     def __init__(self, mode, plot=True, signal=None):
-        self.innov = Innovs()
+        self.innov = util.Innovs()
         if mode == 'rccircuit':
             if signal == None: signal = 300.
-            m = examples.Rccircuit(signal=signal)
-            self.rccircuit(m)
+            m = Rccircuit(signal=signal)
+            self.run_rccircuit(m)
         elif mode == 'kf2':
-            m = examples.Jazwinski1()
-            self.kf2(m)
+            m = Jazwinski1()
+            self.run_ekf2(m)
         elif mode == 'ekf1':
-            m = examples.Jazwinski1()
-            self.ekf1(m)
+            m = Jazwinski1()
+            self.run_ekf1(m)
         elif mode == 'ekf2':
-            m = examples.Jazwinski2()
-            self.ekf2(m)
+            m = Jazwinski2()
+            self.run_ekf2(m)
         if plot: self.innov.plot()
 
-    def rccircuit(self, m):
+    def run_rccircuit(self, m):
+        '''rccircuit.'''
         xhat = 2.5
         Ptil = 50e-4
         for step in m.steps():
@@ -109,7 +113,8 @@ class Classical():
             Ptil = Ptil / (Ptil + 1)
             self.innov.update2(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat, Ree, Ptil)
 
-    def kf2(self, m):
+    def run_kf2(self, m):
+        '''kalman filter 2.'''
         xhat = 2.2
         Ptil = .01
         for step in m.steps():
@@ -123,7 +128,8 @@ class Classical():
             Ptil = (1 - K * m.C(xref)) * Ptil
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
-    def ekf1(self, m):
+    def run_ekf1(self, m):
+        '''extended kalman filter 1.'''
         xhat = 2.2
         Ptil = .01
         for step in m.steps():
@@ -136,7 +142,8 @@ class Classical():
             Ptil = (1 - K * m.C(xhat)) * Ptil
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
-    def ekf2(self, m):
+    def run_ekf2(self, m):
+        '''extended kalman filter 2.'''
         xhat = np.array([2, .055, .044])
         U, D = ud_factorization(1. * np.eye(3))
         for step in m.steps():
@@ -145,10 +152,10 @@ class Classical():
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
 def main():
-    Classical('rccircuit', plot=True)
+    # Classical('rccircuit', plot=True)
     # Classical('kf2')
     # Classical('ekf1')
-    # Classical('ekf2')
+    Classical('ekf2')
 
 if __name__ == "__main__":
     main()
