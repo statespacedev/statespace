@@ -272,7 +272,7 @@ def rccircuit(runs):
     return ens
 
 def rccircuit_ensemble(runs, signal, title=None):
-    from examples import Rccircuit
+    from rccircuit import Rccircuit
     ens = ModelsEnsemble(title)
     for runndx in range(runs):
         sim = Rccircuit(signal)

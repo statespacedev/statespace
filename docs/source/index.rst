@@ -2,11 +2,6 @@
    :maxdepth: 2
    :caption: Contents:
 
-introduction
-=============
-
-this documentation is still in initial stages.
-
 classical.py
 ==============
 
@@ -25,10 +20,14 @@ particle.py
 .. automodule:: statespace.particle
     :members:
 
-examples.py
+jazwinski1.py
 ==============
 
-.. automodule:: statespace.examples
+.. automodule:: statespace.jazwinski1
     :members:
 
+jazwinski2.py
+==============
 
+.. automodule:: statespace.jazwinski2
+    :members:
