@@ -1,7 +1,7 @@
 
 cmake_minimum_required( VERSION 3.0 )
 
-project(libstarid)
+project( libstatespace )
 
 find_package( Eigen3 )
 include_directories( /usr/local/include /usr/include/mkl ${EIGEN3_INCLUDE_DIRS} )

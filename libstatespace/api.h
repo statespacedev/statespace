@@ -6,12 +6,14 @@
 
 class Api {
 public:
-    Api()
+    Api();
+    int test;
 };
 
-PYBIND11_MODULE(cpp, m) {
+PYBIND11_MODULE(libstarid, m) {
     pybind11::class_<Api>(m, "Api")
-            .def(pybind11::init<std::vector<std::string> &>());
+    .def(pybind11::init<>())
+    .def_readonly("test", &Api::test);
 }
 
 #endif //PYBINDEXAMPLE_API_H
