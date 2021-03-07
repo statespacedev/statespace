@@ -5,7 +5,7 @@ from rccircuit import Rccircuit
 import util
 
 class Classical():
-    '''classical kalman filter. the run methods implement and perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
+    '''classical kalman filter. the run methods perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     def __init__(self, mode, plot=True, signal=None):
         self.innov = util.Innovs()
         if mode == 'rccircuit':

@@ -5,7 +5,7 @@ import jazwinski1
 import jazwinski2
 
 class Particle():
-    '''particle filter. monte carlo sampling processor, bootstrap particle filter. the run methods implement and perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
+    '''particle filter. monte carlo sampling processor, bootstrap particle filter. the run methods perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     def __init__(self, mode, innovs=False, dists=False):
         self.innovs = util.Innovs()
         self.dists = util.Dists()

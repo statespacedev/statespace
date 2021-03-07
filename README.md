@@ -12,18 +12,6 @@ reference problems from
 
 [Stochastic Processes and Filtering Theory, Jazwinski](https://amzn.to/2NLXfVK)
 
-build-test-deploy to [pypi](https://pypi.org/project/statespace) is mostly a placeholder, ubuntu clone-install-develop of gitlab [repo](https://gitlab.com/noahhsmith/statespace) is assumed for now.
-
-    sudo apt-get -qq update -qy
-    sudo apt-get -qq install -y python3.6 python3-venv python3-pip
-    git clone git@gitlab.com:noahhsmith/statespace.git statespace
-    cd statespace
-    python3 -m venv venv
-    . venv/bin/activate
-    python3 setup.py develop
-    pytest
-    python3 statespace --demo
-
 210221
 
 brought the documentation via readthedocs up to a minimal level. cleaned up the project and brought some focus to what's going on here. as the docs now make clear - this project focuses on reference problems from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, Kalman Filtering: Theory and Practice, and Stochastic Processes and Filtering Theory - in particular, using numpy for matrix and vector manipulation.

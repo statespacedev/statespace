@@ -7,6 +7,23 @@ introduction
 
 this project focuses on reference problems from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, Kalman Filtering: Theory and Practice, and Stochastic Processes and Filtering Theory - in particular, using numpy for matrix and vector manipulation.
 
+install
+------------------------------------------------------------------------------------------------------------------
+
+build-test-deploy to [pypi](https://pypi.org/project/statespace) is mostly a placeholder, ubuntu clone-install-develop of gitlab [repo](https://gitlab.com/noahhsmith/statespace) is assumed for now.
+
+.. code-block:: bash
+
+    sudo apt-get -qq update -qy
+    sudo apt-get -qq install -y python3.6 python3-venv python3-pip
+    git clone git@gitlab.com:noahhsmith/statespace.git statespace
+    cd statespace
+    python3 -m venv venv
+    . venv/bin/activate
+    python3 setup.py develop
+    pytest
+    python3 statespace --demo
+
 classical.py
 ==============
 
