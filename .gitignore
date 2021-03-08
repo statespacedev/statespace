@@ -7,3 +7,4 @@ venv/*
 version
 /venv38/
 /docs/build/
+/docs/liboregon/octaveworkspace

@@ -7,7 +7,7 @@
 
 2004, EKF-SPKF-PF dissertation, Merwe, [pdf](papers/2004%20merwe.pdf)
 
-2006, ReBEL bayesian estimation, Merwe, [clone](https://gitlab.com/noahhsmith/statespace/tree/master/docs/rebel)
+2006, Oregon bayesian estimation library, Merwe, [clone](https://gitlab.com/noahhsmith/statespace/tree/master/docs/liboregon)
 
 2008, EKF software appendix, Grewal, [pdf](papers/2008%20grewal.pdf)
 
