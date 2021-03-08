@@ -23,7 +23,7 @@ setuptools.setup(
     version=__version__,
     author='noah smith',
     author_email='noahhsmith@gmail.com',
-    description='state-space distributions and decisions',
+    description='statespace models',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://gitlab.com/noahhsmith/statespace',
