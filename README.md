@@ -12,6 +12,10 @@ reference problems from
 
 [Stochastic Processes and Filtering Theory, Jazwinski](https://amzn.to/2NLXfVK)
 
+210308 looking more closely at the oregon library documentation, they have an interesting discussion of their objectives - something to think about going forward.
+
+designed to allow reuse of a system state space definition for state, parameter and joint estimation, using a variety of different inference algorithms. In other words, you define your system once in a standard general state space framework, and then the inference framework generator *geninfds* together with the inference system noise source generator *gensysnoiseds* will adapt/remap that model into the relevant state space framework needed for whatever type of estimation you want to do. This allows you to focus on defining the model, doing data IO, etc. without having to get bogged down into casting the problem into a different framework each time you want to use a different estimator or want to change the type of inference your doing. I.e. the internal inference implementation is hidden or as transparent as possible with respect to the problem definition by the user. [more](https://gitlab.com/noahhsmith/statespace/raw/master/docs/liboregon)
+
 210221
 
 brought the documentation via readthedocs up to a minimal level. cleaned up the project and brought some focus to what's going on here. as the docs now make clear - this project focuses on reference problems from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, Kalman Filtering: Theory and Practice, and Stochastic Processes and Filtering Theory - in particular, using numpy for matrix and vector manipulation.
