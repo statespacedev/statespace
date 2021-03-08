@@ -1,7 +1,7 @@
 import numpy as np
-from jazwinski2 import Jazwinski2
-from jazwinski1 import Jazwinski1
-from rccircuit import Rccircuit
+from model_jazwinski2 import Jazwinski2
+from model_jazwinski1 import Jazwinski1
+from model_rccircuit import Rccircuit
 import util
 
 class Classical():

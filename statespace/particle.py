@@ -1,8 +1,9 @@
 import numpy as np
 import math
 import util
-import jazwinski1
-import jazwinski2
+from model_jazwinski2 import Jazwinski2
+from model_jazwinski1 import Jazwinski1
+from model_rccircuit import Rccircuit
 
 class Particle():
     '''particle filter. monte carlo sampling processor, bootstrap particle filter. the run methods perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
@@ -12,16 +13,16 @@ class Particle():
         self.ens = util.DistsEns()
         if mode == 'test':
             for i in range(100):
-                m = jazwinski1.Jazwinski1()
+                m = Jazwinski1()
                 self.run_pf1(m)
                 self.ens.update(distslog=self.dists.log)
             self.ens.plot()
         if mode == 'pf1':
-            m = jazwinski1.Jazwinski1()
+            m = Jazwinski1()
             self.run_pf1(m)
             if dists: self.dists.plot()
         if mode == 'pf2':
-            m = jazwinski2.Jazwinski2()
+            m = Jazwinski2()
             self.run_pf2(m)
         if innovs: self.innovs.plot()
 

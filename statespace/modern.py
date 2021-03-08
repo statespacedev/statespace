@@ -1,8 +1,9 @@
 import math
 import numpy as np
 from scipy.linalg.blas import drot, drotg
-import jazwinski1
-import jazwinski2
+from model_jazwinski2 import Jazwinski2
+from model_jazwinski1 import Jazwinski1
+from model_rccircuit import Rccircuit
 import util
 
 class Modern():
@@ -10,10 +11,10 @@ class Modern():
     def __init__(self, mode, plot=True):
         self.innov = util.Innovs()
         if mode == 'spkf1':
-            m = jazwinski1.Jazwinski1()
+            m = Jazwinski1()
             self.run_spkf1(m)
         elif mode == 'spkf2':
-            m = jazwinski2.Jazwinski2()
+            m = Jazwinski2()
             self.run_spkf2(m)
         if plot: self.innov.plot()
 
