@@ -10,7 +10,7 @@ this project focuses on reference problems from Bayesian Signal Processing: Clas
 install
 ------------------------------------------------------------------------------------------------------------------
 
-build-test-deploy to [pypi](https://pypi.org/project/statespace) is mostly a placeholder, ubuntu clone-install-develop of gitlab [repo](https://gitlab.com/noahhsmith/statespace) is assumed for now.
+build-test-deploy to `pypi <https://pypi.org/project/statespace>`__ is mostly a placeholder, ubuntu clone-install-develop of `gitlab repo <https://gitlab.com/noahhsmith/statespace>`__ is assumed for now.
 
 .. code-block:: bash
 
@@ -24,32 +24,44 @@ build-test-deploy to [pypi](https://pypi.org/project/statespace) is mostly a pla
     pytest
     python3 statespace --demo
 
+statespace algorithms
+==================================================================================================================
+
 classical.py
-==============
+--------------
 
 .. automodule:: statespace.classical
     :members:
 
 modern.py
-==============
+----------
 
 .. automodule:: statespace.modern
     :members:
 
 particle.py
-==============
+-------------
 
 .. automodule:: statespace.particle
     :members:
 
-jazwinski1.py
-==============
+models
+==================================================================================================================
 
-.. automodule:: statespace.jazwinski1
+jazwinski1.py
+-------------
+
+.. automodule:: models.jazwinski1
     :members:
 
 jazwinski2.py
-==============
+-------------
 
-.. automodule:: statespace.jazwinski2
+.. automodule:: models.jazwinski2
+    :members:
+
+rccircuit.py
+-------------
+
+.. automodule:: models.rccircuit
     :members:

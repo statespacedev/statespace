@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 
 class Rccircuit():
-    '''reference problem Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
+    '''one of the simplest possible reference models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     def __init__(self, signal):
         self.u = signal * 1e-6 # amps step-function input
         self.tsteps = 301
@@ -26,10 +26,3 @@ class Rccircuit():
             self.y = 2 * self.x + v
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
-
-    def plot(self):
-        log = np.asarray(self.log)
-        lw = 1
-        plt.figure()
-        plt.subplot(2, 1, 1), plt.plot(log[:, 0], log[:, 1], linewidth=lw), plt.ylabel('x')
-        plt.subplot(2, 1, 2), plt.plot(log[:, 0], log[:, 2], linewidth=lw), plt.ylabel('y')

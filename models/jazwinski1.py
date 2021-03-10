@@ -1,9 +1,8 @@
 import math
 import numpy as np
 
-
 class Jazwinski1():
-    '''reference problem from Stochastic Processes and Filtering Theory, Jazwinski, and Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
+    '''a standard reference model from Stochastic Processes and Filtering Theory, Jazwinski, and Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods. represents the trajectory of a reentry vehicle entering the atmosphere.'''
     def __init__(self):
         self.tsteps = 151
         self.dt = .01
@@ -22,6 +21,17 @@ class Jazwinski1():
         self.W = np.array([k1, k2, k2])
         self.k0 = k0
         self.kappa = kappa
+
+    def steps(self):
+        for tstep in range(self.tsteps):
+            tsec = tstep * self.dt
+            w = math.sqrt(self.Rww) * np.random.randn()
+            v = math.sqrt(self.Rvv) * np.random.randn()
+            self.x = self.a(self.x, w)
+            self.y = self.c(self.x, v)
+            if tstep == 0: continue
+            self.log.append([tsec, self.x, self.y])
+            yield (tsec, self.x, self.y)
 
     def a(self, x, w=0):
         return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + w
@@ -47,13 +57,3 @@ class Jazwinski1():
     def Cpf(self, y, x):
         return np.exp(-np.log(2. * np.pi * self.Rvv) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.Rvv))
 
-    def steps(self):
-        for tstep in range(self.tsteps):
-            tsec = tstep * self.dt
-            w = math.sqrt(self.Rww) * np.random.randn()
-            v = math.sqrt(self.Rvv) * np.random.randn()
-            self.x = self.a(self.x, w)
-            self.y = self.c(self.x, v)
-            if tstep == 0: continue
-            self.log.append([tsec, self.x, self.y])
-            yield (tsec, self.x, self.y)
