@@ -24,7 +24,7 @@ build-test-deploy to `pypi <https://pypi.org/project/statespace>`__ is mostly a 
     pytest
     python3 statespace --demo
 
-statespace algorithms
+processors
 ==================================================================================================================
 
 classical.py
@@ -34,7 +34,7 @@ classical.py
     :members:
 
 modern.py
-----------
+-----------
 
 .. automodule:: statespace.modern
     :members:
@@ -48,14 +48,16 @@ particle.py
 models
 ==================================================================================================================
 
+will probably be moving towards a higher-level statespace model, encompassing specific lower-level models - possibly something involoving a translator / converter / adaptor... the models here are already an extrememly primitive form of that - rccircuit, jazwinski1, jazwinski2 models are fed into classical, modern, particle processors. we can think about these becoming specific cases of something more fundamental.
+
 jazwinski1.py
--------------
+--------------
 
 .. automodule:: models.jazwinski1
     :members:
 
 jazwinski2.py
--------------
+--------------
 
 .. automodule:: models.jazwinski2
     :members:

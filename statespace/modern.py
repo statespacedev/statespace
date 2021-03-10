@@ -5,20 +5,20 @@ import sys; sys.path.append('../')
 from models.jazwinski2 import Jazwinski2
 from models.jazwinski1 import Jazwinski1
 
+def main(mode='spkf1'):
+    processor = Modern()
+    if mode == 'spkf1': processor.spkf1(Jazwinski1())
+    elif mode == 'spkf2': processor.spkf2(Jazwinski2())
+    processor.innov.plot()
+
 class Modern():
     '''sigma-point or ukf filter. the run methods bring in particular models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     
-    def __init__(self, mode, plot=True):
+    def __init__(self, *args, **kwargs):
+        self.args, self.kwargs = args, kwargs
         self.innov = util.Innovs()
-        if mode == 'spkf1':
-            model = Jazwinski1()
-            self.run_spkf1(model)
-        elif mode == 'spkf2':
-            model = Jazwinski2()
-            self.run_spkf2(model)
-        if plot: self.innov.plot()
 
-    def run_spkf1(self, model):
+    def spkf1(self, model):
         '''sigma-point kalman filter 1.'''
         xhat = 2.2
         Ptil = .01
@@ -34,7 +34,7 @@ class Modern():
             Ptil = Ptil - K * Rksiksi * K
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
-    def run_spkf2(self, model):
+    def spkf2(self, model):
         '''sigma-point kalman filter 2.'''
         xhat = np.array([2.0, .055, .044])
         S = np.linalg.cholesky(.1 * np.eye(3))
@@ -88,5 +88,4 @@ class Modern():
         return xhat, S, yhat
 
 if __name__ == "__main__":
-    # Modern('spkf1')
-    Modern('spkf2')
+    main()

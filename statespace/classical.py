@@ -5,24 +5,20 @@ from models.jazwinski2 import Jazwinski2
 from models.jazwinski1 import Jazwinski1
 from models.rccircuit import Rccircuit
 
+def main(mode='ekf2'):
+    processor = Classical()
+    if mode == 'kf1': processor.kf1(Rccircuit(signal=300))
+    elif mode == 'kf2': processor.kf2(Jazwinski1())
+    elif mode == 'ekf1': processor.ekf1(Jazwinski1())
+    elif mode == 'ekf2': processor.ekf2(Jazwinski2())
+    processor.innov.plot()
+
 class Classical():
     '''classical kalman filter. the run methods bring in particular models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
 
-    def __init__(self, mode, plot=True, signal=300.):
+    def __init__(self, *args, **kwargs):
+        self.args, self.kwargs = args, kwargs
         self.innov = util.Innovs()
-        if mode == 'kf1':
-            model = Rccircuit(signal=signal)
-            self.kf1(model)
-        elif mode == 'kf2':
-            model = Jazwinski1()
-            self.run_kf2(model)
-        elif mode == 'ekf1':
-            model = Jazwinski1()
-            self.run_ekf1(model)
-        elif mode == 'ekf2':
-            model = Jazwinski2()
-            self.run_ekf2(model)
-        if plot: self.innov.plot()
 
     def kf1(self, model):
         '''rccircuit.'''
@@ -38,7 +34,7 @@ class Classical():
             Ptil = Ptil / (Ptil + 1)
             self.innov.update2(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat, Ree, Ptil)
 
-    def run_kf2(self, model):
+    def kf2(self, model):
         '''kalman filter.'''
         xhat = 2.2
         Ptil = .01
@@ -53,7 +49,7 @@ class Classical():
             Ptil = (1 - K * model.C(xref)) * Ptil
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
-    def run_ekf1(self, model):
+    def ekf1(self, model):
         '''extended kalman filter 1.'''
         xhat = 2.2
         Ptil = .01
@@ -67,7 +63,7 @@ class Classical():
             Ptil = (1 - K * model.C(xhat)) * Ptil
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
-    def run_ekf2(self, model):
+    def ekf2(self, model):
         '''extended kalman filter 2.'''
         xhat = np.array([2, .055, .044])
         U, D = self.ud_factorization(1. * np.eye(3))
@@ -154,7 +150,5 @@ class Classical():
         return x, U, D, yhat
 
 if __name__ == "__main__":
-    # Classical('rccircuit', plot=True)
-    # Classical('kf2')
-    # Classical('ekf1')
-    Classical('ekf2')
+    main()
+

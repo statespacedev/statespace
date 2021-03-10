@@ -4,29 +4,29 @@ import sys; sys.path.append('../')
 from models.jazwinski2 import Jazwinski2
 from models.jazwinski1 import Jazwinski1
 
+def main(mode='pf1'):
+    processor = Particle()
+    if mode == 'pf1':
+        processor.pf1(Jazwinski1())
+        # processor.dists.plot()
+    if mode == 'pf2': processor.pf2(Jazwinski2())
+    if mode == 'ensemble':
+        for i in range(100):
+            processor.pf1(Jazwinski1())
+            # processor.ens.update()
+        processor.ens.plot()
+    processor.innov.plot()
+
 class Particle():
     '''particle filter. monte carlo sampling processor, bootstrap particle filter. the run methods bring in particular models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     
-    def __init__(self, mode, innovs=False, dists=False):
-        self.innovs = util.Innovs()
+    def __init__(self, *args, **kwargs):
+        self.args, self.kwargs = args, kwargs
+        self.innov = util.Innovs()
         self.dists = util.Dists()
         self.ens = util.DistsEns()
-        if mode == 'pf1':
-            model = Jazwinski1()
-            self.run_pf1(model)
-            if dists: self.dists.plot()
-        if mode == 'pf2':
-            model = Jazwinski2()
-            self.run_pf2(model)
-        if mode == 'ensemble':
-            for i in range(100):
-                model = Jazwinski1()
-                self.run_pf1(model)
-                self.ens.update(distslog=self.dists.log)
-            self.ens.plot()
-        if innovs: self.innovs.plot()
 
-    def run_pf1(self, model):
+    def pf1(self, model):
         '''particle filter 1.'''
         xhat = 2.05
         x = xhat + math.sqrt(1e-2) * np.random.randn(model.nsamp)
@@ -40,7 +40,7 @@ class Particle():
             self.innovs.update(t=step[0], xhat=xhat, yhat=yhat, err=step[1] - xhat, inn=step[2] - yhat)
             self.dists.update(t=step[0], tru=model.Apf(step[1]), est=x)
 
-    def run_pf2(self, model):
+    def pf2(self, model):
         '''particle filter 2.'''
         xhat = np.array([2.0, .055, .044])
         x = xhat + np.sqrt(model.Rww) * np.random.randn(model.nsamp, 3)
@@ -80,6 +80,4 @@ class Particle():
         return W / sum(W)
 
 if __name__ == "__main__":
-    # Particle('test')
-    # Particle('pf1', dists=1, innovs=0)
-    Particle('pf2', innovs=1)
+    main()
