@@ -6,7 +6,7 @@ from models.jazwinski1 import Jazwinski1
 from models.rccircuit import Rccircuit
 
 class Classical():
-    '''classical kalman filter. the run methods perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
+    '''classical kalman filter. the run methods bring in particular models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     def __init__(self, mode, plot=True, signal=None):
         self.innov = util.Innovs()
         if mode == 'rccircuit':

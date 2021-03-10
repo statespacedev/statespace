@@ -6,7 +6,7 @@ from models.jazwinski1 import Jazwinski1
 from models.rccircuit import Rccircuit
 
 class Particle():
-    '''particle filter. monte carlo sampling processor, bootstrap particle filter. the run methods perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
+    '''particle filter. monte carlo sampling processor, bootstrap particle filter. the run methods bring in particular models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     def __init__(self, mode, innovs=False, dists=False):
         self.innovs = util.Innovs()
         self.dists = util.Dists()

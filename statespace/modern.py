@@ -7,7 +7,7 @@ from models.jazwinski1 import Jazwinski1
 from models.rccircuit import Rccircuit
 
 class Modern():
-    '''sigma-point or ukf filter. the run methods perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
+    '''sigma-point or ukf filter. the run methods bring in particular models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     def __init__(self, mode, plot=True):
         self.innov = util.Innovs()
         if mode == 'spkf1':
