@@ -7,30 +7,30 @@ from models.rccircuit import Rccircuit
 
 class Classical():
     '''classical kalman filter. the run methods bring in particular models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
-    def __init__(self, mode, plot=True, signal=None):
+
+    def __init__(self, mode, plot=True, signal=300.):
         self.innov = util.Innovs()
-        if mode == 'rccircuit':
-            if signal == None: signal = 300.
-            m = Rccircuit(signal=signal)
-            self.run_rccircuit(m)
+        if mode == 'kf1':
+            model = Rccircuit(signal=signal)
+            self.kf1(model)
         elif mode == 'kf2':
-            m = Jazwinski1()
-            self.run_kf2(m)
+            model = Jazwinski1()
+            self.run_kf2(model)
         elif mode == 'ekf1':
-            m = Jazwinski1()
-            self.run_ekf1(m)
+            model = Jazwinski1()
+            self.run_ekf1(model)
         elif mode == 'ekf2':
-            m = Jazwinski2()
-            self.run_ekf2(m)
+            model = Jazwinski2()
+            self.run_ekf2(model)
         if plot: self.innov.plot()
 
-    def run_rccircuit(self, m):
+    def kf1(self, model):
         '''rccircuit.'''
         xhat = 2.5
         Ptil = 50e-4
-        for step in m.steps():
-            xhat = .97 * xhat + 100 * m.u
-            Ptil = .94 * Ptil + m.Rww
+        for step in model.steps():
+            xhat = .97 * xhat + 100 * model.u
+            Ptil = .94 * Ptil + model.Rww
             Ree = 4 * Ptil + 4
             K = 2 * Ptil / Ree
             yhat = 2 * xhat
@@ -38,42 +38,42 @@ class Classical():
             Ptil = Ptil / (Ptil + 1)
             self.innov.update2(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat, Ree, Ptil)
 
-    def run_kf2(self, m):
+    def run_kf2(self, model):
         '''kalman filter.'''
         xhat = 2.2
         Ptil = .01
-        for step in m.steps():
+        for step in model.steps():
             xref = 2. + .067 * step[0]
-            xhat = m.a(xref, 0) + m.A(xref) * (xhat - xref)
-            Ptil = m.A(xref) * Ptil * m.A(xref)
-            Ree = m.C(xref) * Ptil * m.C(xref) + m.Rvv
-            K = Ptil * m.C(xref) / Ree
-            yhat = m.c(xref, 0) + m.C(xref) * (xhat - xref)
+            xhat = model.a(xref, 0) + model.A(xref) * (xhat - xref)
+            Ptil = model.A(xref) * Ptil * model.A(xref)
+            Ree = model.C(xref) * Ptil * model.C(xref) + model.Rvv
+            K = Ptil * model.C(xref) / Ree
+            yhat = model.c(xref, 0) + model.C(xref) * (xhat - xref)
             xhat = xhat + K * (step[2] - yhat)
-            Ptil = (1 - K * m.C(xref)) * Ptil
+            Ptil = (1 - K * model.C(xref)) * Ptil
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
-    def run_ekf1(self, m):
+    def run_ekf1(self, model):
         '''extended kalman filter 1.'''
         xhat = 2.2
         Ptil = .01
-        for step in m.steps():
-            xhat = m.a(xhat)
-            Ptil = m.A(xhat) * Ptil * m.A(xhat)
-            Ree = m.C(xhat) * Ptil * m.C(xhat) + m.Rvv
-            K = Ptil * m.C(xhat) / Ree
-            yhat = m.c(xhat)
+        for step in model.steps():
+            xhat = model.a(xhat)
+            Ptil = model.A(xhat) * Ptil * model.A(xhat)
+            Ree = model.C(xhat) * Ptil * model.C(xhat) + model.Rvv
+            K = Ptil * model.C(xhat) / Ree
+            yhat = model.c(xhat)
             xhat = xhat + K * (step[2] - yhat)
-            Ptil = (1 - K * m.C(xhat)) * Ptil
+            Ptil = (1 - K * model.C(xhat)) * Ptil
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
-    def run_ekf2(self, m):
+    def run_ekf2(self, model):
         '''extended kalman filter 2.'''
         xhat = np.array([2, .055, .044])
         U, D = self.ud_factorization(1. * np.eye(3))
-        for step in m.steps():
-            xhat, U, D = self.temporal_update(xin=m.a(xhat), Uin=U, Din=D, m=m)
-            xhat, U, D, yhat = self.observational_update(xin=xhat, Uin=U, Din=D, obs=step[2], m=m)
+        for step in model.steps():
+            xhat, U, D = self.temporal_update(xin=model.a(xhat), Uin=U, Din=D, model=model)
+            xhat, U, D, yhat = self.observational_update(xin=xhat, Uin=U, Din=D, obs=step[2], model=model)
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
     def ud_factorization(self, M):
@@ -97,9 +97,9 @@ class Classical():
         return U, np.diag(d)
 
 
-    def temporal_update(self, xin, Uin, Din, m):
+    def temporal_update(self, xin, Uin, Din, model):
         '''thornton temporal update.'''
-        Phi, Gin, Q = m.A(xin), m.G, m.Q
+        Phi, Gin, Q = model.A(xin), model.G, model.Q
         x, U, D = Phi @ xin, Uin, Din
         n, r = 3, 3
         G = Gin
@@ -128,9 +128,9 @@ class Classical():
         return x, U, D
 
 
-    def observational_update(self, xin, Uin, Din, obs, m):
+    def observational_update(self, xin, Uin, Din, obs, model):
         '''bierman observation update.'''
-        R, H, yhat = m.Rvv, m.C(xin), m.c(xin)
+        R, H, yhat = model.Rvv, model.C(xin), model.c(xin)
         x, U, D = xin, Uin, Din
         a = U.T @ H.T
         b = D @ a

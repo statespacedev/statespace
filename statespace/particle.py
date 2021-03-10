@@ -3,53 +3,53 @@ import math, util
 import sys; sys.path.append('../')
 from models.jazwinski2 import Jazwinski2
 from models.jazwinski1 import Jazwinski1
-from models.rccircuit import Rccircuit
 
 class Particle():
     '''particle filter. monte carlo sampling processor, bootstrap particle filter. the run methods bring in particular models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
+    
     def __init__(self, mode, innovs=False, dists=False):
         self.innovs = util.Innovs()
         self.dists = util.Dists()
         self.ens = util.DistsEns()
-        if mode == 'test':
-            for i in range(100):
-                m = Jazwinski1()
-                self.run_pf1(m)
-                self.ens.update(distslog=self.dists.log)
-            self.ens.plot()
         if mode == 'pf1':
-            m = Jazwinski1()
-            self.run_pf1(m)
+            model = Jazwinski1()
+            self.run_pf1(model)
             if dists: self.dists.plot()
         if mode == 'pf2':
-            m = Jazwinski2()
-            self.run_pf2(m)
+            model = Jazwinski2()
+            self.run_pf2(model)
+        if mode == 'ensemble':
+            for i in range(100):
+                model = Jazwinski1()
+                self.run_pf1(model)
+                self.ens.update(distslog=self.dists.log)
+            self.ens.plot()
         if innovs: self.innovs.plot()
 
-    def run_pf1(self, m):
+    def run_pf1(self, model):
         '''particle filter 1.'''
         xhat = 2.05
-        x = xhat + math.sqrt(1e-2) * np.random.randn(m.nsamp)
-        W = self.normalize(np.ones(m.nsamp))
-        for step in m.steps():
+        x = xhat + math.sqrt(1e-2) * np.random.randn(model.nsamp)
+        W = self.normalize(np.ones(model.nsamp))
+        for step in model.steps():
             x = self.resample(x, W)
-            x = m.Apf(x)
-            W = self.normalize(m.Cpf(step[2], x))
-            yhat = m.c(xhat, 0)
+            x = model.Apf(x)
+            W = self.normalize(model.Cpf(step[2], x))
+            yhat = model.c(xhat, 0)
             xhat = W @ x
             self.innovs.update(t=step[0], xhat=xhat, yhat=yhat, err=step[1] - xhat, inn=step[2] - yhat)
-            self.dists.update(t=step[0], tru=m.Apf(step[1]), est=x)
+            self.dists.update(t=step[0], tru=model.Apf(step[1]), est=x)
 
-    def run_pf2(self, m):
+    def run_pf2(self, model):
         '''particle filter 2.'''
         xhat = np.array([2.0, .055, .044])
-        x = xhat + np.sqrt(m.Rww) * np.random.randn(m.nsamp, 3)
-        W = np.ones((m.nsamp, 3)) / m.nsamp
-        for step in m.steps():
+        x = xhat + np.sqrt(model.Rww) * np.random.randn(model.nsamp, 3)
+        W = np.ones((model.nsamp, 3)) / model.nsamp
+        for step in model.steps():
             x[:, 0], x[:, 1], x[:, 2] = self.resample(x[:, 0], W[:, 0]), self.roughen(x[:, 1]), self.roughen(x[:, 2])
-            x[:, 0] = np.apply_along_axis(m.Apf, 1, x)
-            W[:, 0] = self.normalize(m.Cpf(step[2], x[:, 0]))
-            yhat = m.c(xhat, 0)
+            x[:, 0] = np.apply_along_axis(model.Apf, 1, x)
+            W[:, 0] = self.normalize(model.Cpf(step[2], x[:, 0]))
+            yhat = model.c(xhat, 0)
             xhat = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
             self.innovs.update(t=step[0], xhat=xhat[0], yhat=yhat, err=step[1][0] - xhat[0], inn=step[2] - yhat)
 
