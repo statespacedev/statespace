@@ -1,8 +1,9 @@
 import numpy as np
-from model_jazwinski2 import Jazwinski2
-from model_jazwinski1 import Jazwinski1
-from model_rccircuit import Rccircuit
 import util
+import sys; sys.path.append('../')
+from models.jazwinski2 import Jazwinski2
+from models.jazwinski1 import Jazwinski1
+from models.rccircuit import Rccircuit
 
 class Classical():
     '''classical kalman filter. the run methods perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''

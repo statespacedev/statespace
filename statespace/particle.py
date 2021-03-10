@@ -1,9 +1,9 @@
 import numpy as np
-import math
-import util
-from model_jazwinski2 import Jazwinski2
-from model_jazwinski1 import Jazwinski1
-from model_rccircuit import Rccircuit
+import math, util
+import sys; sys.path.append('../')
+from models.jazwinski2 import Jazwinski2
+from models.jazwinski1 import Jazwinski1
+from models.rccircuit import Rccircuit
 
 class Particle():
     '''particle filter. monte carlo sampling processor, bootstrap particle filter. the run methods perform particular filters from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
