@@ -10,9 +10,12 @@ class Jazwinski2():
         self.x = np.array([2., .05, .04])
         self.Rww = 1e-9 * np.array([1, 1, 1])
         self.Rvv = 9e-2
+        self.log = []
+        self.custom()
+
+    def custom(self):
         self.Sw = np.linalg.cholesky(np.diag(self.Rww))
         self.Sv = np.linalg.cholesky(np.diag(self.Rvv * np.array([1])))
-        self.log = []
         self.nsamp = 250
         n = 3
         kappa = 1

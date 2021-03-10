@@ -6,13 +6,16 @@ from matplotlib import pyplot as plt
 class Rccircuit():
     '''one of the simplest possible reference models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
     def __init__(self, signal):
-        self.u = signal * 1e-6 # amps step-function input
         self.tsteps = 301
         self.dt = .1
         self.x = 2.5 + math.sqrt(1e-6) * np.random.randn()
         self.Rww = 1e-5
         self.Rvv = 4
         self.log = []
+        self.custom(signal)
+
+    def custom(self, signal):
+        self.u = signal * 1e-6 # amps step-function input
         v = math.sqrt(self.Rvv) * np.random.randn()
         self.y = 2 * self.x + v
         self.log.append([0, self.x, self.y])

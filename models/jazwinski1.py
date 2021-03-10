@@ -10,6 +10,9 @@ class Jazwinski1():
         self.Rww = 1e-6
         self.Rvv = 9e-2
         self.log = []
+        self.custom()
+
+    def custom(self):
         self.va = np.vectorize(self.a)
         self.vc = np.vectorize(self.c)
         bignsubx = 1
