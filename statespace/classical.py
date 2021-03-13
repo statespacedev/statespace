@@ -57,7 +57,7 @@ class Classical():
         '''UD factorized form of the extended kalman filter, or square-root filter, with better numerical characteristics. instead of a covariance matrix full of squared values, we propagate something like it's square-root. this is the U matrix. this makes the state and observation equations look different, but they're doing the same thing as the standard form.'''
         xhat, Ptil = model.xhat0b, model.Ptil0b
         U, D = self.udfactorize(Ptil)
-        test = api.udfactorize(Ptil)
+        test = api.udfactorize(Ptil); U2, D2 = test[0], np.diag(test[1].transpose()[0])
         for step in model.steps():
             xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, model=model)
             xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, obs=step[2], model=model)

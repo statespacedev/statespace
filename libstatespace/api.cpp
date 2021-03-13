@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <map>
+#include <Eigen/Cholesky>
 
 /*
  * class Api:
@@ -13,9 +14,9 @@ Api::Api() {}
  *    def udfactorize(self):
  *       '''cpp implementation.'''
  * */
-std::vector<Eigen::MatrixXd> Api::udfactorize(Eigen::MatrixXd matin) {
-
-    std::vector<Eigen::MatrixXd> res; res.emplace_back(matin); res.emplace_back(matin);
+std::vector<Eigen::MatrixXd> Api::udfactorize(Eigen::MatrixXd M) {
+    using namespace Eigen; std::vector<Eigen::MatrixXd> res;
+    auto chol = M.ldlt(); res.emplace_back(chol.matrixU()); res.emplace_back(chol.vectorD());
     return res;
 }
 
