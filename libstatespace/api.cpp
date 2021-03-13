@@ -45,7 +45,28 @@ std::vector<Eigen::MatrixXd> Api::temporal(Eigen::MatrixXd xin, Eigen::MatrixXd 
     return res;
 }
 
-//      for k in range(n): PhiU[j, k] = PhiU[j, k] - U[j, i] * PhiU[i, k]
-//      for k in range(r): G[j, k] = G[j, k] - U[j, i] * G[i, k]
-//return x, U, D
+std::vector<Eigen::MatrixXd> Api::observational(Eigen::MatrixXd xin, Eigen::MatrixXd Uin,
+                                                Eigen::MatrixXd Din, Eigen::MatrixXd H,
+                                                double obs, double R, double yhat) {
+    using namespace Eigen; std::vector<MatrixXd> res;
 
+    return res;
+}
+//x, U, D, dz, alpha, gamma = xin, Uin, Din, obs - yhat, R, 1/R
+//a = U.T @ H.T
+//b = D @ a
+//for j in range(3):
+//beta = alpha
+//alpha = alpha + a[j] * b[j]
+//lamda = -a[j] * gamma
+//gamma = 1 / alpha
+//D[j, j] = beta * gamma * D[j, j]
+//jlim = j - 1
+//if not jlim < 0:
+//for i in range(jlim):
+//beta = U[i, j]
+//U[i, j] = beta + b[i] * lamda
+//        b[i] = b[i] + b[j] * beta
+//dzs = gamma * dz
+//x = x + dzs * b
+//return x, U, D, yhat

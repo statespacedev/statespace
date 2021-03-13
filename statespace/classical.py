@@ -62,7 +62,8 @@ class Classical():
             # xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
             tmp = api.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
             xhat, U, D = tmp[0].flatten(), tmp[1], tmp[2]
-            xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, obs=step[2], model=model)
+            xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, H=model.C(xhat), obs=step[2], R=model.Rvv, yhat=model.c(xhat))
+            tmp = api.observational(xin=xhat, Uin=U, Din=D, H=model.C(xhat), obs=step[2], R=model.Rvv, yhat=model.c(xhat))
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
     def udfactorize(self, M):
@@ -102,15 +103,11 @@ class Classical():
                     for k in range(r): G[j, k] = G[j, k] - U[j, i] * G[i, k]
         return x, U, D
 
-    def observational(self, xin, Uin, Din, obs, model):
+    def observational(self, xin, Uin, Din, H, obs, R, yhat):
         '''bierman observation update.'''
-        R, H, yhat = model.Rvv, model.C(xin), model.c(xin)
-        x, U, D = xin, Uin, Din
+        x, U, D, dz, alpha, gamma = xin, Uin, Din, obs - yhat, R, 1/R
         a = U.T @ H.T
         b = D @ a
-        dz = obs - yhat  # z - H @ xin
-        alpha = R
-        gamma = 1 / alpha
         for j in range(3):
             beta = alpha
             alpha = alpha + a[j] * b[j]

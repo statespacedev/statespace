@@ -11,6 +11,9 @@ public:
     std::vector<Eigen::MatrixXd> udfactorize(Eigen::MatrixXd M);
     std::vector<Eigen::MatrixXd> temporal(Eigen::MatrixXd xin, Eigen::MatrixXd Uin, Eigen::MatrixXd Din,
                                           Eigen::MatrixXd Phi, Eigen::MatrixXd Gin, Eigen::MatrixXd Q);
+    std::vector<Eigen::MatrixXd> observational(Eigen::MatrixXd xin, Eigen::MatrixXd Uin,
+                                               Eigen::MatrixXd Din, Eigen::MatrixXd H,
+                                               double obs, double R, double yhat);
 };
 
 PYBIND11_MODULE(libstatespace, m) {
@@ -19,7 +22,10 @@ PYBIND11_MODULE(libstatespace, m) {
     .def("udfactorize", &Api::udfactorize, pybind11::arg("M"))
     .def("temporal", &Api::temporal, pybind11::arg("xin"), pybind11::arg("Uin"),
          pybind11::arg("Din"), pybind11::arg("Phi"),
-         pybind11::arg("Gin"), pybind11::arg("Q"));
+         pybind11::arg("Gin"), pybind11::arg("Q"))
+   .def("observational", &Api::observational, pybind11::arg("xin"), pybind11::arg("Uin"),
+   pybind11::arg("Din"), pybind11::arg("H"),
+   pybind11::arg("obs"), pybind11::arg("R"), pybind11::arg("yhat"));
 }
 
 #endif //PYBINDEXAMPLE_API_H
