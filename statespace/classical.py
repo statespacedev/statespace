@@ -57,9 +57,9 @@ class Classical():
         '''UD factorized form of the extended kalman filter, or square-root filter, with better numerical characteristics. instead of a covariance matrix full of squared values, we propagate something like it's square-root. this is the U matrix. this makes the state and observation equations look different, but they're doing the same thing as the standard form.'''
         xhat, Ptil = model.xhat0b, model.Ptil0b
         U, D = self.udfactorize(Ptil)
-        test = api.udfactorize(Ptil); U2, D2 = test[0], np.diag(test[1].transpose()[0])
+        ud = api.udfactorize(Ptil); U2, D2 = ud[0], np.diag(ud[1].transpose()[0])
         for step in model.steps():
-            xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, model=model)
+            xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
             xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, obs=step[2], model=model)
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
@@ -79,9 +79,8 @@ class Classical():
         d[0] = M[0, 0]
         return U, np.diag(d)
 
-    def temporal(self, xin, Uin, Din, model):
+    def temporal(self, xin, Uin, Din, Phi, Gin, Q):
         '''thornton temporal update.'''
-        Phi, Gin, Q = model.A(xin), model.G, model.Q
         x, U, D = Phi @ xin, Uin, Din
         n, r, G, U = 3, 3, Gin, np.eye(3)
         PhiU = Phi @ Uin
@@ -101,7 +100,6 @@ class Classical():
                     for k in range(n): PhiU[j, k] = PhiU[j, k] - U[j, i] * PhiU[i, k]
                     for k in range(r): G[j, k] = G[j, k] - U[j, i] * G[i, k]
         return x, U, D
-
 
     def observational(self, xin, Uin, Din, obs, model):
         '''bierman observation update.'''
