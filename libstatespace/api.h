@@ -9,7 +9,6 @@ class Api {
 public:
     Api();
     std::vector<Eigen::MatrixXd> udfactorize(Eigen::MatrixXd matin);
-    int test();
 };
 
 PYBIND11_MODULE(libstatespace, m) {

@@ -45,6 +45,12 @@ particle.py
 .. automodule:: statespace.particle
     :members:
 
+api.py
+--------
+
+.. automodule:: libstatespace_.api
+    :members:
+
 models
 ==================================================================================================================
 
@@ -62,8 +68,3 @@ jazwinski2.py
 .. automodule:: models.jazwinski2
     :members:
 
-rccircuit.py
--------------
-
-.. automodule:: models.rccircuit
-    :members:
