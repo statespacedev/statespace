@@ -56,11 +56,12 @@ class Classical():
     def ekfud(self, model):
         '''UD factorized form of the extended kalman filter, or square-root filter, with better numerical characteristics. instead of a covariance matrix full of squared values, we propagate something like it's square-root. this is the U matrix. this makes the state and observation equations look different, but they're doing the same thing as the standard form.'''
         xhat, Ptil = model.xhat0b, model.Ptil0b
-        U, D = self.udfactorize(Ptil)
-        ud = api.udfactorize(Ptil); U2, D2 = ud[0], np.diag(ud[1].transpose()[0])
+        # U, D = self.udfactorize(Ptil)
+        ud = api.udfactorize(Ptil); U, D = ud[0], np.diag(ud[1].transpose()[0])
         for step in model.steps():
-            xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
+            # xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
             tmp = api.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
+            xhat, U, D = tmp[0].flatten(), tmp[1], tmp[2]
             xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, obs=step[2], model=model)
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
@@ -91,7 +92,7 @@ class Classical():
                 if (j <= r - 1): sigma = sigma + G[i, j] ** 2 + Q[j, j]
             D[i, i] = sigma
             ilim = i - 1
-            if not ilim < 0:
+            if ilim > 0:
                 for j in range(ilim):
                     sigma = 0
                     for k in range(n): sigma = sigma + PhiU[i, k] * Din[k, k] * PhiU[j, k]
