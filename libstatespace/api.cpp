@@ -3,7 +3,7 @@
 
 /*
  * class Api:
- *    '''handles calls from python code.'''
+ *    '''handles calls from python.'''
  * */
 Api::Api() {}
 
@@ -42,31 +42,32 @@ std::vector<Eigen::MatrixXd> Api::temporal(Eigen::MatrixXd xin, Eigen::MatrixXd 
                 for (int k = 0; k < n; ++k) PhiU(j, k) = PhiU(j, k) - U(j, i) * PhiU(i, k);
                 for (int k = 0; k < r; ++k) G(j, k) = G(j, k) - U(j, i) * G(i, k); } } }
     res.emplace_back(x); res.emplace_back(U); res.emplace_back(D);
-    return res;
-}
+    return res; }
 
-std::vector<Eigen::MatrixXd> Api::observational(Eigen::MatrixXd xin, Eigen::MatrixXd Uin,
-                                                Eigen::MatrixXd Din, Eigen::MatrixXd H,
+/*
+ *    def observational(self):
+ *       '''bierman observation update for the ud factorized ekf.'''
+ * */
+std::vector<Eigen::MatrixXd> Api::observational(Eigen::MatrixXd x, Eigen::MatrixXd U,
+                                                Eigen::MatrixXd D, Eigen::MatrixXd H,
                                                 double obs, double R, double yhat) {
     using namespace Eigen; std::vector<MatrixXd> res;
+    auto dz = obs - yhat; auto alpha = R; auto gamma = 1/R;
+    auto a = U.transpose() * H;
+    Eigen::MatrixXd b = D * a;
+    for (int j = 0; j < 3; ++j) {
+        auto beta = alpha;
+        alpha = alpha + a(j) * b(j);
+        auto lambda = -a(j) * gamma;
+        gamma = 1/alpha;
+        D(j, j) = beta * gamma * D(j, j);
+        int jlim = j - 1;
+        if (jlim > 0) {
+            for (int i = 0; i < jlim; ++i) {
+                beta = U(i, j);
+                U(i, j) = beta + b(i) * lambda;
+                b(i) = b(i) + b(j) * beta; } } }
+    x = x + gamma * dz * b;
+    res.emplace_back(x); res.emplace_back(U); res.emplace_back(D);
+    return res; }
 
-    return res;
-}
-//x, U, D, dz, alpha, gamma = xin, Uin, Din, obs - yhat, R, 1/R
-//a = U.T @ H.T
-//b = D @ a
-//for j in range(3):
-//beta = alpha
-//alpha = alpha + a[j] * b[j]
-//lamda = -a[j] * gamma
-//gamma = 1 / alpha
-//D[j, j] = beta * gamma * D[j, j]
-//jlim = j - 1
-//if not jlim < 0:
-//for i in range(jlim):
-//beta = U[i, j]
-//U[i, j] = beta + b[i] * lamda
-//        b[i] = b[i] + b[j] * beta
-//dzs = gamma * dz
-//x = x + dzs * b
-//return x, U, D, yhat

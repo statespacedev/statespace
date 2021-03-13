@@ -56,14 +56,21 @@ class Classical():
     def ekfud(self, model):
         '''UD factorized form of the extended kalman filter, or square-root filter, with better numerical characteristics. instead of a covariance matrix full of squared values, we propagate something like it's square-root. this is the U matrix. this makes the state and observation equations look different, but they're doing the same thing as the standard form.'''
         xhat, Ptil = model.xhat0b, model.Ptil0b
-        # U, D = self.udfactorize(Ptil)
+        U, D = self.udfactorize(Ptil)
+        for step in model.steps():
+            xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
+            xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, H=model.C(xhat), obs=step[2], R=model.Rvv, yhat=model.c(xhat))
+            self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
+
+    def ekfudcpp(self, model):
+        '''UD factorized form of the extended kalman filter, in cpp.'''
+        xhat, Ptil = model.xhat0b, model.Ptil0b
         ud = api.udfactorize(Ptil); U, D = ud[0], np.diag(ud[1].transpose()[0])
         for step in model.steps():
-            # xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
-            tmp = api.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
-            xhat, U, D = tmp[0].flatten(), tmp[1], tmp[2]
-            xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, H=model.C(xhat), obs=step[2], R=model.Rvv, yhat=model.c(xhat))
-            tmp = api.observational(xin=xhat, Uin=U, Din=D, H=model.C(xhat), obs=step[2], R=model.Rvv, yhat=model.c(xhat))
+            res = api.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
+            xhat, U, D = res[0].flatten(), res[1], res[2]
+            res = api.observational(xin=xhat, Uin=U, Din=D, H=model.C(xhat), obs=step[2], R=model.Rvv, yhat=model.c(xhat))
+            xhat, U, D, yhat = res[0].flatten(), res[1], res[2], model.c(xhat)
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
     def udfactorize(self, M):

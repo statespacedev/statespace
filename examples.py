@@ -8,6 +8,6 @@ from statespace.classical import Classical
 from models.jazwinski2 import Jazwinski2
 
 processor, model = Classical(), Jazwinski2()
-processor.ekfud(model)
+processor.ekfudcpp(model)
 processor.innov.plot()
 
