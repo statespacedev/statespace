@@ -60,6 +60,7 @@ class Classical():
         ud = api.udfactorize(Ptil); U2, D2 = ud[0], np.diag(ud[1].transpose()[0])
         for step in model.steps():
             xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
+            tmp = api.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
             xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, obs=step[2], model=model)
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
@@ -81,9 +82,8 @@ class Classical():
 
     def temporal(self, xin, Uin, Din, Phi, Gin, Q):
         '''thornton temporal update.'''
-        x, U, D = Phi @ xin, Uin, Din
-        n, r, G, U = 3, 3, Gin, np.eye(3)
-        PhiU = Phi @ Uin
+        U, D, G, n, r = np.eye(3), Din, Gin, 3, 3
+        x, PhiU = Phi @ xin, Phi @ Uin
         for i in reversed(range(3)):
             sigma = 0
             for j in range(n):
