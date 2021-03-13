@@ -1,9 +1,11 @@
 import numpy as np
 import util
-import sys; sys.path.append('../')
+import sys; sys.path.append('../'); sys.path.append('../cmake-build-debug/libstatespace')
 from models.jazwinski2 import Jazwinski2
 from models.jazwinski1 import Jazwinski1
 from models.rccircuit import Rccircuit
+import libstatespace
+api = libstatespace.Api()
 
 def main(mode='ekf2'):
     processor = Classical()
@@ -64,7 +66,7 @@ class Classical():
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
     def ekf2(self, model):
-        '''extended kalman filter 2.'''
+        '''extended kalman filter 2. UD factorized form of the kalman filter, or square-root filter, with better numerical characteristics. instead of a covariance matrix full of squared values, we propagate something like it's square-root. this is the U matrix. this makes the state and observation equations look unrecognizable, but they are doing exactly the same thing as the friendlier standard kalman form.'''
         xhat = np.array([2, .055, .044])
         U, D = self.ud_factorization(1. * np.eye(3))
         for step in model.steps():
