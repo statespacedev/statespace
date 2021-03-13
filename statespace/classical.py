@@ -66,16 +66,12 @@ class Classical():
     def udfactorize(self, M):
         '''ud factorization.'''
         assert np.allclose(M, M.T)
-        n = M.shape[0]
-        M = np.triu(M)
-        U = np.eye(n)
-        d = np.zeros(n)
+        n, M = M.shape[0], np.triu(M)
+        U, d = np.eye(n), np.zeros(n)
         for j in reversed(range(2, n + 1)):
             d[j - 1] = M[j - 1, j - 1]
-            if d[j - 1] > 0:
-                alpha = 1.0 / d[j - 1]
-            else:
-                alpha = 0.0
+            if d[j - 1] > 0: alpha = 1.0 / d[j - 1]
+            else: alpha = 0.0
             for k in range(1, j):
                 beta = M[k - 1, j - 1]
                 U[k - 1, j - 1] = alpha * beta
@@ -83,35 +79,27 @@ class Classical():
         d[0] = M[0, 0]
         return U, np.diag(d)
 
-
     def temporal(self, xin, Uin, Din, model):
         '''thornton temporal update.'''
         Phi, Gin, Q = model.A(xin), model.G, model.Q
         x, U, D = Phi @ xin, Uin, Din
-        n, r = 3, 3
-        G = Gin
-        U = np.eye(3)
+        n, r, G, U = 3, 3, Gin, np.eye(3)
         PhiU = Phi @ Uin
         for i in reversed(range(3)):
             sigma = 0
             for j in range(n):
                 sigma = sigma + PhiU[i, j] ** 2 * Din[j, j]
-                if (j <= r - 1):
-                    sigma = sigma + G[i, j] ** 2 + Q[j, j]
+                if (j <= r - 1): sigma = sigma + G[i, j] ** 2 + Q[j, j]
             D[i, i] = sigma
             ilim = i - 1
             if not ilim < 0:
                 for j in range(ilim):
                     sigma = 0
-                    for k in range(n):
-                        sigma = sigma + PhiU[i, k] * Din[k, k] * PhiU[j, k]
-                    for k in range(r):
-                        sigma = sigma + G[i, k] * Q[k, k] * G[j, k]
+                    for k in range(n): sigma = sigma + PhiU[i, k] * Din[k, k] * PhiU[j, k]
+                    for k in range(r): sigma = sigma + G[i, k] * Q[k, k] * G[j, k]
                     U[j, i] = sigma / D[i, i]
-                    for k in range(n):
-                        PhiU[j, k] = PhiU[j, k] - U[j, i] * PhiU[i, k]
-                    for k in range(r):
-                        G[j, k] = G[j, k] - U[j, i] * G[i, k]
+                    for k in range(n): PhiU[j, k] = PhiU[j, k] - U[j, i] * PhiU[i, k]
+                    for k in range(r): G[j, k] = G[j, k] - U[j, i] * G[i, k]
         return x, U, D
 
 
