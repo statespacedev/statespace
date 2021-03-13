@@ -8,7 +8,7 @@
 class Api {
 public:
     Api();
-    Eigen::MatrixXd test2(Eigen::MatrixXd matin);
+    std::vector<Eigen::MatrixXd> udfactorize(Eigen::MatrixXd matin);
     int test();
 };
 
@@ -16,7 +16,7 @@ PYBIND11_MODULE(libstatespace, m) {
     pybind11::class_<Api>(m, "Api")
     .def(pybind11::init<>())
     .def("test", &Api::test)
-    .def("test2", &Api::test2, pybind11::arg("matin"));
+    .def("udfactorize", &Api::udfactorize, pybind11::arg("matin"));
 }
 
 #endif //PYBINDEXAMPLE_API_H

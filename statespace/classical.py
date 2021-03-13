@@ -1,5 +1,5 @@
 import numpy as np
-import util
+import statespace.util as util
 import sys; sys.path.append('../'); sys.path.append('../cmake-build-debug/libstatespace')
 from models.jazwinski2 import Jazwinski2
 from models.jazwinski1 import Jazwinski1
@@ -56,13 +56,14 @@ class Classical():
     def ekfud(self, model):
         '''UD factorized form of the extended kalman filter, or square-root filter, with better numerical characteristics. instead of a covariance matrix full of squared values, we propagate something like it's square-root. this is the U matrix. this makes the state and observation equations look different, but they're doing the same thing as the standard form.'''
         xhat, Ptil = model.xhat0b, model.Ptil0b
-        U, D = self.ud_factorization(Ptil)
+        U, D = self.udfactorize(Ptil)
+        test = api.udfactorize(Ptil)
         for step in model.steps():
-            xhat, U, D = self.temporal_update(xin=model.a(xhat), Uin=U, Din=D, model=model)
-            xhat, U, D, yhat = self.observational_update(xin=xhat, Uin=U, Din=D, obs=step[2], model=model)
+            xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, model=model)
+            xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, obs=step[2], model=model)
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
-    def ud_factorization(self, M):
+    def udfactorize(self, M):
         '''ud factorization.'''
         assert np.allclose(M, M.T)
         n = M.shape[0]
@@ -83,7 +84,7 @@ class Classical():
         return U, np.diag(d)
 
 
-    def temporal_update(self, xin, Uin, Din, model):
+    def temporal(self, xin, Uin, Din, model):
         '''thornton temporal update.'''
         Phi, Gin, Q = model.A(xin), model.G, model.Q
         x, U, D = Phi @ xin, Uin, Din
@@ -114,7 +115,7 @@ class Classical():
         return x, U, D
 
 
-    def observational_update(self, xin, Uin, Din, obs, model):
+    def observational(self, xin, Uin, Din, obs, model):
         '''bierman observation update.'''
         R, H, yhat = model.Rvv, model.C(xin), model.c(xin)
         x, U, D = xin, Uin, Din
