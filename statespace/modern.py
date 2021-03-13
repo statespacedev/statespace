@@ -5,7 +5,11 @@ import sys; sys.path.append('../')
 from models.jazwinski2 import Jazwinski2
 from models.jazwinski1 import Jazwinski1
 
-def main(mode='spkf1'):
+def main():
+    run('spkf1')
+    run('spkf2')
+
+def run(mode='spkf1'):
     processor = Modern()
     if mode == 'spkf1': processor.spkf1(Jazwinski1())
     elif mode == 'spkf2': processor.spkf2(Jazwinski2())

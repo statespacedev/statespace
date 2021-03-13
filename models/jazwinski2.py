@@ -14,6 +14,10 @@ class Jazwinski2():
         self.custom()
 
     def custom(self):
+        self.xhat0 = 2.2
+        self.Ptil0 = .01
+        self.xhat0b = np.array([2, .055, .044])
+        self.Ptil0b = 1. * np.eye(3)
         self.Sw = np.linalg.cholesky(np.diag(self.Rww))
         self.Sv = np.linalg.cholesky(np.diag(self.Rvv * np.array([1])))
         self.nsamp = 250

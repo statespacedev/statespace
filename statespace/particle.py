@@ -4,7 +4,11 @@ import sys; sys.path.append('../')
 from models.jazwinski2 import Jazwinski2
 from models.jazwinski1 import Jazwinski1
 
-def main(mode='pf1'):
+def main():
+    run('pf1')
+    run('pf2')
+
+def run(mode='pf1'):
     processor = Particle()
     if mode == 'pf1':
         processor.pf1(Jazwinski1())
@@ -37,7 +41,7 @@ class Particle():
             W = self.normalize(model.Cpf(step[2], x))
             yhat = model.c(xhat, 0)
             xhat = W @ x
-            self.innovs.update(t=step[0], xhat=xhat, yhat=yhat, err=step[1] - xhat, inn=step[2] - yhat)
+            self.innov.update(t=step[0], xhat=xhat, yhat=yhat, err=step[1] - xhat, inn=step[2] - yhat)
             self.dists.update(t=step[0], tru=model.Apf(step[1]), est=x)
 
     def pf2(self, model):
@@ -51,7 +55,7 @@ class Particle():
             W[:, 0] = self.normalize(model.Cpf(step[2], x[:, 0]))
             yhat = model.c(xhat, 0)
             xhat = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
-            self.innovs.update(t=step[0], xhat=xhat[0], yhat=yhat, err=step[1][0] - xhat[0], inn=step[2] - yhat)
+            self.innov.update(t=step[0], xhat=xhat[0], yhat=yhat, err=step[1][0] - xhat[0], inn=step[2] - yhat)
 
     def resample(self, xi, Wi):
         '''particle resampling.'''

@@ -13,6 +13,8 @@ class Jazwinski1():
         self.custom()
 
     def custom(self):
+        self.xhat0 = 2.2
+        self.Ptil0 = .01
         self.va = np.vectorize(self.a)
         self.vc = np.vectorize(self.c)
         bignsubx = 1
@@ -24,6 +26,9 @@ class Jazwinski1():
         self.W = np.array([k1, k2, k2])
         self.k0 = k0
         self.kappa = kappa
+
+    def xref(self, step0):
+        return 2. + .067 * step0
 
     def steps(self):
         for tstep in range(self.tsteps):

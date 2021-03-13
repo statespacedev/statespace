@@ -3,45 +3,34 @@ import util
 import sys; sys.path.append('../'); sys.path.append('../cmake-build-debug/libstatespace')
 from models.jazwinski2 import Jazwinski2
 from models.jazwinski1 import Jazwinski1
-from models.rccircuit import Rccircuit
 import libstatespace
 api = libstatespace.Api()
 
-def main(mode='ekf2'):
+def main():
+    # run('kf')
+    # run('ekf')
+    run('ekfud')
+
+def run(mode='ekf'):
+    '''individual 'run functions' here use particular versions of the processor, for example standard ekf and ud factorized ekf, and run the processor on a particular model problem, for example jazwinski1 or jazwinski2.'''
     processor = Classical()
-    if mode == 'kf1': processor.kf1(Rccircuit(signal=300))
-    elif mode == 'kf2': processor.kf2(Jazwinski1())
-    elif mode == 'ekf1': processor.ekf1(Jazwinski1())
-    elif mode == 'ekf2': processor.ekf2(Jazwinski2())
+    if mode == 'kf': processor.kf(Jazwinski1())
+    elif mode == 'ekf': processor.ekf(Jazwinski1())
+    elif mode == 'ekfud': processor.ekfud(Jazwinski2())
     processor.innov.plot()
 
 class Classical():
-    '''classical kalman filter. the run methods bring in particular models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
+    '''classical kalman filter.'''
 
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs = args, kwargs
         self.innov = util.Innovs()
 
-    def kf1(self, model):
-        '''rccircuit.'''
-        xhat = 2.5
-        Ptil = 50e-4
+    def kf(self, model):
+        '''basic kalman filter. linearized about a reference trajectory which has to be expressed explicitly. this is one of the distinguishing characteristics - in a basic kalman filter there has to be an explicit reference trajectory, in the extended kalman filter there's not.'''
+        xhat, Ptil = model.xhat0, model.Ptil0
         for step in model.steps():
-            xhat = .97 * xhat + 100 * model.u
-            Ptil = .94 * Ptil + model.Rww
-            Ree = 4 * Ptil + 4
-            K = 2 * Ptil / Ree
-            yhat = 2 * xhat
-            xhat = xhat + K * (step[2] - yhat)
-            Ptil = Ptil / (Ptil + 1)
-            self.innov.update2(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat, Ree, Ptil)
-
-    def kf2(self, model):
-        '''kalman filter.'''
-        xhat = 2.2
-        Ptil = .01
-        for step in model.steps():
-            xref = 2. + .067 * step[0]
+            xref = model.xref(step[0])
             xhat = model.a(xref, 0) + model.A(xref) * (xhat - xref)
             Ptil = model.A(xref) * Ptil * model.A(xref)
             Ree = model.C(xref) * Ptil * model.C(xref) + model.Rvv
@@ -51,10 +40,9 @@ class Classical():
             Ptil = (1 - K * model.C(xref)) * Ptil
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
-    def ekf1(self, model):
-        '''extended kalman filter 1.'''
-        xhat = 2.2
-        Ptil = .01
+    def ekf(self, model):
+        '''standard form extended kalman filter.'''
+        xhat, Ptil = model.xhat0, model.Ptil0
         for step in model.steps():
             xhat = model.a(xhat)
             Ptil = model.A(xhat) * Ptil * model.A(xhat)
@@ -65,10 +53,10 @@ class Classical():
             Ptil = (1 - K * model.C(xhat)) * Ptil
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
-    def ekf2(self, model):
-        '''extended kalman filter 2. UD factorized form of the kalman filter, or square-root filter, with better numerical characteristics. instead of a covariance matrix full of squared values, we propagate something like it's square-root. this is the U matrix. this makes the state and observation equations look unrecognizable, but they are doing exactly the same thing as the friendlier standard kalman form.'''
-        xhat = np.array([2, .055, .044])
-        U, D = self.ud_factorization(1. * np.eye(3))
+    def ekfud(self, model):
+        '''UD factorized form of the extended kalman filter, or square-root filter, with better numerical characteristics. instead of a covariance matrix full of squared values, we propagate something like it's square-root. this is the U matrix. this makes the state and observation equations look different, but they're doing the same thing as the standard form.'''
+        xhat, Ptil = model.xhat0b, model.Ptil0b
+        U, D = self.ud_factorization(Ptil)
         for step in model.steps():
             xhat, U, D = self.temporal_update(xin=model.a(xhat), Uin=U, Din=D, model=model)
             xhat, U, D, yhat = self.observational_update(xin=xhat, Uin=U, Din=D, obs=step[2], model=model)
