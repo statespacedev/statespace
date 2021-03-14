@@ -4,14 +4,6 @@ from modelbase import ModelBase
 
 class Jazwinski1(ModelBase):
     '''a standard reference model from Stochastic Processes and Filtering Theory, Jazwinski, and Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods. represents the trajectory of a reentry vehicle entering the atmosphere.'''
-    def __init__(self):
-        self.tsteps = 151
-        self.dt = .01
-        self.x = 2.
-        self.Rww = 1e-6
-        self.Rvv = 9e-2
-        self.log = []
-        self.custom()
 
     def custom(self):
         self.xhat0 = 2.2
