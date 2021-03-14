@@ -35,9 +35,9 @@ fprintf('NOTE 2: To best view result plots, maximize window and move legend boxe
 
 
 %--- General setup
-
-addrelpath('../gssm');         % add relative search path to example GSSM files to MATLABPATH
-addrelpath('../data');         % add relative search path to example data files to MATLABPATH
+addpath('../../core')
+addpath('../gssm');         % add relative search path to example GSSM files to MATLABPATH
+addpath('../data');         % add relative search path to example data files to MATLABPATH
 
 %--- Initialise GSSM
 
