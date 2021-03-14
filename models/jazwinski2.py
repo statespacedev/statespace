@@ -1,8 +1,8 @@
 import math
 import numpy as np
+from modelbase import ModelBase
 
-
-class Jazwinski2():
+class Jazwinski2(ModelBase):
     '''a standard reference model from Stochastic Processes and Filtering Theory, Jazwinski, and Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods. represents the trajectory of a reentry vehicle entering the atmosphere.'''
     def __init__(self):
         self.tsteps = 1501

@@ -56,6 +56,14 @@ models
 
 will probably be moving towards a higher-level statespace model, encompassing specific lower-level models - possibly something involoving a translator / converter / adaptor... the models here are already an extrememly primitive form of that - rccircuit, jazwinski1, jazwinski2 models are fed into classical, modern, particle processors. we can think about these becoming specific cases of something more fundamental.
 
+modelbase.py
+-------------
+
+placeholder for what could grow to become a higher-level statespace model - with individual cases inheriting and overriding.
+
+.. automodule:: models.modelbase
+    :members:
+
 jazwinski1.py
 --------------
 
