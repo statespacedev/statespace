@@ -7,10 +7,10 @@ from models.onestate import Onestate
 
 def main():
     processor = Modern()
-    model = Onestate()
-    # model = Threestate()
-    processor.spkf1(model)
-    # processor.spkf2(model)
+    # model = Onestate()
+    model = Threestate()
+    # processor.spkf1(model)
+    processor.spkf2(model)
     processor.innov.plot()
 
 class Modern():

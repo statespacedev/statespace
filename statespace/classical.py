@@ -10,9 +10,10 @@ def main():
     processor = Classical()
     model = Onestate()
     # model = Threestate()
-    processor.ekf(model)
-    # processor.ekfud(model)
-    processor.innov.plot()
+    # processor.ekf(model)
+    processor.ekfud(model)
+    try: processor.innov.plot()
+    except: pass
 
 class Classical():
     '''classical kalman filter.'''

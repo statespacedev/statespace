@@ -119,14 +119,16 @@ class Innovs():
         self.log = np.asarray(self.log)
         self.tts = self.log[:, 0]
         self.ets = self.log[:, 4]
-        self.mhate = np.mean(self.ets)
-        self.Rhatee = np.mean(np.power(self.ets, 2))
-        n = len(self.ets)
-        self.tau = 1.96 * math.sqrt(self.Rhatee / n)
-        self.iszeromean = True
-        if abs(self.mhate) > self.tau:
-            self.iszeromean = False
-        # self.zmw = self.autocorr1(self.ets)
+        try:
+            self.mhate = np.mean(self.ets)
+            self.Rhatee = np.mean(np.power(self.ets, 2))
+            n = len(self.ets)
+            self.tau = 1.96 * math.sqrt(self.Rhatee / n)
+            self.iszeromean = True
+            if abs(self.mhate) > self.tau:
+                self.iszeromean = False
+            self.zmw = self.autocorr1(self.ets)
+        except: pass
 
     def plot(self):
         self.finalize()
@@ -135,7 +137,7 @@ class Innovs():
         plt.subplot(3, 2, 2), plt.plot(self.tts, self.log[:, 3], linewidth=lw), plt.ylabel('err')
         plt.subplot(3, 2, 3), plt.plot(self.tts, self.log[:, 2], linewidth=lw), plt.ylabel('yhat')
         plt.subplot(3, 2, 4), plt.plot(self.tts, self.log[:, 4], linewidth=lw), plt.ylabel('innov')
-        # plt.subplot(3, 2, 5), plt.plot(self.tts, self.zmw, linewidth=lw), plt.ylabel('autocorr')
+        plt.subplot(3, 2, 5), plt.plot(self.tts, self.zmw, linewidth=lw), plt.ylabel('autocorr')
         plt.show()
 
 

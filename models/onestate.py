@@ -25,23 +25,23 @@ class Onestate(ModelBase):
         self.k0 = k0
         self.kappa = kappa
         self.G = np.eye(1)
-        # self.Q = np.diag(self.Rww)
+        self.Q = self.Rww * np.eye(1)
 
     def steps(self):
         for tstep in range(self.tsteps):
             tsec = tstep * self.dt
-            w = math.sqrt(self.Rww) * np.random.randn()
-            v = math.sqrt(self.Rvv) * np.random.randn()
-            self.x = self.a(self.x, w)
-            self.y = self.c(self.x, v)
+            self.x = self.a(self.x)
+            self.y = self.c(self.x)
             if tstep == 0: continue
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
 
-    def a(self, x, w=0):
+    def a(self, x):
+        w = math.sqrt(self.Rww) * np.random.randn()
         return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + w
 
-    def c(self, x, v=0):
+    def c(self, x):
+        v = math.sqrt(self.Rvv) * np.random.randn()
         return x ** 2 + x ** 3 + v
 
     def A(self, x):
