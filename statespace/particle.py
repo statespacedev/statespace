@@ -5,20 +5,11 @@ from models.threestate import Threestate
 from models.onestate import Onestate
 
 def main():
-    run('pf1')
-    run('pf2')
-
-def run(mode='pf1'):
     processor = Particle()
-    if mode == 'pf1':
-        processor.pf1(Onestate())
-        # processor.dists.plot()
-    if mode == 'pf2': processor.pf2(Threestate())
-    if mode == 'ensemble':
-        for i in range(100):
-            processor.pf1(Onestate())
-            # processor.ens.update()
-        processor.ens.plot()
+    model = Onestate()
+    # model = Threestate()
+    processor.pf1(model)
+    # processor.pf2(model)
     processor.innov.plot()
 
 class Particle():

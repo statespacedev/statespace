@@ -8,11 +8,12 @@ class Onestate(ModelBase):
     def init(self):
         self.tsteps = 151
         self.dt = .01
-        self.x = 2.
+        self.x = np.array([2.])
         self.Rww = 1e-6
         self.Rvv = 9e-2
-        self.xhat0 = 2.2
-        self.Ptil0 = .01
+        self.xhat0 = 2.2 * np.array([1])
+        self.Ptil0 = .01 * np.eye(1)
+        self.nsamp = 250
         self.va = np.vectorize(self.a)
         self.vc = np.vectorize(self.c)
         bignsubx = 1
@@ -20,13 +21,11 @@ class Onestate(ModelBase):
         k0 = bignsubx + kappa
         k1 = kappa / float(k0)
         k2 = 1 / float(2 * k0)
-        self.nsamp = 250
         self.W = np.array([k1, k2, k2])
         self.k0 = k0
         self.kappa = kappa
-
-    def xref(self, step0):
-        return 2. + .067 * step0
+        self.G = np.eye(1)
+        # self.Q = np.diag(self.Rww)
 
     def steps(self):
         for tstep in range(self.tsteps):
@@ -46,7 +45,9 @@ class Onestate(ModelBase):
         return x ** 2 + x ** 3 + v
 
     def A(self, x):
-        return 1 - .05 * self.dt + .08 * self.dt * x
+        A = np.eye(1)
+        A[0, 0] = 1 - .05 * self.dt + .08 * self.dt * x
+        return A
 
     def C(self, x):
         return 2 * x + 3 * x ** 2

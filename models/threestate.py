@@ -32,6 +32,7 @@ class Threestate(ModelBase):
         self.Pxy = np.zeros((3, 1))
         self.G = np.eye(3)
         self.Q = np.diag(self.Rww)
+        self.W = self.Wm
 
     def steps(self):
         for tstep in range(self.tsteps):
@@ -45,8 +46,7 @@ class Threestate(ModelBase):
             yield (tsec, self.x, self.y)
 
     def a(self, x, w=0):
-        tmp = np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]])
-        return tmp + w
+        return np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]]) + w
 
     def c(self, x, v=0):
         return x[0] ** 2 + x[0] ** 3 + v
