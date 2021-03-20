@@ -10,8 +10,6 @@ reference models and processors from
 
 [Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
 
-[Stochastic Processes and Filtering Theory, Jazwinski](https://amzn.to/2NLXfVK)
-
 210314 maybe what we need is to bring in a new reference model - to kind of shake things up and help brainstorming around the concept of a high level base model. a strong candidate is the 'headings only ship tracking problem' - have a working example with the orgeon library, and it's in the textbooks. looking at this possibility closely now...
 
 the bearings only problem has some interesting history - it's basically about being on a ww2 era sub. your sub is travelling along, and you begin hearing the sound of a ship at some bearing. over time, as the bearing changes, you can estimate the position and velocity of the ship. keep in mind that both your sub and the ship are moving the entire time. at some point you make a course change for your sub - to put yourself on an attack heading and also to hopefully improve the observability of the ship's postion and velocity.

@@ -1,8 +1,8 @@
 import numpy as np
 import statespace.util as util
 import sys; sys.path.append('../'); sys.path.append('../cmake-build-debug/libstatespace')
-from models.jazwinski2 import Jazwinski2
-from models.jazwinski1 import Jazwinski1
+from models.nonlinear2 import Nonlinear2
+from models.nonlinear1 import Nonlinear1
 import libstatespace
 api = libstatespace.Api()
 
@@ -14,9 +14,9 @@ def main():
 def run(mode='ekf'):
     '''individual 'run functions' here use particular versions of the processor, for example standard ekf and ud factorized ekf, and run the processor on a particular model problem, for example jazwinski1 or jazwinski2.'''
     processor = Classical()
-    if mode == 'kf': processor.kf(Jazwinski1())
-    elif mode == 'ekf': processor.ekf(Jazwinski1())
-    elif mode == 'ekfud': processor.ekfud(Jazwinski2())
+    if mode == 'kf': processor.kf(Nonlinear1())
+    elif mode == 'ekf': processor.ekf(Nonlinear1())
+    elif mode == 'ekfud': processor.ekfud(Nonlinear2())
     processor.innov.plot()
 
 class Classical():

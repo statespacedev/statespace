@@ -1,8 +1,8 @@
 import numpy as np
 import math, util
 import sys; sys.path.append('../')
-from models.jazwinski2 import Jazwinski2
-from models.jazwinski1 import Jazwinski1
+from models.nonlinear2 import Nonlinear2
+from models.nonlinear1 import Nonlinear1
 
 def main():
     run('pf1')
@@ -11,12 +11,12 @@ def main():
 def run(mode='pf1'):
     processor = Particle()
     if mode == 'pf1':
-        processor.pf1(Jazwinski1())
+        processor.pf1(Nonlinear1())
         # processor.dists.plot()
-    if mode == 'pf2': processor.pf2(Jazwinski2())
+    if mode == 'pf2': processor.pf2(Nonlinear2())
     if mode == 'ensemble':
         for i in range(100):
-            processor.pf1(Jazwinski1())
+            processor.pf1(Nonlinear1())
             # processor.ens.update()
         processor.ens.plot()
     processor.innov.plot()
