@@ -24,16 +24,16 @@ class Particle():
     def pf1(self, model):
         '''particle filter 1.'''
         xhat = 2.05
-        x = xhat + math.sqrt(1e-2) * np.random.randn(model.nsamp)
-        W = self.normalize(np.ones(model.nsamp))
+        x = xhat + math.sqrt(1e-2) * np.random.randn(model.pf.nsamp)
+        W = self.normalize(np.ones(model.pf.nsamp))
         for step in model.steps():
             x = self.resample(x, W)
-            x = model.Apf(x)
-            W = self.normalize(model.Cpf(step[2], x))
-            yhat = model.c(xhat, 0)
+            x = model.pf.A(x)
+            W = self.normalize(model.pf.C(step[2], x))
+            yhat = model.c(xhat)
             xhat = W @ x
             self.innov.update(t=step[0], xhat=xhat, yhat=yhat, err=step[1] - xhat, inn=step[2] - yhat)
-            self.dists.update(t=step[0], tru=model.Apf(step[1]), est=x)
+            self.dists.update(t=step[0], tru=model.pf.A(step[1]), est=x)
 
     def pf2(self, model):
         '''particle filter 2.'''

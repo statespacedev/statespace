@@ -32,7 +32,7 @@ class Threestate(ModelBase):
         self.Pxy = np.zeros((3, 1))
         self.G = np.eye(3)
         self.Q = np.diag(self.Rww)
-        # self.W = self.Wm
+        self.W = self.Wm
 
     def steps(self):
         for tstep in range(self.tsteps):
@@ -84,12 +84,12 @@ class Threestate(ModelBase):
         return Xhat
 
     def va(self, X):
-        for i in range(7): X[:, i] = self.a(X[:, i], 0)
+        for i in range(7): X[:, i] = self.a(X[:, i])
         return X
 
     def vc(self, Xhat):
         Y = np.zeros(7)
-        for i in range(7): Y[i] = self.c(Xhat[:, i], 0)
+        for i in range(7): Y[i] = self.c(Xhat[:, i])
         return Y
 
     def Xtil(self, X, W):

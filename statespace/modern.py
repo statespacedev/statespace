@@ -7,10 +7,10 @@ from models.onestate import Onestate
 
 def main():
     processor = Modern()
-    # model = Onestate()
-    model = Threestate()
-    # processor.spkf1(model)
-    processor.spkf2(model)
+    model = Onestate()
+    # model = Threestate()
+    processor.spkf1(model)
+    # processor.spkf2(model)
     processor.innov.plot()
 
 class Modern():
@@ -24,14 +24,14 @@ class Modern():
         '''sigma-point kalman filter 1.'''
         xhat, Ptil = model.xhat0, model.Ptil0
         for step in model.steps():
-            X = model.va(model.X(xhat, Ptil))
-            Y = model.vc(model.Xhat(X, model.Rww))
-            Ptil = model.W @ np.power(X - model.W @ X, 2) + model.Rww
-            Rksiksi = model.W @ np.power(Y - model.W @ Y, 2) + model.Rvv
-            RXtilksi = model.W @ np.multiply(X - model.W @ X, Y - model.W @ Y)
+            X = model.spkf.va(model.spkf.X(xhat, Ptil))
+            Y = model.spkf.vc(model.spkf.Xhat(X))
+            Ptil = model.spkf.W @ np.power(X - model.spkf.W @ X, 2) + model.Rww
+            Rksiksi = model.spkf.W @ np.power(Y - model.spkf.W @ Y, 2) + model.Rvv
+            RXtilksi = model.spkf.W @ np.multiply(X - model.spkf.W @ X, Y - model.spkf.W @ Y)
             K = RXtilksi / Rksiksi
-            yhat = model.W @ Y
-            xhat = model.W @ X + K * (step[2] - model.W @ Y)
+            yhat = model.spkf.W @ Y
+            xhat = model.spkf.W @ X + K * (step[2] - model.spkf.W @ Y)
             Ptil = Ptil - K * Rksiksi * K
             self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
@@ -90,3 +90,4 @@ class Modern():
 
 if __name__ == "__main__":
     main()
+

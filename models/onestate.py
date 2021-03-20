@@ -3,7 +3,7 @@ import numpy as np
 from modelbase import ModelBase
 
 class Onestate(ModelBase):
-    '''a basic reference model for processor validation.'''
+    '''one-state reference model for processor validation.'''
 
     def init(self):
         self.tsteps = 151
@@ -13,19 +13,10 @@ class Onestate(ModelBase):
         self.Rvv = 9e-2
         self.xhat0 = 2.2 * np.array([1])
         self.Ptil0 = .01 * np.eye(1)
-        self.nsamp = 250
-        self.va = np.vectorize(self.a)
-        self.vc = np.vectorize(self.c)
-        bignsubx = 1
-        kappa = 1
-        k0 = bignsubx + kappa
-        k1 = kappa / float(k0)
-        k2 = 1 / float(2 * k0)
-        self.W = np.array([k1, k2, k2])
-        self.k0 = k0
-        self.kappa = kappa
-        self.G = np.eye(1)
-        self.Q = self.Rww * np.eye(1)
+        self.G = np.eye(1) # ekfud
+        self.Q = self.Rww * np.eye(1) # ekfud
+        self.spkf = Spkf(self)
+        self.pf = Pf(self)
 
     def steps(self):
         for tstep in range(self.tsteps):
@@ -52,15 +43,36 @@ class Onestate(ModelBase):
     def C(self, x):
         return 2 * x + 3 * x ** 2
 
+class Spkf():
+    def __init__(self, parent):
+        self.parent = parent
+        self.va = np.vectorize(parent.a)
+        self.vc = np.vectorize(parent.c)
+        bignsubx = 1
+        kappa = 1
+        k0 = bignsubx + kappa
+        k1 = kappa / float(k0)
+        k2 = 1 / float(2 * k0)
+        self.W = np.array([k1, k2, k2])
+        self.k0 = k0
+        self.kappa = kappa
+
     def X(self, xhat, Ptil):
         return [xhat, xhat + math.sqrt(self.k0 * Ptil), xhat - math.sqrt(self.k0 * Ptil)]
 
-    def Xhat(self, X, Rww):
-        return [X[0], X[1] + self.kappa * math.sqrt(Rww), X[2] - self.kappa * math.sqrt(Rww)]
+    def Xhat(self, X):
+        return [X[0], X[1] + self.kappa * math.sqrt(self.parent.Rww), X[2] - self.kappa * math.sqrt(self.parent.Rww)]
 
-    def Apf(self, x):
-        return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + math.sqrt(self.Rww) * np.random.randn(self.nsamp)
+class Pf():
+    def __init__(self, parent):
+        self.parent = parent
+        self.nsamp = 250
 
-    def Cpf(self, y, x):
-        return np.exp(-np.log(2. * np.pi * self.Rvv) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.Rvv))
+    def A(self, x):
+        return (1 - .05 * self.parent.dt) * x + (.04 * self.parent.dt) * x ** 2 + math.sqrt(self.parent.Rww) * np.random.randn(self.nsamp)
 
+    def C(self, y, x):
+        return np.exp(-np.log(2. * np.pi * self.parent.Rvv) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.Rvv))
+
+if __name__ == "__main__":
+    pass

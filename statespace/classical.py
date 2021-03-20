@@ -8,10 +8,10 @@ api = libstatespace.Api()
 
 def main():
     processor = Classical()
-    model = Onestate()
-    # model = Threestate()
-    # processor.ekf(model)
-    processor.ekfud(model)
+    # model = Onestate()
+    model = Threestate()
+    processor.ekf(model)
+    # processor.ekfud(model)
     try: processor.innov.plot()
     except: pass
 
@@ -22,17 +22,17 @@ class Classical():
         self.args, self.kwargs = args, kwargs
         self.innov = util.Innovs()
 
-    def ekf(self, model):
+    def ekf(self, m):
         '''standard form extended kalman filter.'''
-        xhat, Ptil = model.xhat0, model.Ptil0
-        for step in model.steps():
-            xhat = model.a(xhat)
-            Ptil = model.A(xhat) @ Ptil @ model.A(xhat)
-            Ree = model.C(xhat) @ Ptil @ model.C(xhat) + model.Rvv
-            K = Ptil @ model.C(xhat) / Ree
-            yhat = model.c(xhat)
+        xhat, Ptil = m.xhat0, m.Ptil0
+        for step in m.steps():
+            xhat = m.a(xhat)
+            Ptil = m.A(xhat) @ Ptil @ m.A(xhat)
+            Ree = m.C(xhat) @ Ptil @ m.C(xhat) + m.Rvv
+            K = Ptil @ m.C(xhat) / Ree
+            yhat = m.c(xhat)
             xhat = xhat + K * (step[2] - yhat)
-            Ptil = (1 - K * model.C(xhat)) * Ptil
+            Ptil = (1 - K * m.C(xhat)) * Ptil
             self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
     def ekfud(self, model):
