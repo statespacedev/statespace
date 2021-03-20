@@ -21,9 +21,9 @@ class Particle():
         self.dists = util.Dists()
         self.ens = util.DistsEns()
 
-    def pf1(self, model):
+    def pf1(self, model): # todo seems to essentially still be scalar
         '''particle filter 1.'''
-        xhat = 2.05
+        xhat = model.pf.xhat0
         x = xhat + math.sqrt(1e-2) * np.random.randn(model.pf.nsamp)
         W = self.normalize(np.ones(model.pf.nsamp))
         for step in model.steps():
@@ -37,14 +37,14 @@ class Particle():
 
     def pf2(self, model):
         '''particle filter 2.'''
-        xhat = np.array([2.0, .055, .044])
-        x = xhat + np.sqrt(model.Rww) * np.random.randn(model.nsamp, 3)
-        W = np.ones((model.nsamp, 3)) / model.nsamp
+        xhat = model.pf.xhat0
+        x = xhat + np.sqrt(model.Rww) * np.random.randn(model.pf.nsamp, len(xhat))
+        W = np.ones((model.pf.nsamp, 3)) / model.pf.nsamp
         for step in model.steps():
             x[:, 0], x[:, 1], x[:, 2] = self.resample(x[:, 0], W[:, 0]), self.roughen(x[:, 1]), self.roughen(x[:, 2])
-            x[:, 0] = np.apply_along_axis(model.Apf, 1, x)
-            W[:, 0] = self.normalize(model.Cpf(step[2], x[:, 0]))
-            yhat = model.c(xhat, 0)
+            x[:, 0] = np.apply_along_axis(model.pf.A, 1, x)
+            W[:, 0] = self.normalize(model.pf.C(step[2], x[:, 0]))
+            yhat = model.c(xhat)
             xhat = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
             self.innov.update(t=step[0], xhat=xhat[0], yhat=yhat, err=step[1][0] - xhat[0], inn=step[2] - yhat)
 

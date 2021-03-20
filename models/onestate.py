@@ -3,15 +3,15 @@ import numpy as np
 from modelbase import ModelBase
 
 class Onestate(ModelBase):
-    '''one-state reference model for processor validation.'''
+    '''one-state reference model.'''
 
     def init(self):
         self.tsteps = 151
         self.dt = .01
         self.x = np.array([2.])
-        self.Rww = 1e-6
+        self.Rww = 1e-6 * np.array([1])
         self.Rvv = 9e-2
-        self.xhat0 = 2.2 * np.array([1])
+        self.xhat0 = np.array([2.2])
         self.Ptil0 = .01 * np.eye(1)
         self.G = np.eye(1) # ekfud
         self.Q = self.Rww * np.eye(1) # ekfud
@@ -66,6 +66,7 @@ class Spkf():
 class Pf():
     def __init__(self, parent):
         self.parent = parent
+        self.xhat0 = 2.05
         self.nsamp = 250
 
     def A(self, x):
@@ -76,3 +77,4 @@ class Pf():
 
 if __name__ == "__main__":
     pass
+

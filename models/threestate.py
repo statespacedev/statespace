@@ -3,7 +3,7 @@ import numpy as np
 from modelbase import ModelBase
 
 class Threestate(ModelBase):
-    '''a basic reference model for processor validation.'''
+    '''three-state reference model.'''
 
     def init(self):
         self.tsteps = 1501
@@ -13,26 +13,10 @@ class Threestate(ModelBase):
         self.Rvv = 9e-2
         self.xhat0 = np.array([2, .055, .044])
         self.Ptil0 = 1. * np.eye(3)
-        self.Sw = np.linalg.cholesky(np.diag(self.Rww))
-        self.Sv = np.linalg.cholesky(np.diag(self.Rvv * np.array([1])))
-        self.nsamp = 250
-        n = 3
-        kappa = 1
-        alpha = 1
-        beta = 2
-        lam = alpha ** 2 * (n + kappa) - n
-        wi = 1 / float(2 * (n + lam))
-        w0m = lam / float(n + lam)
-        w0c = lam / float(n + lam) + (1 - alpha ** 2 + beta)
-        self.Wm = np.array([w0m, wi, wi, wi, wi, wi, wi])
-        self.Wc = np.array([w0c, wi, wi, wi, wi, wi, wi])
-        self.nlroot = math.sqrt(n + lam)
-        self.Xtil = np.zeros((3, 7))
-        self.Ytil = np.zeros((1, 7))
-        self.Pxy = np.zeros((3, 1))
-        self.G = np.eye(3)
-        self.Q = np.diag(self.Rww)
-        self.W = self.Wm
+        self.G = np.eye(3) # ekfud
+        self.Q = np.diag(self.Rww) # ekfud
+        self.spkf = Spkf(self)
+        self.pf = Pf(self)
 
     def steps(self):
         for tstep in range(self.tsteps):
@@ -61,6 +45,27 @@ class Threestate(ModelBase):
     def C(self, x):
         return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])
 
+class Spkf():
+    def __init__(self, parent):
+        self.parent = parent
+        self.Sw = np.linalg.cholesky(np.diag(parent.Rww))
+        self.Sv = np.linalg.cholesky(np.diag(parent.Rvv * np.array([1])))
+        n = 3
+        kappa = 1
+        alpha = 1
+        beta = 2
+        lam = alpha ** 2 * (n + kappa) - n
+        wi = 1 / float(2 * (n + lam))
+        w0m = lam / float(n + lam)
+        w0c = lam / float(n + lam) + (1 - alpha ** 2 + beta)
+        self.Wm = np.array([w0m, wi, wi, wi, wi, wi, wi])
+        self.Wc = np.array([w0c, wi, wi, wi, wi, wi, wi])
+        self.nlroot = math.sqrt(n + lam)
+        self.Xtil = np.zeros((3, 7))
+        self.Ytil = np.zeros((1, 7))
+        self.Pxy = np.zeros((3, 1))
+        self.W = self.Wm
+
     def X(self, x, C):
         X = np.zeros([3, 7])
         X[:, 0] = x
@@ -84,12 +89,12 @@ class Threestate(ModelBase):
         return Xhat
 
     def va(self, X):
-        for i in range(7): X[:, i] = self.a(X[:, i])
+        for i in range(7): X[:, i] = self.parent.a(X[:, i])
         return X
 
     def vc(self, Xhat):
         Y = np.zeros(7)
-        for i in range(7): Y[i] = self.c(Xhat[:, i])
+        for i in range(7): Y[i] = self.parent.c(Xhat[:, i])
         return Y
 
     def Xtil(self, X, W):
@@ -102,8 +107,18 @@ class Threestate(ModelBase):
         for i in range(7): ksi[0, i] = Y[i] - W @ Y.T
         return ksi
 
-    def Apf(self, x):
-        return (1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2
+class Pf():
+    def __init__(self, parent):
+        self.parent = parent
+        self.xhat0 = np.array([2.0, .055, .044])
+        self.nsamp = 250
 
-    def Cpf(self, y, x):
-        return np.exp(-np.log(2. * np.pi * self.Rvv) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.Rvv))
+    def A(self, x):
+        return (1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2
+
+    def C(self, y, x):
+        return np.exp(-np.log(2. * np.pi * self.parent.Rvv) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.Rvv))
+
+if __name__ == "__main__":
+    pass
+

@@ -8,10 +8,10 @@ api = libstatespace.Api()
 
 def main():
     processor = Classical()
-    # model = Onestate()
-    model = Threestate()
-    processor.ekf(model)
-    # processor.ekfud(model)
+    model = Onestate()
+    # model = Threestate()
+    # processor.ekf(model)
+    processor.ekfud(model)
     try: processor.innov.plot()
     except: pass
 

@@ -7,10 +7,10 @@ from models.onestate import Onestate
 
 def main():
     processor = Modern()
-    model = Onestate()
-    # model = Threestate()
-    processor.spkf1(model)
-    # processor.spkf2(model)
+    # model = Onestate()
+    model = Threestate()
+    # processor.spkf1(model)
+    processor.spkf2(model)
     processor.innov.plot()
 
 class Modern():
@@ -66,23 +66,23 @@ class Modern():
 
     def temporal_update(self, xhat, S, model):
         '''temporal update.'''
-        X = model.va(model.X(xhat, S))
-        xhat = model.Wm @ X.T
-        for i in range(7): model.Xtil[:, i] = X[:, i] - xhat
-        q, r = np.linalg.qr(np.concatenate([math.sqrt(model.Wc[1]) * model.Xtil[:, 1:], model.Sw], 1))
-        S = self.cholupdate(r.T[0:3, 0:3], model.Wc[0] * model.Xtil[:, 0])
+        X = model.spkf.va(model.spkf.X(xhat, S))
+        xhat = model.spkf.Wm @ X.T
+        for i in range(7): model.spkf.Xtil[:, i] = X[:, i] - xhat
+        q, r = np.linalg.qr(np.concatenate([math.sqrt(model.spkf.Wc[1]) * model.spkf.Xtil[:, 1:], model.spkf.Sw], 1))
+        S = self.cholupdate(r.T[0:3, 0:3], model.spkf.Wc[0] * model.spkf.Xtil[:, 0])
         return xhat, S, X
 
     def observational_update(self, xhat, S, X, obs, model):
         '''observational update.'''
-        Y = model.vc(model.Xhat(X))
-        yhat = model.Wm @ Y.T
-        for i in range(7): model.Ytil[0, i] = Y[i] - yhat
-        q, r = np.linalg.qr(np.concatenate([math.sqrt(model.Wc[1]) * model.Ytil[:, 1:], model.Sv], 1))
-        Sy = self.cholupdate(r.T[0:1, 0:1], model.Wc[0] * model.Ytil[:, 0])
-        for i in range(7): model.Pxy[:, 0] = model.Pxy[:, 0] + model.Wc[i] * model.Xtil[:, i] * model.Ytil.T[i, :]
+        Y = model.spkf.vc(model.spkf.Xhat(X))
+        yhat = model.spkf.Wm @ Y.T
+        for i in range(7): model.spkf.Ytil[0, i] = Y[i] - yhat
+        q, r = np.linalg.qr(np.concatenate([math.sqrt(model.spkf.Wc[1]) * model.spkf.Ytil[:, 1:], model.spkf.Sv], 1))
+        Sy = self.cholupdate(r.T[0:1, 0:1], model.spkf.Wc[0] * model.spkf.Ytil[:, 0])
+        for i in range(7): model.spkf.Pxy[:, 0] = model.spkf.Pxy[:, 0] + model.spkf.Wc[i] * model.spkf.Xtil[:, i] * model.spkf.Ytil.T[i, :]
         if Sy[0, 0] < math.sqrt(10) or Sy[0, 0] > math.sqrt(1000): Sy[0, 0] = math.sqrt(1000)
-        K = model.Pxy / Sy[0, 0] ** 2
+        K = model.spkf.Pxy / Sy[0, 0] ** 2
         U = K * Sy
         xhat = xhat + K[:, 0] * (obs - yhat)
         S = self.choldowndate(S, U)
