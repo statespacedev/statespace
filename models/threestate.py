@@ -2,17 +2,15 @@ import math
 import numpy as np
 from modelbase import ModelBase
 
-class Nonlinear2(ModelBase):
+class Threestate(ModelBase):
     '''a basic reference model for processor validation.'''
 
     def custom(self):
         self.tsteps = 1501
         self.x = np.array([2., .05, .04])
         self.Rww = 1e-9 * np.array([1, 1, 1])
-        self.xhat0 = 2.2
-        self.Ptil0 = .01
-        self.xhat0b = np.array([2, .055, .044])
-        self.Ptil0b = 1. * np.eye(3)
+        self.xhat0 = np.array([2, .055, .044])
+        self.Ptil0 = 1. * np.eye(3)
         self.Sw = np.linalg.cholesky(np.diag(self.Rww))
         self.Sv = np.linalg.cholesky(np.diag(self.Rvv * np.array([1])))
         self.nsamp = 250
@@ -45,7 +43,8 @@ class Nonlinear2(ModelBase):
             yield (tsec, self.x, self.y)
 
     def a(self, x, w=0):
-        return np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]]) + w
+        tmp = np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]])
+        return tmp + w
 
     def c(self, x, v=0):
         return x[0] ** 2 + x[0] ** 3 + v

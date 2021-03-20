@@ -1,8 +1,8 @@
 import numpy as np
 import statespace.util as util
 import sys; sys.path.append('../'); sys.path.append('../cmake-build-debug/libstatespace')
-from models.nonlinear2 import Nonlinear2
-from models.nonlinear1 import Nonlinear1
+from models.threestate import Threestate
+from models.onestate import Onestate
 import libstatespace
 api = libstatespace.Api()
 
@@ -14,9 +14,9 @@ def main():
 def run(mode='ekf'):
     '''individual 'run functions' here use particular versions of the processor, for example standard ekf and ud factorized ekf, and run the processor on a particular model problem, for example jazwinski1 or jazwinski2.'''
     processor = Classical()
-    if mode == 'kf': processor.kf(Nonlinear1())
-    elif mode == 'ekf': processor.ekf(Nonlinear1())
-    elif mode == 'ekfud': processor.ekfud(Nonlinear2())
+    if mode == 'kf': processor.kf(Onestate())
+    elif mode == 'ekf': processor.ekf(Onestate())
+    elif mode == 'ekfud': processor.ekfud(Threestate())
     processor.innov.plot()
 
 class Classical():
@@ -55,7 +55,7 @@ class Classical():
 
     def ekfud(self, model):
         '''UD factorized form of the extended kalman filter, or square-root filter, with better numerical characteristics. instead of a covariance matrix full of squared values, we propagate something like it's square-root. this is the U matrix. this makes the state and observation equations look different, but they're doing the same thing as the standard form.'''
-        xhat, Ptil = model.xhat0b, model.Ptil0b
+        xhat, Ptil = model.xhat0, model.Ptil0
         U, D = self.udfactorize(Ptil)
         for step in model.steps():
             xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
@@ -64,7 +64,7 @@ class Classical():
 
     def ekfudcpp(self, model):
         '''UD factorized form of the extended kalman filter, in cpp.'''
-        xhat, Ptil = model.xhat0b, model.Ptil0b
+        xhat, Ptil = model.xhat0, model.Ptil0
         ud = api.udfactorize(Ptil); U, D = ud[0], np.diag(ud[1].transpose()[0])
         for step in model.steps():
             res = api.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)

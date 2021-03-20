@@ -2,7 +2,7 @@ import math
 import numpy as np
 from modelbase import ModelBase
 
-class Nonlinear1(ModelBase):
+class Onestate(ModelBase):
     '''a basic reference model for processor validation.'''
 
     def custom(self):

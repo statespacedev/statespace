@@ -2,8 +2,8 @@ import math, util
 import numpy as np
 from scipy.linalg.blas import drot, drotg
 import sys; sys.path.append('../')
-from models.nonlinear2 import Nonlinear2
-from models.nonlinear1 import Nonlinear1
+from models.threestate import Threestate
+from models.onestate import Onestate
 
 def main():
     run('spkf1')
@@ -11,8 +11,8 @@ def main():
 
 def run(mode='spkf1'):
     processor = Modern()
-    if mode == 'spkf1': processor.spkf1(Nonlinear1())
-    elif mode == 'spkf2': processor.spkf2(Nonlinear2())
+    if mode == 'spkf1': processor.spkf1(Onestate())
+    elif mode == 'spkf2': processor.spkf2(Threestate())
     processor.innov.plot()
 
 class Modern():
