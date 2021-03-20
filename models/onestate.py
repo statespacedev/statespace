@@ -5,7 +5,12 @@ from modelbase import ModelBase
 class Onestate(ModelBase):
     '''a basic reference model for processor validation.'''
 
-    def custom(self):
+    def init(self):
+        self.tsteps = 151
+        self.dt = .01
+        self.x = 2.
+        self.Rww = 1e-6
+        self.Rvv = 9e-2
         self.xhat0 = 2.2
         self.Ptil0 = .01
         self.va = np.vectorize(self.a)

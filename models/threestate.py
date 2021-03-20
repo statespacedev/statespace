@@ -5,10 +5,12 @@ from modelbase import ModelBase
 class Threestate(ModelBase):
     '''a basic reference model for processor validation.'''
 
-    def custom(self):
+    def init(self):
         self.tsteps = 1501
+        self.dt = .01
         self.x = np.array([2., .05, .04])
         self.Rww = 1e-9 * np.array([1, 1, 1])
+        self.Rvv = 9e-2
         self.xhat0 = np.array([2, .055, .044])
         self.Ptil0 = 1. * np.eye(3)
         self.Sw = np.linalg.cholesky(np.diag(self.Rww))

@@ -8,14 +8,14 @@ api = libstatespace.Api()
 
 def main():
     # run('kf')
-    # run('ekf')
-    run('ekfud')
+    run('ekf')
+    # run('ekfud')
 
 def run(mode='ekf'):
     '''individual 'run functions' here use particular versions of the processor, for example standard ekf and ud factorized ekf, and run the processor on a particular model problem, for example jazwinski1 or jazwinski2.'''
     processor = Classical()
     if mode == 'kf': processor.kf(Onestate())
-    elif mode == 'ekf': processor.ekf(Onestate())
+    elif mode == 'ekf': processor.ekf(Threestate())
     elif mode == 'ekfud': processor.ekfud(Threestate())
     processor.innov.plot()
 
