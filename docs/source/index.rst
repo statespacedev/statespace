@@ -64,15 +64,15 @@ placeholder for what could grow to become a higher-level statespace model - with
 .. automodule:: models.modelbase
     :members:
 
-jazwinski1.py
+onestate.py
 --------------
 
-.. automodule:: models.jazwinski1
+.. automodule:: models.onestate
     :members:
 
-jazwinski2.py
+threestate.py
 --------------
 
-.. automodule:: models.jazwinski2
+.. automodule:: models.threestate
     :members:
 
