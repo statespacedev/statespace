@@ -5,51 +5,54 @@ from modelbase import ModelBase
 class Threestate(ModelBase):
     '''three-state reference model.'''
 
+    def ekf(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
+    def ekfud(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0, self.G, self.Q
+
     def init(self):
         self.tsteps = 1501
         self.dt = .01
         self.x = np.array([2., .05, .04])
         self.Rww = 1e-9 * np.array([1, 1, 1])
-        self.Rvv = 9e-2
-        self.xhat0 = np.array([2, .055, .044])
-        self.Ptil0 = 1. * np.eye(3)
-        self.G = np.eye(3) # ekfud
-        self.Q = np.diag(self.Rww) # ekfud
+        self.R = 9e-2
+        self.x0 = np.array([2, .055, .044])
+        self.P0 = 1. * np.eye(3)
+        self.G = np.eye(3)
+        self.Q = np.diag(self.Rww)
         self.spkf = Spkf(self)
         self.pf = Pf(self)
 
     def steps(self):
         for tstep in range(self.tsteps):
             tsec = tstep * self.dt
-            self.x = self.a(self.x)
-            self.y = self.c(self.x)
+            self.x = self.f(self.x)
+            self.y = self.h(self.x)
             if tstep == 0: continue
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
 
-    def a(self, x):
+    def f(self, x):
         w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Rww)))
         return np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]]) + np.diag(w)
 
-    def c(self, x):
-        v = math.sqrt(self.Rvv) * np.random.randn()
+    def h(self, x):
+        v = math.sqrt(self.R) * np.random.randn()
         return x[0] ** 2 + x[0] ** 3 + v
 
-    def A(self, x):
+    def F(self, x):
         A = np.eye(3)
         A[0, 0] = 1 - x[1] * self.dt + 2 * x[2] * self.dt * x[0]
         A[0, 1] = -self.dt * x[0]
         A[0, 2] = self.dt * x[0] ** 2
         return A
 
-    def C(self, x):
+    def H(self, x):
         return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])
 
 class Spkf():
     def __init__(self, parent):
         self.parent = parent
         self.Sw = np.linalg.cholesky(np.diag(parent.Rww))
-        self.Sv = np.linalg.cholesky(np.diag(parent.Rvv * np.array([1])))
+        self.Sv = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
         n = 3
         kappa = 1
         alpha = 1
@@ -89,12 +92,12 @@ class Spkf():
         return Xhat
 
     def va(self, X):
-        for i in range(7): X[:, i] = self.parent.a(X[:, i])
+        for i in range(7): X[:, i] = self.parent.f(X[:, i])
         return X
 
     def vc(self, Xhat):
         Y = np.zeros(7)
-        for i in range(7): Y[i] = self.parent.c(Xhat[:, i])
+        for i in range(7): Y[i] = self.parent.h(Xhat[:, i])
         return Y
 
     def Xtil(self, X, W):
@@ -117,7 +120,7 @@ class Pf():
         return (1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2
 
     def C(self, y, x):
-        return np.exp(-np.log(2. * np.pi * self.parent.Rvv) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.Rvv))
+        return np.exp(-np.log(2. * np.pi * self.parent.R) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R))
 
 if __name__ == "__main__":
     pass

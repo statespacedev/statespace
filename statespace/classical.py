@@ -1,8 +1,9 @@
 import numpy as np
-import statespace.util as util
+np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 import sys; sys.path.append('../'); sys.path.append('../cmake-build-debug/libstatespace')
 from models.threestate import Threestate
 from models.onestate import Onestate
+from innovations import Innovs
 import libstatespace
 api = libstatespace.Api()
 
@@ -12,47 +13,45 @@ def main():
     # model = Threestate()
     processor.ekf(model)
     # processor.ekfud(model)
-    try: processor.innovs.plot()
-    except: pass
+    processor.innovs.plot()
 
 class Classical():
     '''classical kalman filter'''
 
     def __init__(self, *args, **kwargs):
-        self.args, self.kwargs = args, kwargs
-        self.innovs = util.Innovs()
+        self.args, self.kwargs, self.innovs = args, kwargs, Innovs()
 
     def ekf(self, model):
         '''basic form'''
-        steps, a, c, A, C, Ro, xc, P = model.pieces()
-        for t, x, y in steps():
-            xc = a(xc)
-            yc = c(xc)
-            P = A(xc) @ P @ A(xc)
-            K = P @ C(xc) / (C(xc) @ P @ C(xc) + Ro)
-            xc = xc + K * (y - yc)
-            P = (1 - K * C(xc)) * P
-            self.innovs.add(t, x, y, xc, yc)
+        steps, f, h, F, H, R, x, P = model.ekf()
+        for t, xt, yt in steps():
+            x = f(x)
+            y = h(x)
+            P = F(x) @ P @ F(x)
+            K = P @ H(x) / (H(x) @ P @ H(x) + R)
+            x = x + K * (yt - y)
+            P = (1 - K * H(x)) * P
+            self.innovs.add(t, xt, yt, x, y)
 
-    def ekfud(self, m):
+    def ekfud(self, model):
         '''UD factorized form'''
-        xhat, Ptil = m.xhat0, m.Ptil0
-        U, D = self.udfactorize(Ptil)
-        for step in m.steps():
-            xhat, U, D = self.temporal(xin=m.a(xhat), Uin=U, Din=D, Phi=m.A(xhat), Gin=m.G, Q=m.Q)
-            xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, H=m.C(xhat), obs=step[2], R=m.Rvv, yhat=m.c(xhat))
-            self.innovs.add(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
+        steps, f, h, F, H, R, x, P, G, Q = model.ekfud()
+        U, D = self.udfactorize(P)
+        for t, xt, yt in steps():
+            x, U, D = self.temporal(f(x), U, D, F(x), G, Q)
+            x, U, D, y = self.observational(x, U, D, H(x), yt, R, h(x))
+            self.innovs.add(t, xt, yt, x, y)
 
-    def ekfudcpp(self, m):
+    def ekfudcpp(self, model):
         '''UD factorized form in cpp'''
-        xhat, Ptil = m.xhat0, m.Ptil0
-        ud = api.udfactorize(Ptil); U, D = ud[0], np.diag(ud[1].transpose()[0])
-        for step in m.steps():
-            res = api.temporal(xin=m.a(xhat), Uin=U, Din=D, Phi=m.A(xhat), Gin=m.G, Q=m.Q)
-            xhat, U, D = res[0].flatten(), res[1], res[2]
-            res = api.observational(xin=xhat, Uin=U, Din=D, H=m.C(xhat), obs=step[2], R=m.Rvv, yhat=m.c(xhat))
-            xhat, U, D, yhat = res[0].flatten(), res[1], res[2], m.c(xhat)
-            self.innovs.add(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
+        steps, f, h, F, H, R, x, P, G, Q = model.ekfud()
+        ud = api.udfactorize(P); U, D = ud[0], np.diag(ud[1].transpose()[0])
+        for t, xt, yt in steps():
+            cpp = api.temporal(f(x), U, D, H(x), G, Q)
+            x, U, D = cpp[0].flatten(), cpp[1], cpp[2]
+            cpp = api.observational(x, U, D, H(x), yt, R, h(x))
+            x, U, D, y = cpp[0].flatten(), cpp[1], cpp[2], h(x)
+            self.innovs.add(t, xt, yt, x, y)
 
     def udfactorize(self, M):
         '''UD factorization'''

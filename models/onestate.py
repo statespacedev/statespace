@@ -5,51 +5,52 @@ from modelbase import ModelBase
 class Onestate(ModelBase):
     '''one-state reference model.'''
 
-    def pieces(self): return self.steps, self.a, self.c, self.A, self.C, self.Rvv, self.xhat0, self.Ptil0
+    def ekf(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
+    def ekfud(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0, self.G, self.Q
 
     def init(self):
         self.tsteps = 151
         self.dt = .01
         self.x = np.array([2.])
         self.Rww = 1e-6 * np.array([1])
-        self.Rvv = 9e-2
-        self.xhat0 = np.array([2.2])
-        self.Ptil0 = .01 * np.eye(1)
-        self.G = np.eye(1) # ekfud
-        self.Q = self.Rww * np.eye(1) # ekfud
+        self.R = 9e-2
+        self.x0 = np.array([2.2])
+        self.P0 = .01 * np.eye(1)
+        self.G = np.eye(1)
+        self.Q = self.Rww * np.eye(1)
         self.spkf = Spkf(self)
         self.pf = Pf(self)
 
     def steps(self):
         for tstep in range(self.tsteps):
             tsec = tstep * self.dt
-            self.x = self.a(self.x)
-            self.y = self.c(self.x)
+            self.x = self.f(self.x)
+            self.y = self.h(self.x)
             if tstep == 0: continue
             self.log.append([tsec, self.x, self.y])
             yield (tsec, self.x, self.y)
 
-    def a(self, x):
+    def f(self, x):
         w = math.sqrt(self.Rww) * np.random.randn()
         return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + w
 
-    def c(self, x):
-        v = math.sqrt(self.Rvv) * np.random.randn()
+    def h(self, x):
+        v = math.sqrt(self.R) * np.random.randn()
         return x ** 2 + x ** 3 + v
 
-    def A(self, x):
+    def F(self, x):
         A = np.eye(1)
         A[0, 0] = 1 - .05 * self.dt + .08 * self.dt * x
         return A
 
-    def C(self, x):
+    def H(self, x):
         return 2 * x + 3 * x ** 2
 
 class Spkf():
     def __init__(self, parent):
         self.parent = parent
-        self.va = np.vectorize(parent.a)
-        self.vc = np.vectorize(parent.c)
+        self.va = np.vectorize(parent.f)
+        self.vc = np.vectorize(parent.h)
         bignsubx = 1
         kappa = 1
         k0 = bignsubx + kappa
@@ -75,7 +76,7 @@ class Pf():
         return (1 - .05 * self.parent.dt) * x + (.04 * self.parent.dt) * x ** 2 + math.sqrt(self.parent.Rww) * np.random.randn(self.nsamp)
 
     def C(self, y, x):
-        return np.exp(-np.log(2. * np.pi * self.parent.Rvv) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.Rvv))
+        return np.exp(-np.log(2. * np.pi * self.parent.R) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R))
 
 if __name__ == "__main__":
     pass

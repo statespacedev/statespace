@@ -22,12 +22,12 @@ class Modern():
 
     def spkf1(self, model):
         '''sigma-point kalman filter 1.'''
-        xhat, Ptil = model.xhat0, model.Ptil0
+        xhat, Ptil = model.x0, model.P0
         for step in model.steps():
             X = model.spkf.va(model.spkf.X(xhat, Ptil))
             Y = model.spkf.vc(model.spkf.Xhat(X))
             Ptil = model.spkf.W @ np.power(X - model.spkf.W @ X, 2) + model.Rww
-            Rksiksi = model.spkf.W @ np.power(Y - model.spkf.W @ Y, 2) + model.Rvv
+            Rksiksi = model.spkf.W @ np.power(Y - model.spkf.W @ Y, 2) + model.R
             RXtilksi = model.spkf.W @ np.multiply(X - model.spkf.W @ X, Y - model.spkf.W @ Y)
             K = RXtilksi / Rksiksi
             yhat = model.spkf.W @ Y
