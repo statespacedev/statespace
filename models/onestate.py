@@ -7,6 +7,8 @@ class Onestate(ModelBase):
 
     def ekf(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
     def ekfud(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0, self.G, self.Q
+    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W
+    def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def init(self):
         self.tsteps = 151
@@ -18,8 +20,8 @@ class Onestate(ModelBase):
         self.P0 = .01 * np.eye(1)
         self.G = np.eye(1)
         self.Q = self.Rww * np.eye(1)
-        self.spkf = Spkf(self)
-        self.pf = Pf(self)
+        self.SPKF = SPKF(self)
+        self.PF = PF(self)
 
     def steps(self):
         for tstep in range(self.tsteps):
@@ -46,11 +48,11 @@ class Onestate(ModelBase):
     def H(self, x):
         return 2 * x + 3 * x ** 2
 
-class Spkf():
+class SPKF():
     def __init__(self, parent):
         self.parent = parent
-        self.va = np.vectorize(parent.f)
-        self.vc = np.vectorize(parent.h)
+        self.vf = np.vectorize(parent.f)
+        self.vh = np.vectorize(parent.h)
         bignsubx = 1
         kappa = 1
         k0 = bignsubx + kappa
@@ -60,22 +62,22 @@ class Spkf():
         self.k0 = k0
         self.kappa = kappa
 
-    def X(self, xhat, Ptil):
+    def X1(self, xhat, Ptil):
         return [xhat, xhat + math.sqrt(self.k0 * Ptil), xhat - math.sqrt(self.k0 * Ptil)]
 
-    def Xhat(self, X):
+    def X2(self, X):
         return [X[0], X[1] + self.kappa * math.sqrt(self.parent.Rww), X[2] - self.kappa * math.sqrt(self.parent.Rww)]
 
-class Pf():
+class PF():
     def __init__(self, parent):
         self.parent = parent
         self.xhat0 = 2.05
         self.nsamp = 250
 
-    def A(self, x):
+    def F(self, x):
         return (1 - .05 * self.parent.dt) * x + (.04 * self.parent.dt) * x ** 2 + math.sqrt(self.parent.Rww) * np.random.randn(self.nsamp)
 
-    def C(self, y, x):
+    def H(self, y, x):
         return np.exp(-np.log(2. * np.pi * self.parent.R) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R))
 
 if __name__ == "__main__":

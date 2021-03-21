@@ -6,8 +6,9 @@ class Innovs():
     def __init__(self):
         self.log = []
 
-    def add(self, t, x, y, xhat, yhat):
-        self.log.append([t, xhat[0], yhat, x[0] - xhat[0], y - yhat])
+    def add(self, t, xt, yt, x, y):
+        try: self.log.append([t, x[0], y, xt[0] - x[0], yt - y])
+        except: self.log.append([t, x, y, xt[0] - x, yt - y])
 
     def update2(self, t, xhat, yhat, err, inn, Ree, Ptil):
         self.log.append([t, xhat, yhat, err, inn, Ree, Ptil])

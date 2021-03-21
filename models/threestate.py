@@ -7,6 +7,8 @@ class Threestate(ModelBase):
 
     def ekf(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
     def ekfud(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0, self.G, self.Q
+    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
+    def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def init(self):
         self.tsteps = 1501
@@ -18,8 +20,8 @@ class Threestate(ModelBase):
         self.P0 = 1. * np.eye(3)
         self.G = np.eye(3)
         self.Q = np.diag(self.Rww)
-        self.spkf = Spkf(self)
-        self.pf = Pf(self)
+        self.SPKF = SPKF(self)
+        self.PF = PF(self)
 
     def steps(self):
         for tstep in range(self.tsteps):
@@ -48,9 +50,11 @@ class Threestate(ModelBase):
     def H(self, x):
         return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])
 
-class Spkf():
+class SPKF():
     def __init__(self, parent):
         self.parent = parent
+        P0 = .1 * np.eye(3)
+        self.S = np.linalg.cholesky(P0)
         self.Sw = np.linalg.cholesky(np.diag(parent.Rww))
         self.Sv = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
         n = 3
@@ -69,7 +73,7 @@ class Spkf():
         self.Pxy = np.zeros((3, 1))
         self.W = self.Wm
 
-    def X(self, x, C):
+    def X1(self, x, C):
         X = np.zeros([3, 7])
         X[:, 0] = x
         X[:, 1] = x + self.nlroot * C.T[:, 0]
@@ -80,7 +84,7 @@ class Spkf():
         X[:, 6] = x - self.nlroot * C.T[:, 2]
         return X
 
-    def Xhat(self, X):
+    def X2(self, X):
         Xhat = np.zeros([3, 7])
         Xhat[:, 0] = X[:, 0]
         Xhat[:, 1] = X[:, 1] + self.nlroot * self.Sw.T[:, 0]
@@ -91,11 +95,11 @@ class Spkf():
         Xhat[:, 6] = X[:, 6] - self.nlroot * self.Sw.T[:, 2]
         return Xhat
 
-    def va(self, X):
+    def vf(self, X):
         for i in range(7): X[:, i] = self.parent.f(X[:, i])
         return X
 
-    def vc(self, Xhat):
+    def vh(self, Xhat):
         Y = np.zeros(7)
         for i in range(7): Y[i] = self.parent.h(Xhat[:, i])
         return Y
@@ -110,16 +114,16 @@ class Spkf():
         for i in range(7): ksi[0, i] = Y[i] - W @ Y.T
         return ksi
 
-class Pf():
+class PF():
     def __init__(self, parent):
         self.parent = parent
         self.xhat0 = np.array([2.0, .055, .044])
         self.nsamp = 250
 
-    def A(self, x):
+    def F(self, x):
         return (1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2
 
-    def C(self, y, x):
+    def H(self, y, x):
         return np.exp(-np.log(2. * np.pi * self.parent.R) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R))
 
 if __name__ == "__main__":

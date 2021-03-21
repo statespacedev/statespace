@@ -1,52 +1,52 @@
 import numpy as np
+np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 import math, util
 import sys; sys.path.append('../')
 from models.threestate import Threestate
 from models.onestate import Onestate
+from innovations import Innovs
 
 def main():
     processor = Particle()
-    model = Onestate()
-    # model = Threestate()
-    processor.pf1(model)
-    # processor.pf2(model)
-    processor.innov.plot()
+    # model = Onestate()
+    model = Threestate()
+    # processor.pf1(model)
+    processor.pf2(model)
+    processor.innovs.plot()
 
 class Particle():
-    '''particle filter. monte carlo sampling processor, bootstrap particle filter. the run methods bring in particular models from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods.'''
+    '''particle filter, sequential monte carlo sampling processor, bootstrap particle filter'''
     
     def __init__(self, *args, **kwargs):
-        self.args, self.kwargs = args, kwargs
-        self.innov = util.Innovs()
-        self.dists = util.Dists()
-        self.ens = util.DistsEns()
+        self.args, self.kwargs, self.innovs = args, kwargs, Innovs()
 
-    def pf1(self, model): # todo seems to essentially still be scalar
-        '''particle filter 1.'''
-        xhat = model.pf.x0
-        x = xhat + math.sqrt(1e-2) * np.random.randn(model.pf.nsamp)
-        W = self.normalize(np.ones(model.pf.nsamp))
-        for step in model.steps():
-            x = self.resample(x, W)
-            x = model.pf.F(x)
-            W = self.normalize(model.pf.H(step[2], x))
-            yhat = model.h(xhat)
-            xhat = W @ x
-            self.innov.add(t=step[0], xhat=xhat, yhat=yhat, err=step[1] - xhat, inn=step[2] - yhat)
-            self.dists.update(t=step[0], tru=model.pf.F(step[1]), est=x)
+    def pf1(self, model): # todo still scalar
+        '''particle filter'''
+        steps, f, h, F, H, R, x, P = model.ekf()
+        nsamp, F, H = model.pf()
+        xp = x + math.sqrt(1e-2) * np.random.randn(nsamp)
+        W = self.normalize(np.ones(nsamp))
+        for t, xt, yt in steps():
+            xp = self.resample(xp, W)
+            xp = F(xp)
+            y = h(x)
+            W = self.normalize(H(yt, xp))
+            x = W @ xp
+            self.innovs.add(t, xt, yt, x, y)
 
     def pf2(self, model):
-        '''particle filter 2.'''
-        xhat = model.pf.x0
-        x = xhat + np.sqrt(model.Rww) * np.random.randn(model.pf.nsamp, len(xhat))
-        W = np.ones((model.pf.nsamp, 3)) / model.pf.nsamp
-        for step in model.steps():
-            x[:, 0], x[:, 1], x[:, 2] = self.resample(x[:, 0], W[:, 0]), self.roughen(x[:, 1]), self.roughen(x[:, 2])
-            x[:, 0] = np.apply_along_axis(model.pf.F, 1, x)
-            W[:, 0] = self.normalize(model.pf.H(step[2], x[:, 0]))
-            yhat = model.h(xhat)
-            xhat = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
-            self.innov.add(t=step[0], xhat=xhat[0], yhat=yhat, err=step[1][0] - xhat[0], inn=step[2] - yhat)
+        '''particle filter'''
+        steps, f, h, F, H, R, x, P = model.ekf()
+        nsamp, F, H = model.pf()
+        xp = x + np.sqrt(model.Rww) * np.random.randn(model.PF.nsamp, len(x))
+        W = np.ones((nsamp, 3)) / nsamp
+        for t, xt, yt in steps():
+            xp[:, 0], xp[:, 1], xp[:, 2] = self.resample(xp[:, 0], W[:, 0]), self.roughen(xp[:, 1]), self.roughen(xp[:, 2])
+            xp[:, 0] = np.apply_along_axis(F, 1, xp)
+            y = model.h(x)
+            W[:, 0] = self.normalize(H(yt, xp[:, 0]))
+            x = [W[:, 0].T @ xp[:, 0], W[:, 1].T @ xp[:, 1], W[:, 2].T @ xp[:, 2]]
+            self.innovs.add(t, xt, yt, x, y)
 
     def resample(self, xi, Wi):
         '''particle resampling.'''
