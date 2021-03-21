@@ -77,11 +77,11 @@ class DecisionsEns():
 class Decisions():
     def __init__(self, mode, tracker):
         self.mode = mode
-        tracker.innov.finalize()
-        self.t = tracker.innov.log[:, 0]
-        self.yhat = tracker.innov.log[:, 2]
-        self.inn = tracker.innov.log[:, 4]
-        self.Rhatee = tracker.innov.log[:, 5]
+        tracker.innovs.finalize()
+        self.t = tracker.innovs.log[:, 0]
+        self.yhat = tracker.innovs.log[:, 2]
+        self.inn = tracker.innovs.log[:, 4]
+        self.Rhatee = tracker.innovs.log[:, 5]
         self.decisionfunction = self.evaldecisionfunction()
 
     def evaldecisionfunction(self):
@@ -96,8 +96,8 @@ class Innovs():
     def __init__(self):
         self.log = []
 
-    def update(self, t, xhat, yhat, err, inn):
-        self.log.append([t, xhat, yhat, err, inn])
+    def add(self, t, x, y, xhat, yhat):
+        self.log.append([t, xhat, yhat, x[0] - xhat[0], y - yhat])
 
     def update2(self, t, xhat, yhat, err, inn, Ree, Ptil):
         self.log.append([t, xhat, yhat, err, inn, Ree, Ptil])

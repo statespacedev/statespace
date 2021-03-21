@@ -10,53 +10,52 @@ def main():
     processor = Classical()
     model = Onestate()
     # model = Threestate()
-    # processor.ekf(model)
-    processor.ekfud(model)
-    try: processor.innov.plot()
+    processor.ekf(model)
+    # processor.ekfud(model)
+    try: processor.innovs.plot()
     except: pass
 
 class Classical():
-    '''classical kalman filter.'''
+    '''classical kalman filter'''
 
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs = args, kwargs
-        self.innov = util.Innovs()
+        self.innovs = util.Innovs()
 
-    def ekf(self, m):
-        '''standard form extended kalman filter.'''
+    def ekf(self, model):
+        '''basic form'''
+        steps, a, c, A, C, Ro, xc, P = model.pieces()
+        for t, x, y in steps():
+            xc = a(xc)
+            yc = c(xc)
+            P = A(xc) @ P @ A(xc)
+            K = P @ C(xc) / (C(xc) @ P @ C(xc) + Ro)
+            xc = xc + K * (y - yc)
+            P = (1 - K * C(xc)) * P
+            self.innovs.add(t, x, y, xc, yc)
+
+    def ekfud(self, m):
+        '''UD factorized form'''
         xhat, Ptil = m.xhat0, m.Ptil0
-        for step in m.steps():
-            xhat = m.a(xhat)
-            Ptil = m.A(xhat) @ Ptil @ m.A(xhat)
-            Ree = m.C(xhat) @ Ptil @ m.C(xhat) + m.Rvv
-            K = Ptil @ m.C(xhat) / Ree
-            yhat = m.c(xhat)
-            xhat = xhat + K * (step[2] - yhat)
-            Ptil = (1 - K * m.C(xhat)) * Ptil
-            self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
-
-    def ekfud(self, model):
-        '''UD factorized form of the extended kalman filter, or square-root filter, with better numerical characteristics. instead of a covariance matrix full of squared values, we propagate something like it's square-root. this is the U matrix. this makes the state and observation equations look different, but they're doing the same thing as the standard form.'''
-        xhat, Ptil = model.xhat0, model.Ptil0
         U, D = self.udfactorize(Ptil)
-        for step in model.steps():
-            xhat, U, D = self.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
-            xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, H=model.C(xhat), obs=step[2], R=model.Rvv, yhat=model.c(xhat))
-            self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
+        for step in m.steps():
+            xhat, U, D = self.temporal(xin=m.a(xhat), Uin=U, Din=D, Phi=m.A(xhat), Gin=m.G, Q=m.Q)
+            xhat, U, D, yhat = self.observational(xin=xhat, Uin=U, Din=D, H=m.C(xhat), obs=step[2], R=m.Rvv, yhat=m.c(xhat))
+            self.innovs.add(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
-    def ekfudcpp(self, model):
-        '''UD factorized form of the extended kalman filter, in cpp.'''
-        xhat, Ptil = model.xhat0, model.Ptil0
+    def ekfudcpp(self, m):
+        '''UD factorized form in cpp'''
+        xhat, Ptil = m.xhat0, m.Ptil0
         ud = api.udfactorize(Ptil); U, D = ud[0], np.diag(ud[1].transpose()[0])
-        for step in model.steps():
-            res = api.temporal(xin=model.a(xhat), Uin=U, Din=D, Phi=model.A(xhat), Gin=model.G, Q=model.Q)
+        for step in m.steps():
+            res = api.temporal(xin=m.a(xhat), Uin=U, Din=D, Phi=m.A(xhat), Gin=m.G, Q=m.Q)
             xhat, U, D = res[0].flatten(), res[1], res[2]
-            res = api.observational(xin=xhat, Uin=U, Din=D, H=model.C(xhat), obs=step[2], R=model.Rvv, yhat=model.c(xhat))
-            xhat, U, D, yhat = res[0].flatten(), res[1], res[2], model.c(xhat)
-            self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
+            res = api.observational(xin=xhat, Uin=U, Din=D, H=m.C(xhat), obs=step[2], R=m.Rvv, yhat=m.c(xhat))
+            xhat, U, D, yhat = res[0].flatten(), res[1], res[2], m.c(xhat)
+            self.innovs.add(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
     def udfactorize(self, M):
-        '''ud factorization.'''
+        '''UD factorization'''
         assert np.allclose(M, M.T)
         n, M = M.shape[0], np.triu(M)
         U, d = np.eye(n), np.zeros(n)
@@ -72,7 +71,7 @@ class Classical():
         return U, np.diag(d)
 
     def temporal(self, xin, Uin, Din, Phi, Gin, Q):
-        '''thornton temporal update.'''
+        '''thornton temporal update'''
         U, D, G, n, r = np.eye(len(xin)), Din, Gin, len(xin), len(xin)
         x, PhiU = Phi @ xin, Phi @ Uin
         for i in reversed(range(len(xin))):
@@ -93,7 +92,7 @@ class Classical():
         return x, U, D
 
     def observational(self, xin, Uin, Din, H, obs, R, yhat):
-        '''bierman observation update.'''
+        '''bierman observation update'''
         x, U, D, dz, alpha, gamma = xin, Uin, Din, obs - yhat, R, 1/R
         a = U.T @ H.T
         b = D @ a

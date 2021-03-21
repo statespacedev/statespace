@@ -33,7 +33,7 @@ class Modern():
             yhat = model.spkf.W @ Y
             xhat = model.spkf.W @ X + K * (step[2] - model.spkf.W @ Y)
             Ptil = Ptil - K * Rksiksi * K
-            self.innov.update(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
+            self.innov.add(step[0], xhat, yhat, step[1] - xhat, step[2] - yhat)
 
     def spkf2(self, model):
         '''sigma-point kalman filter 2.'''
@@ -42,7 +42,7 @@ class Modern():
         for step in model.steps():
             xhat, S, X = self.temporal_update(xhat=xhat, S=S, model=model)
             xhat, S, yhat = self.observational_update(xhat=xhat, S=S, X=X, obs=step[2], model=model)
-            self.innov.update(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
+            self.innov.add(step[0], xhat[0], yhat, step[1][0] - xhat[0], step[2] - yhat)
 
     def cholupdate(self, R, z):
         '''cholesky update.'''

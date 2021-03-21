@@ -5,6 +5,8 @@ from modelbase import ModelBase
 class Onestate(ModelBase):
     '''one-state reference model.'''
 
+    def pieces(self): return self.steps, self.a, self.c, self.A, self.C, self.Rvv, self.xhat0, self.Ptil0
+
     def init(self):
         self.tsteps = 151
         self.dt = .01

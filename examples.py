@@ -9,5 +9,5 @@ from models.jazwinski2 import Nonlinear2
 
 processor, model = Classical(), Nonlinear2()
 processor.ekfudcpp(model)
-processor.innov.plot()
+processor.innovs.plot()
 

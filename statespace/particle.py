@@ -32,7 +32,7 @@ class Particle():
             W = self.normalize(model.pf.C(step[2], x))
             yhat = model.c(xhat)
             xhat = W @ x
-            self.innov.update(t=step[0], xhat=xhat, yhat=yhat, err=step[1] - xhat, inn=step[2] - yhat)
+            self.innov.add(t=step[0], xhat=xhat, yhat=yhat, err=step[1] - xhat, inn=step[2] - yhat)
             self.dists.update(t=step[0], tru=model.pf.A(step[1]), est=x)
 
     def pf2(self, model):
@@ -46,7 +46,7 @@ class Particle():
             W[:, 0] = self.normalize(model.pf.C(step[2], x[:, 0]))
             yhat = model.c(xhat)
             xhat = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
-            self.innov.update(t=step[0], xhat=xhat[0], yhat=yhat, err=step[1][0] - xhat[0], inn=step[2] - yhat)
+            self.innov.add(t=step[0], xhat=xhat[0], yhat=yhat, err=step[1][0] - xhat[0], inn=step[2] - yhat)
 
     def resample(self, xi, Wi):
         '''particle resampling.'''
