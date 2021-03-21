@@ -38,11 +38,15 @@ baseline extended kalman filters. both the standard textbook form, and the ud fa
 modern.py
 -----------
 
+sigma-point sampling kalman filters.
+
 .. automodule:: statespace.modern
     :members:
 
 particle.py
 -------------
+
+particle filters, sequential monte carlo sampling processors.
 
 .. automodule:: statespace.particle
     :members:
