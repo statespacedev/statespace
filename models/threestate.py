@@ -1,16 +1,17 @@
 import math
 import numpy as np
-from modelbase import ModelBase
+from modelbase import ModelBase, SPKFBase, PFBase
 
 class Threestate(ModelBase):
-    '''three-state reference model.'''
+    '''three-state reference model'''
 
     def ekf(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
-    def ekfud(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0, self.G, self.Q
+    def ekfud(self): return self.G, self.Q
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
-    def init(self):
+    def __init__(self):
+        super().__init__()
         self.tsteps = 1501
         self.dt = .01
         self.x = np.array([2., .05, .04])
@@ -50,8 +51,10 @@ class Threestate(ModelBase):
     def H(self, x):
         return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])
 
-class SPKF():
+class SPKF(SPKFBase):
+
     def __init__(self, parent):
+        super().__init__()
         self.parent = parent
         P0 = .1 * np.eye(3)
         self.S = np.linalg.cholesky(P0)
@@ -114,8 +117,10 @@ class SPKF():
         for i in range(7): ksi[0, i] = Y[i] - W @ Y.T
         return ksi
 
-class PF():
+class PF(PFBase):
+
     def __init__(self, parent):
+        super().__init__()
         self.parent = parent
         self.xhat0 = np.array([2.0, .055, .044])
         self.nsamp = 250

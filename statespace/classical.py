@@ -11,8 +11,8 @@ def main():
     processor = Classical()
     model = Onestate()
     # model = Threestate()
-    processor.ekf(model)
-    # processor.ekfud(model)
+    # processor.ekf(model)
+    processor.ekfud(model)
     processor.innovs.plot()
 
 class Classical():
@@ -35,7 +35,8 @@ class Classical():
 
     def ekfud(self, model):
         '''UD factorized form'''
-        steps, f, h, F, H, R, x, P, G, Q = model.ekfud()
+        steps, f, h, F, H, R, x, P = model.ekf()
+        G, Q = model.ekfud()
         U, D = self.udfactorize(P)
         for t, xt, yt in steps():
             x, U, D = self.temporal(f(x), U, D, F(x), G, Q)
@@ -44,7 +45,8 @@ class Classical():
 
     def ekfudcpp(self, model):
         '''UD factorized form in cpp'''
-        steps, f, h, F, H, R, x, P, G, Q = model.ekfud()
+        steps, f, h, F, H, R, x, P = model.ekf()
+        G, Q = model.ekfud()
         ud = api.udfactorize(P); U, D = ud[0], np.diag(ud[1].transpose()[0])
         for t, xt, yt in steps():
             cpp = api.temporal(f(x), U, D, H(x), G, Q)

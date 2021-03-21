@@ -1,16 +1,17 @@
 import math
 import numpy as np
-from modelbase import ModelBase
+from modelbase import ModelBase, SPKFBase, PFBase
 
 class Onestate(ModelBase):
-    '''one-state reference model.'''
+    '''one-state reference model'''
 
     def ekf(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
-    def ekfud(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0, self.G, self.Q
+    def ekfud(self): return self.G, self.Q
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
-    def init(self):
+    def __init__(self):
+        super().__init__()
         self.tsteps = 151
         self.dt = .01
         self.x = np.array([2.])
@@ -48,8 +49,10 @@ class Onestate(ModelBase):
     def H(self, x):
         return 2 * x + 3 * x ** 2
 
-class SPKF():
+class SPKF(SPKFBase):
+
     def __init__(self, parent):
+        super().__init__()
         self.parent = parent
         self.vf = np.vectorize(parent.f)
         self.vh = np.vectorize(parent.h)
@@ -68,8 +71,10 @@ class SPKF():
     def X2(self, X):
         return [X[0], X[1] + self.kappa * math.sqrt(self.parent.Rww), X[2] - self.kappa * math.sqrt(self.parent.Rww)]
 
-class PF():
+class PF(PFBase):
+
     def __init__(self, parent):
+        super().__init__()
         self.parent = parent
         self.xhat0 = 2.05
         self.nsamp = 250
