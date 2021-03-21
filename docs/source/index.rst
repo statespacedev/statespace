@@ -5,7 +5,7 @@
 introduction
 ==================================================================================================================
 
-this project focuses on reference problems from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, Kalman Filtering: Theory and Practice, and Stochastic Processes and Filtering Theory - in particular, using numpy for matrix and vector manipulation.
+this project focuses on reference problems in kalman, sigma-point, and particle processors - in particular, numpy and eigen implementations.
 
 install
 ------------------------------------------------------------------------------------------------------------------
