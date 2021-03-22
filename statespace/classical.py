@@ -4,8 +4,6 @@ import sys; sys.path.append('../'); sys.path.append('../cmake-build-debug/libsta
 from models.threestate import Threestate
 from models.onestate import Onestate
 from innovations import Innovs
-import libstatespace
-api = libstatespace.Api()
 
 def main():
     processor = Classical()
@@ -45,6 +43,8 @@ class Classical():
 
     def ekfudcpp(self, model):
         '''UD factorized form in cpp'''
+        import libstatespace
+        api = libstatespace.Api()
         steps, f, h, F, H, R, x, P = model.ekf()
         G, Q = model.ekfud()
         ud = api.udfactorize(P); U, D = ud[0], np.diag(ud[1].transpose()[0])
