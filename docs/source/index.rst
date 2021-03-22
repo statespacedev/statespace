@@ -27,12 +27,6 @@ build-test-deploy to `pypi <https://pypi.org/project/statespace>`__ is mostly a 
 processors
 ==================================================================================================================
 
-api.py
---------
-
-.. automodule:: libstatespace_.api
-    :members:
-
 classical.py
 ---------------
 
@@ -55,6 +49,12 @@ particle.py
 particle filters, sequential monte carlo sampling processors.
 
 .. automodule:: statespace.particle
+    :members:
+
+api.py
+--------
+
+.. automodule:: libstatespace_.api
     :members:
 
 models
