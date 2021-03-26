@@ -24,7 +24,7 @@ wa2 = np.dot(uw2, data)
 # here's an equivalent provided by numpy
 wa1b = np.average(data, weights=uw1)
 wa2b = np.average(data, weights=uw2)
-# and np.average actually does normalize the weights internally, so you can bypass normalization and do
+# and np.average actually does normalize the weights internally, so you can skip normalization and do
 wa1c = np.average(data, weights=w1)
 wa2c = np.average(data, weights=w2)
 
