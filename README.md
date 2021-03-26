@@ -10,7 +10,7 @@ processors and models from
 
 [Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
 
-210321 settling on a new model structure that separates the parts associated with baseline kalman filter, sigma-point filter, and particle filter. this can eventually gorw upward into a high level base model. concept is that a model needs to know something about the processors that are going to use it. a particle processor has different needs than a kalman processor. this gives a natural shape and structure to the models.
+210321 settling on a new model structure that separates the parts associated with baseline kalman filter, sigma-point filter, and particle filter. this can eventually grow upward into a high level base model. concept is that a model needs to know something about the processors that are going to use it. a particle processor has different needs than a kalman processor. this gives a natural shape and structure to the models.
 
 210314 maybe what we need is to bring in a new reference model - to kind of shake things up and help brainstorming around the concept of a high level base model. a strong candidate is the bearings only ship tracking problem - we have working examples in the orgeon library, and it's in the textbooks.
 
