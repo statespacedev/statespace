@@ -21,7 +21,7 @@ uw2b = w2 / np.linalg.norm(w2, ord=1)
 # weighted average is the dot product of a normalized weight vector and a data vector
 wa1 = np.dot(uw1, data)
 wa2 = np.dot(uw2, data)
-# here's an equivalent method
+# here's an equivalent provided by numpy
 wa1b = np.average(data, weights=uw1)
 wa2b = np.average(data, weights=uw2)
 # and np.average actually does normalize the weights internally, so you can bypass normalization and do
