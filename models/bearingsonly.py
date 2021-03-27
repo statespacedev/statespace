@@ -5,48 +5,48 @@ from modelbase import ModelBase, SPKFBase, PFBase
 class BearingsOnly(ModelBase):
     '''bearings-only tracking problem'''
 
-    def ekf(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
+    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
     def ekfud(self): return self.G, self.Q
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def __init__(self):
         super().__init__()
-        self.tsteps = 1501
-        self.dt = .01
-        self.x = np.array([2., .05, .04])
-        self.Rww = 1e-9 * np.array([1, 1, 1])
-        self.R = 9e-2
-        self.x0 = np.array([2, .055, .044])
-        self.P0 = 1. * np.eye(3)
-        self.G = np.eye(3)
+        self.tsteps = 72 # 2hr = 7200sec / 100
+        self.dt = .02 # hrs, .02 hr = 72 sec
+        self.x = np.array([0., 15., 20., -10.])
+        self.Rww = 1e-6 * np.array([1, 1, 1, 1])
+        self.R = 3.05e-4 # rad**2 for deltat 0.33hr
+        self.x0 = np.array([0., 0., 0., 0.])
+        self.P0 = 1. * np.eye(4)
+        self.G = np.eye(4)
         self.Q = np.diag(self.Rww)
         self.SPKF = SPKF(self)
         self.PF = PF(self)
 
-    def steps(self):
+    def sim(self):
         for tstep in range(self.tsteps):
-            tsec = tstep * self.dt
+            t = tstep * self.dt
             self.x = self.f(self.x)
+            if t == 0.5: self.x[2] += -24.; self.x[3] += 10. # course change at 0.5 hrs
             self.y = self.h(self.x)
             if tstep == 0: continue
-            self.log.append([tsec, self.x, self.y])
-            yield (tsec, self.x, self.y)
+            self.log.append([t, self.x, self.y])
+            yield (t, self.x, self.y)
 
     def f(self, x):
-        w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Rww)))
-        return np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]]) + np.diag(w)
+        w = np.multiply(np.random.randn(1, 4), np.sqrt(np.diag(self.Rww)))
+        return np.array([x[0] + self.dt * x[2], x[1] + self.dt * x[3], x[2], x[3]]) + np.diag(w)
+
+    def F(self, x):
+        A = np.eye(4)
+        A[0, 2] = self.dt
+        A[1, 3] = self.dt
+        return A
 
     def h(self, x):
         v = math.sqrt(self.R) * np.random.randn()
         return x[0] ** 2 + x[0] ** 3 + v
-
-    def F(self, x):
-        A = np.eye(3)
-        A[0, 0] = 1 - x[1] * self.dt + 2 * x[2] * self.dt * x[0]
-        A[0, 1] = -self.dt * x[0]
-        A[0, 2] = self.dt * x[0] ** 2
-        return A
 
     def H(self, x):
         return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])

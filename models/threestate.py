@@ -5,7 +5,7 @@ from modelbase import ModelBase, SPKFBase, PFBase
 class Threestate(ModelBase):
     '''three-state reference model'''
 
-    def ekf(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
+    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
     def ekfud(self): return self.G, self.Q
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
@@ -24,22 +24,20 @@ class Threestate(ModelBase):
         self.SPKF = SPKF(self)
         self.PF = PF(self)
 
-    def steps(self):
+    def sim(self):
         for tstep in range(self.tsteps):
-            tsec = tstep * self.dt
+            t = tstep * self.dt
             self.x = self.f(self.x)
             self.y = self.h(self.x)
             if tstep == 0: continue
-            self.log.append([tsec, self.x, self.y])
-            yield (tsec, self.x, self.y)
+            self.log.append([t, self.x, self.y])
+            yield (t, self.x, self.y)
 
-    def f(self, x):
+    def f(self, x, *args):
         w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Rww)))
-        return np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]]) + np.diag(w)
-
-    def h(self, x):
-        v = math.sqrt(self.R) * np.random.randn()
-        return x[0] ** 2 + x[0] ** 3 + v
+        base = np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]])
+        if 0 in args: return base
+        return base + np.diag(w)
 
     def F(self, x):
         A = np.eye(3)
@@ -47,6 +45,12 @@ class Threestate(ModelBase):
         A[0, 1] = -self.dt * x[0]
         A[0, 2] = self.dt * x[0] ** 2
         return A
+
+    def h(self, x, *args):
+        v = math.sqrt(self.R) * np.random.randn()
+        base = x[0] ** 2 + x[0] ** 3
+        if 0 in args: return base
+        return base + v
 
     def H(self, x):
         return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])

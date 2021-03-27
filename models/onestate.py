@@ -5,7 +5,7 @@ from modelbase import ModelBase, SPKFBase, PFBase
 class Onestate(ModelBase):
     '''one-state reference model'''
 
-    def ekf(self): return self.steps, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
+    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
     def ekfud(self): return self.G, self.Q
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
@@ -24,27 +24,31 @@ class Onestate(ModelBase):
         self.SPKF = SPKF(self)
         self.PF = PF(self)
 
-    def steps(self):
+    def sim(self):
         for tstep in range(self.tsteps):
-            tsec = tstep * self.dt
+            t = tstep * self.dt
             self.x = self.f(self.x)
             self.y = self.h(self.x)
             if tstep == 0: continue
-            self.log.append([tsec, self.x, self.y])
-            yield (tsec, self.x, self.y)
+            self.log.append([t, self.x, self.y])
+            yield (t, self.x, self.y)
 
-    def f(self, x):
+    def f(self, x, *args):
         w = math.sqrt(self.Rww) * np.random.randn()
-        return (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2 + w
-
-    def h(self, x):
-        v = math.sqrt(self.R) * np.random.randn()
-        return x ** 2 + x ** 3 + v
+        base = (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2
+        if 0 in args: return base
+        return base + w
 
     def F(self, x):
         A = np.eye(1)
         A[0, 0] = 1 - .05 * self.dt + .08 * self.dt * x
         return A
+
+    def h(self, x, *args):
+        v = math.sqrt(self.R) * np.random.randn()
+        base = x ** 2 + x ** 3
+        if 0 in args: return base
+        return base + v
 
     def H(self, x):
         return 2 * x + 3 * x ** 2

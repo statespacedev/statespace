@@ -9,8 +9,8 @@ def main():
     processor = Classical()
     model = Onestate()
     # model = Threestate()
-    # processor.ekf(model)
-    processor.ekfud(model)
+    processor.ekf(model)
+    # processor.ekfud(model)
     processor.innovs.plot()
 
 class Classical():
@@ -21,39 +21,39 @@ class Classical():
 
     def ekf(self, model):
         '''basic form'''
-        steps, f, h, F, H, R, x, P = model.ekf()
-        for t, xt, yt in steps():
-            x = f(x)
-            y = h(x)
-            P = F(x) @ P @ F(x)
-            K = P @ H(x) / (H(x) @ P @ H(x) + R)
-            x = x + K * (yt - y)
-            P = (1 - K * H(x)) * P
-            self.innovs.add(t, xt, yt, x, y)
+        sim, f, h, F, H, R, xe, P = model.ekf()
+        for t, x, y in sim():
+            xe = f(xe, 0)
+            ye = h(xe, 0)
+            P = F(xe) @ P @ F(xe)
+            K = P @ H(xe) / (H(xe) @ P @ H(xe) + R)
+            xe = xe + K * (y - ye)
+            P = (1 - K * H(xe)) * P
+            self.innovs.add(t, x, y, xe, ye)
 
     def ekfud(self, model):
         '''UD factorized form'''
-        steps, f, h, F, H, R, x, P = model.ekf()
+        sim, f, h, F, H, R, xe, P = model.ekf()
         G, Q = model.ekfud()
         U, D = self.udfactorize(P)
-        for t, xt, yt in steps():
-            x, U, D = self.temporal(f(x), U, D, F(x), G, Q)
-            x, U, D, y = self.observational(x, U, D, H(x), yt, R, h(x))
-            self.innovs.add(t, xt, yt, x, y)
+        for t, x, y in sim():
+            xe, U, D = self.temporal(f(xe, 0), U, D, F(xe), G, Q)
+            xe, U, D, ye = self.observational(xe, U, D, H(xe), y, R, h(xe, 0))
+            self.innovs.add(t, x, y, xe, ye)
 
     def ekfudcpp(self, model):
         '''UD factorized form in cpp'''
         import libstatespace
         api = libstatespace.Api()
-        steps, f, h, F, H, R, x, P = model.ekf()
+        sim, f, h, F, H, R, xe, P = model.ekf()
         G, Q = model.ekfud()
         ud = api.udfactorize(P); U, D = ud[0], np.diag(ud[1].transpose()[0])
-        for t, xt, yt in steps():
-            cpp = api.temporal(f(x), U, D, H(x), G, Q)
-            x, U, D = cpp[0].flatten(), cpp[1], cpp[2]
-            cpp = api.observational(x, U, D, H(x), yt, R, h(x))
-            x, U, D, y = cpp[0].flatten(), cpp[1], cpp[2], h(x)
-            self.innovs.add(t, xt, yt, x, y)
+        for t, x, y in sim():
+            cpp = api.temporal(f(xe, 0), U, D, H(xe), G, Q)
+            xe, U, D = cpp[0].flatten(), cpp[1], cpp[2]
+            cpp = api.observational(xe, U, D, H(xe), y, R, h(xe, 0))
+            xe, U, D, ye = cpp[0].flatten(), cpp[1], cpp[2], h(xe, 0)
+            self.innovs.add(t, x, y, xe, ye)
 
     def udfactorize(self, M):
         '''UD factorization'''
