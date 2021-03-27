@@ -27,8 +27,8 @@ class Onestate(ModelBase):
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
-            self.x = self.f(self.x)
-            self.y = self.h(self.x)
+            self.x = self.f(self.x, 0)
+            self.y = self.h(self.x, 0)
             if tstep == 0: continue
             self.log.append([t, self.x, self.y])
             yield (t, self.x, self.y)
@@ -36,8 +36,8 @@ class Onestate(ModelBase):
     def f(self, x, *args):
         w = math.sqrt(self.Rww) * np.random.randn()
         base = (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2
-        if 0 in args: return base
-        return base + w
+        if 0 in args: return base + w
+        return base
 
     def F(self, x):
         A = np.eye(1)
@@ -47,8 +47,8 @@ class Onestate(ModelBase):
     def h(self, x, *args):
         v = math.sqrt(self.R) * np.random.randn()
         base = x ** 2 + x ** 3
-        if 0 in args: return base
-        return base + v
+        if 0 in args: return base + v
+        return base
 
     def H(self, x):
         return 2 * x + 3 * x ** 2

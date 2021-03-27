@@ -27,16 +27,18 @@ class BearingsOnly(ModelBase):
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
-            self.x = self.f(self.x)
+            self.x = self.f(self.x, 0)
             if t == 0.5: self.x[2] += -24.; self.x[3] += 10. # course change at 0.5 hrs
-            self.y = self.h(self.x)
+            self.y = self.h(self.x, 0)
             if tstep == 0: continue
             self.log.append([t, self.x, self.y])
             yield (t, self.x, self.y)
 
-    def f(self, x):
+    def f(self, x, *args):
         w = np.multiply(np.random.randn(1, 4), np.sqrt(np.diag(self.Rww)))
-        return np.array([x[0] + self.dt * x[2], x[1] + self.dt * x[3], x[2], x[3]]) + np.diag(w)
+        base = np.array([x[0] + self.dt * x[2], x[1] + self.dt * x[3], x[2], x[3]]) + np.diag(w)
+        if 0 in args: return base + w
+        return base
 
     def F(self, x):
         A = np.eye(4)
@@ -44,9 +46,11 @@ class BearingsOnly(ModelBase):
         A[1, 3] = self.dt
         return A
 
-    def h(self, x):
+    def h(self, x, *args):
         v = math.sqrt(self.R) * np.random.randn()
-        return x[0] ** 2 + x[0] ** 3 + v
+        base = x[0] ** 2 + x[0] ** 3 + v
+        if 0 in args: return base + v
+        return base
 
     def H(self, x):
         return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])

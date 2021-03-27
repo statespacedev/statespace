@@ -23,8 +23,8 @@ class Classical():
         '''basic form'''
         sim, f, h, F, H, R, xe, P = model.ekf()
         for t, x, y in sim():
-            xe = f(xe, 0)
-            ye = h(xe, 0)
+            xe = f(xe)
+            ye = h(xe)
             P = F(xe) @ P @ F(xe)
             K = P @ H(xe) / (H(xe) @ P @ H(xe) + R)
             xe = xe + K * (y - ye)
@@ -37,8 +37,8 @@ class Classical():
         G, Q = model.ekfud()
         U, D = self.udfactorize(P)
         for t, x, y in sim():
-            xe, U, D = self.temporal(f(xe, 0), U, D, F(xe), G, Q)
-            xe, U, D, ye = self.observational(xe, U, D, H(xe), y, R, h(xe, 0))
+            xe, U, D = self.temporal(f(xe), U, D, F(xe), G, Q)
+            xe, U, D, ye = self.observational(xe, U, D, H(xe), y, R, h(xe))
             self.innovs.add(t, x, y, xe, ye)
 
     def ekfudcpp(self, model):
@@ -49,10 +49,10 @@ class Classical():
         G, Q = model.ekfud()
         ud = api.udfactorize(P); U, D = ud[0], np.diag(ud[1].transpose()[0])
         for t, x, y in sim():
-            cpp = api.temporal(f(xe, 0), U, D, H(xe), G, Q)
+            cpp = api.temporal(f(xe), U, D, H(xe), G, Q)
             xe, U, D = cpp[0].flatten(), cpp[1], cpp[2]
-            cpp = api.observational(xe, U, D, H(xe), y, R, h(xe, 0))
-            xe, U, D, ye = cpp[0].flatten(), cpp[1], cpp[2], h(xe, 0)
+            cpp = api.observational(xe, U, D, H(xe), y, R, h(xe))
+            xe, U, D, ye = cpp[0].flatten(), cpp[1], cpp[2], h(xe)
             self.innovs.add(t, x, y, xe, ye)
 
     def udfactorize(self, M):

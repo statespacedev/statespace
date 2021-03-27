@@ -27,8 +27,8 @@ class Threestate(ModelBase):
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
-            self.x = self.f(self.x)
-            self.y = self.h(self.x)
+            self.x = self.f(self.x, 0)
+            self.y = self.h(self.x, 0)
             if tstep == 0: continue
             self.log.append([t, self.x, self.y])
             yield (t, self.x, self.y)
@@ -36,8 +36,8 @@ class Threestate(ModelBase):
     def f(self, x, *args):
         w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Rww)))
         base = np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]])
-        if 0 in args: return base
-        return base + np.diag(w)
+        if 0 in args: return base + np.diag(w)
+        return base
 
     def F(self, x):
         A = np.eye(3)
@@ -49,8 +49,8 @@ class Threestate(ModelBase):
     def h(self, x, *args):
         v = math.sqrt(self.R) * np.random.randn()
         base = x[0] ** 2 + x[0] ** 3
-        if 0 in args: return base
-        return base + v
+        if 0 in args: return base + v
+        return base
 
     def H(self, x):
         return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])
