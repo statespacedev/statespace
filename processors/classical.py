@@ -1,18 +1,5 @@
 import numpy as np
 np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
-import sys; sys.path.append('../'); sys.path.append('../cmake-build-debug/libstatespace')
-from models.threestate import Threestate
-from models.onestate import Onestate
-from models.bearingsonly import BearingsOnly
-
-def main():
-    processor = Classical()
-    model = BearingsOnly()
-    # model = Onestate()
-    # model = Threestate()
-    processor.ekf(model)
-    # processor.ekfud(model)
-    model.eval.plot_model()
 
 class Classical():
     '''classical kalman filter'''
@@ -115,5 +102,5 @@ class Classical():
         return x, U, D, yhat
 
 if __name__ == "__main__":
-    main()
+    pass
 

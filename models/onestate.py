@@ -1,7 +1,7 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from basemodel import BaseModel, SPKFBase, PFBase, EvalBase
+from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr
 
 class Onestate(BaseModel):
     '''one-state reference model'''
@@ -95,16 +95,17 @@ class Eval(EvalBase):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
+        self.autocorr = Autocorr(parent)
 
-    def plot_estimate(self, estlog):
+    def plot_estimate(self, proclog):
         lw = 1
         plt.figure()
         t = np.array([x[0] for x in self.parent.log])
         x = np.array([x[1] for x in self.parent.log])
         y = np.array([x[2] for x in self.parent.log])
-        te = np.array([x[0] for x in estlog])
-        xe = np.array([x[1] for x in estlog])
-        ye = np.array([x[2] for x in estlog])
+        te = np.array([x[0] for x in proclog])
+        xe = np.array([x[1] for x in proclog])
+        ye = np.array([x[2] for x in proclog])
         plt.subplot(3, 2, 1), plt.plot(t, x[:, 0], linewidth=lw), plt.ylabel('x[0]')
         plt.subplot(3, 2, 2), plt.plot(t, y, linewidth=lw), plt.ylabel('y')
         plt.subplot(3, 2, 3), plt.plot(te, xe[:, 0], linewidth=lw), plt.ylabel('xe[0]')

@@ -4,8 +4,8 @@ sys.path.append('./processors')
 sys.path.append('./models')
 
 def main():
-    # onestate_ekf()
-    bearingsonly_ekf()
+    onestate_ekf()
+    # bearingsonly_ekf()
 
 def bearingsonly_ekf():
     from models.bearingsonly import BearingsOnly
@@ -24,6 +24,8 @@ def onestate_ekf():
     processor = Classical()
     processor.ekf(model)
     model.eval.plot_estimate(processor.log)
+    model.eval.autocorr.run(processor.log)
+    model.eval.autocorr.plot()
     model.eval.show()
 
 if __name__ == "__main__":
