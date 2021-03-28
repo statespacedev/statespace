@@ -212,13 +212,13 @@ class ModelsEnsemble():
             plt.ylabel('y')
 
 def rccircuit(runs):
-    from classical import Classical
+    from classical import Kalman
     ens = DecisionsEns()
     for runndx in range(runs):
-        tracker = Classical(mode='rccircuit', plot=False, signal=300.)
+        tracker = Kalman(mode='rccircuit', plot=False, signal=300.)
         dec = Decisions(mode='rccircuit', tracker=tracker)
         ens.addsig(decisionfunction=dec.decisionfunction)
-        tracker = Classical(mode='rccircuit', plot=False, signal=0.)
+        tracker = Kalman(mode='rccircuit', plot=False, signal=0.)
         dec = Decisions(mode='rccircuit', tracker=tracker)
         ens.addnoise(decisionfunction=dec.decisionfunction)
     ens.finalize()

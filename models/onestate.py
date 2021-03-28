@@ -1,7 +1,7 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr
+from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
 
 class Onestate(BaseModel):
     '''one-state reference model'''
@@ -33,7 +33,7 @@ class Onestate(BaseModel):
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
             self.log.append([t, self.x, self.y])
-            yield (t, self.x, self.y)
+            yield (t, self.y)
 
     def f(self, x, *args):
         w = math.sqrt(self.Rww) * np.random.randn()
@@ -97,21 +97,15 @@ class Eval(EvalBase):
         self.parent = parent
         self.autocorr = Autocorr(parent)
 
-    def plot_estimate(self, proclog):
-        lw = 1
+    def estimate(self, proclog):
+        lw, logm, logp = 1, Log(self.parent.log), Log(proclog)
         plt.figure()
-        t = np.array([x[0] for x in self.parent.log])
-        x = np.array([x[1] for x in self.parent.log])
-        y = np.array([x[2] for x in self.parent.log])
-        te = np.array([x[0] for x in proclog])
-        xe = np.array([x[1] for x in proclog])
-        ye = np.array([x[2] for x in proclog])
-        plt.subplot(3, 2, 1), plt.plot(t, x[:, 0], linewidth=lw), plt.ylabel('x[0]')
-        plt.subplot(3, 2, 2), plt.plot(t, y, linewidth=lw), plt.ylabel('y')
-        plt.subplot(3, 2, 3), plt.plot(te, xe[:, 0], linewidth=lw), plt.ylabel('xe[0]')
-        plt.subplot(3, 2, 4), plt.plot(te, ye, linewidth=lw), plt.ylabel('ye')
-        plt.subplot(3, 2, 5), plt.plot(te, x[:, 0] - xe[:, 0], linewidth=lw), plt.ylabel('xe[0] err')
-        plt.subplot(3, 2, 6), plt.plot(te, y - ye, linewidth=lw), plt.ylabel('ye err')
+        plt.subplot(3, 2, 1), plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x[0]')
+        plt.subplot(3, 2, 2), plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
+        plt.subplot(3, 2, 3), plt.plot(logp.t, logp.x[:, 0], linewidth=lw), plt.ylabel('xe[0]')
+        plt.subplot(3, 2, 4), plt.plot(logp.t, logp.y, linewidth=lw), plt.ylabel('ye')
+        plt.subplot(3, 2, 5), plt.plot(logp.t, logm.x[:, 0] - logp.x[:, 0], linewidth=lw), plt.ylabel('xe[0] err')
+        plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('ye err')
 
 if __name__ == "__main__":
     pass

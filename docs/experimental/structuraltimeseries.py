@@ -60,11 +60,11 @@ class Structural():
         num_steps = len(self.ts)
         num_steps_forecast = fm.shape[-1]
         num_steps_train = num_steps - num_steps_forecast
-        ax.plot_model(self.tvec, self.ts, lw=1, color='g', alpha=.5, label='ground truth')
+        ax.model(self.tvec, self.ts, lw=1, color='g', alpha=.5, label='ground truth')
         ax.scatter(self.tvec, self.ts, s=1, color='g')
         forecast_steps = np.arange(self.tvec[num_steps_train], self.tvec[num_steps_train]+num_steps_forecast, dtype=self.tvec.dtype)
-        ax.plot_model(forecast_steps, fsa.T, lw=1, color='b', alpha=0.1)
-        ax.plot_model(forecast_steps, fm, lw=1, ls='--', color='b', label='forecast')
+        ax.model(forecast_steps, fsa.T, lw=1, color='b', alpha=0.1)
+        ax.model(forecast_steps, fm, lw=1, ls='--', color='b', label='forecast')
         ax.fill_between(forecast_steps, fm-2*fsc, fm+2*fsc, color='b', alpha=0.2)
         ymin, ymax = min(np.min(fsa), np.min(self.ts)), max(np.max(fsa), np.max(self.ts))
         ax.set_ylim([ymin - (ymax-ymin)*0.1, ymax + (ymax-ymin)*0.1])

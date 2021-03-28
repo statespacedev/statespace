@@ -1,49 +1,36 @@
-import math, util
+import math
 import numpy as np
-np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 from scipy.linalg.blas import drot, drotg
-import sys; sys.path.append('../')
-from models.threestate import Threestate
-from models.onestate import Onestate
-from innovations import Innovs
 
-def main():
-    processor = Modern()
-    # model = Onestate()
-    model = Threestate()
-    # processor.spkf(model)
-    processor.spkfcholeksy(model)
-    processor.innovs.plot()
-
-class Modern():
+class SigmaPoint():
     '''modern sigma-point or ukf filter'''
     
     def __init__(self, *args, **kwargs):
-        self.args, self.kwargs, self.innovs = args, kwargs, Innovs()
+        self.args, self.kwargs, self.log = args, kwargs, []
 
     def spkf(self, model):
         '''sigma-point sampling kalman filter'''
-        steps, f, h, F, H, R, x, P = model.ekf()
+        sim, f, h, F, H, R, x, P = model.ekf()
         f, h, X1, X2, W = model.sp()
-        for t, xt, yt in steps():
+        for t, obs in sim():
             X = f(X1(x, P))
             Y = h(X2(X))
             x = W @ X
             y = W @ Y
             P = W @ np.power(X - x, 2) + model.Rww
             K = (W @ np.multiply(X - x, Y - y)) / (W @ np.power(Y - y, 2) + R)
-            x = x + K * (yt - y)
+            x = x + K * (obs - y)
             P = P - K * (W @ np.power(Y - y, 2) + R) * K
-            self.innovs.add(t, xt, yt, x, y)
+            self.log.append([t, x, y])
 
     def spkfcholeksy(self, model):
         '''cholesky factorized sigma-point sampling kalman filter'''
         steps, f, h, F, H, R, x, P = model.ekf()
         f, h, X1, X2, W, S = model.sp()
-        for t, xt, yt in steps():
+        for t, obs in steps():
             x, S, X = self.temporal(x, S, model)
-            x, S, y = self.observational(x, S, X, yt, model)
-            self.innovs.add(t, xt, yt, x, y)
+            x, S, y = self.observational(x, S, X, obs, model)
+            self.log.append([t, x, y])
 
     def cholupdate(self, R, z):
         '''cholesky update'''
@@ -90,5 +77,5 @@ class Modern():
         return xhat, S, yhat
 
 if __name__ == "__main__":
-    main()
+    pass
 

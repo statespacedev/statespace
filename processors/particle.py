@@ -1,52 +1,39 @@
+import math
 import numpy as np
-np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
-import math, util
-import sys; sys.path.append('../')
-from models.threestate import Threestate
-from models.onestate import Onestate
-from innovations import Innovs
-
-def main():
-    processor = Particle()
-    # model = Onestate()
-    model = Threestate()
-    # processor.pf1(model)
-    processor.pf2(model)
-    processor.innovs.plot()
 
 class Particle():
     '''particle filter, sequential monte carlo sampling processor, bootstrap particle filter'''
     
     def __init__(self, *args, **kwargs):
-        self.args, self.kwargs, self.innovs = args, kwargs, Innovs()
+        self.args, self.kwargs, self.log = args, kwargs, []
 
     def pf1(self, model): # todo still scalar
         '''particle filter'''
-        steps, f, h, F, H, R, x, P = model.ekf()
+        sim, f, h, F, H, R, x, P = model.ekf()
         nsamp, F, H = model.pf()
-        xp = x + math.sqrt(1e-2) * np.random.randn(nsamp)
+        x = x + math.sqrt(1e-2) * np.random.randn(nsamp)
         W = self.normalize(np.ones(nsamp))
-        for t, xt, yt in steps():
-            xp = self.resample(xp, W)
-            xp = F(xp)
+        for t, obs in sim():
+            x = self.resample(x, W)
+            x = F(x)
             y = h(x)
-            W = self.normalize(H(yt, xp))
-            x = W @ xp
-            self.innovs.add(t, xt, yt, x, y)
+            W = self.normalize(H(obs, x))
+            x = W @ x
+            self.log.append([t, x, y])
 
     def pf2(self, model):
         '''particle filter'''
-        steps, f, h, F, H, R, x, P = model.ekf()
+        sim, f, h, F, H, R, x, P = model.ekf()
         nsamp, F, H = model.pf()
-        xp = x + np.sqrt(model.Rww) * np.random.randn(model.PF.nsamp, len(x))
+        x = x + np.sqrt(model.Rww) * np.random.randn(model.PF.nsamp, len(x))
         W = np.ones((nsamp, 3)) / nsamp
-        for t, xt, yt in steps():
-            xp[:, 0], xp[:, 1], xp[:, 2] = self.resample(xp[:, 0], W[:, 0]), self.roughen(xp[:, 1]), self.roughen(xp[:, 2])
-            xp[:, 0] = np.apply_along_axis(F, 1, xp)
+        for t, obs in sim():
+            x[:, 0], x[:, 1], x[:, 2] = self.resample(x[:, 0], W[:, 0]), self.roughen(x[:, 1]), self.roughen(x[:, 2])
+            x[:, 0] = np.apply_along_axis(F, 1, x)
             y = model.h(x)
-            W[:, 0] = self.normalize(H(yt, xp[:, 0]))
-            x = [W[:, 0].T @ xp[:, 0], W[:, 1].T @ xp[:, 1], W[:, 2].T @ xp[:, 2]]
-            self.innovs.add(t, xt, yt, x, y)
+            W[:, 0] = self.normalize(H(obs, x[:, 0]))
+            x = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
+            self.log.append([t, x, y])
 
     def resample(self, xi, Wi):
         '''particle resampling.'''
@@ -75,4 +62,4 @@ class Particle():
         return W / sum(W)
 
 if __name__ == "__main__":
-    main()
+    pass

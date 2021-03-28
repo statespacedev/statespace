@@ -27,8 +27,10 @@ class PFBase():
     def H(self, y, x): return None
 
 class EvalBase():
-    def plot_model(self): return None
-    def plot_estimate(self, proclog): return None
+    def __init__(self):
+        self.autocorr = Autocorr() # override this in child's constructor with self.autocorr = Autocorr(parent)
+    def model(self): return None
+    def estimate(self, proclog): return None
     def show(self): plt.show()
 
 class Log():
@@ -53,6 +55,7 @@ class Autocorr():
         self.iszeromean = True
         if abs(self.mhate) > self.tau: self.iszeromean = False
         self.zmw = self.autocorr1(self.ets)
+        self.plot()
 
     def plot(self):
         plt.figure()

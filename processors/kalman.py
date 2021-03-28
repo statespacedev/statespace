@@ -1,7 +1,6 @@
 import numpy as np
-np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 
-class Classical():
+class Kalman():
     '''classical kalman filter'''
 
     def __init__(self, *args, **kwargs):
@@ -9,39 +8,39 @@ class Classical():
 
     def ekf(self, model):
         '''basic form'''
-        sim, f, h, F, H, R, xe, P = model.ekf()
-        for t, x, y in sim():
-            xe = f(xe)
-            ye = h(xe)
-            P = F(xe) @ P @ F(xe)
-            K = P @ H(xe) / (H(xe) @ P @ H(xe) + R)
-            xe = xe + K * (y - ye)
-            P = (1 - K * H(xe)) * P
-            self.log.append([t, xe, ye])
+        sim, f, h, F, H, R, x, P = model.ekf()
+        for t, obs in sim():
+            x = f(x)
+            y = h(x)
+            P = F(x) @ P @ F(x)
+            K = P @ H(x) / (H(x) @ P @ H(x) + R)
+            x = x + K * (obs - y)
+            P = (1 - K * H(x)) * P
+            self.log.append([t, x, y])
 
     def ekfud(self, model):
         '''UD factorized form'''
-        sim, f, h, F, H, R, xe, P = model.ekf()
+        sim, f, h, F, H, R, x, P = model.ekf()
         G, Q = model.ekfud()
         U, D = self.udfactorize(P)
-        for t, x, y in sim():
-            xe, U, D = self.temporal(f(xe), U, D, F(xe), G, Q)
-            xe, U, D, ye = self.observational(xe, U, D, H(xe), y, R, h(xe))
-            self.log.append([t, xe, ye])
+        for t, obs in sim():
+            x, U, D = self.temporal(f(x), U, D, F(x), G, Q)
+            x, U, D, y = self.observational(x, U, D, H(x), obs, R, h(x))
+            self.log.append([t, x, y])
 
     def ekfudcpp(self, model):
         '''UD factorized form in cpp'''
         import libstatespace
         api = libstatespace.Api()
-        sim, f, h, F, H, R, xe, P = model.ekf()
+        sim, f, h, F, H, R, x, P = model.ekf()
         G, Q = model.ekfud()
         ud = api.udfactorize(P); U, D = ud[0], np.diag(ud[1].transpose()[0])
-        for t, x, y in sim():
-            cpp = api.temporal(f(xe), U, D, H(xe), G, Q)
-            xe, U, D = cpp[0].flatten(), cpp[1], cpp[2]
-            cpp = api.observational(xe, U, D, H(xe), y, R, h(xe))
-            xe, U, D, ye = cpp[0].flatten(), cpp[1], cpp[2], h(xe)
-            self.log.append([t, xe, ye])
+        for t, obs in sim():
+            cpp = api.temporal(f(x), U, D, H(x), G, Q)
+            x, U, D = cpp[0].flatten(), cpp[1], cpp[2]
+            cpp = api.observational(x, U, D, H(x), obs, R, h(x))
+            x, U, D, y = cpp[0].flatten(), cpp[1], cpp[2], h(x)
+            self.log.append([t, x, y])
 
     def udfactorize(self, M):
         '''UD factorization'''

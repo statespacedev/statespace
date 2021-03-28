@@ -1,6 +1,7 @@
 import math
 import numpy as np
-from basemodel import BaseModel, SPKFBase, PFBase
+import matplotlib.pyplot as plt
+from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
 
 class Threestate(BaseModel):
     '''three-state reference model'''
@@ -31,7 +32,7 @@ class Threestate(BaseModel):
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
             self.log.append([t, self.x, self.y])
-            yield (t, self.x, self.y)
+            yield (t, self.y)
 
     def f(self, x, *args):
         w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Rww)))
@@ -134,6 +135,22 @@ class PF(PFBase):
 
     def H(self, y, x):
         return np.exp(-np.log(2. * np.pi * self.parent.R) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R))
+
+class Eval(EvalBase):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.autocorr = Autocorr(parent)
+
+    def estimate(self, proclog):
+        lw, logm, logp = 1, Log(self.parent.log), Log(proclog)
+        plt.figure()
+        plt.subplot(3, 2, 1), plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x[0]')
+        plt.subplot(3, 2, 2), plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
+        plt.subplot(3, 2, 3), plt.plot(logp.t, logp.x[:, 0], linewidth=lw), plt.ylabel('xe[0]')
+        plt.subplot(3, 2, 4), plt.plot(logp.t, logp.y, linewidth=lw), plt.ylabel('ye')
+        plt.subplot(3, 2, 5), plt.plot(logp.t, logm.x[:, 0] - logp.x[:, 0], linewidth=lw), plt.ylabel('xe[0] err')
+        plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('ye err')
 
 if __name__ == "__main__":
     pass
