@@ -4,11 +4,7 @@
 [![pypi](https://img.shields.io/badge/pypi-latest-brightgreen.svg)](https://pypi.org/project/statespace/)
 [![docs](https://readthedocs.org/projects/statespace/badge/?version=latest)](https://statespace.readthedocs.io/en/latest/?badge=latest)
 
-processors and models from 
-
-[Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, James V. Candy](http://a.co/gp4upXd)
-
-[Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
+processors and models from [Bayesian Signal Processing: Classical, Modern, and Particle Filtering](http://a.co/gp4upXd) and [Kalman Filtering: Theory and Practice](http://a.co/6hAa35c).
 
 210328 new model structure is definitely on the right path - it's already quite essential for working on the new bearings only model. evaluation and plotting is migrating into a new eval class within the base model. there each model will know how to make its own appropriate plots - definitely including model states and processor states - and perform its own evaluation tests. 
 
