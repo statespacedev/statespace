@@ -10,7 +10,7 @@ processors and models from
 
 [Kalman Filtering: Theory and Practice, Mohinder S. Grewal, Angus P. Andrews](http://a.co/6hAa35c)
 
-210328 new model structure is definitely on the right path - it's already quite essential for working on the new bearings only model. evaluation and plotting is migrating into a new eval class within the base model. there each model will know how to make it's own appropriate plots - definitely including model states and processor states - and perform it's own evaluation tests. 
+210328 new model structure is definitely on the right path - it's already quite essential for working on the new bearings only model. evaluation and plotting is migrating into a new eval class within the base model. there each model will know how to make its own appropriate plots - definitely including model states and processor states - and perform its own evaluation tests. 
 
 210321 settling on a new model structure that separates the parts associated with baseline kalman filter, sigma-point filter, and particle filter. this can eventually grow upward into a high level base model. concept is that a model needs to know something about the processors that are going to use it. a particle processor has different needs than a kalman processor. this gives a natural shape and structure to the models.
 
