@@ -1,13 +1,12 @@
 import sys
 sys.path.append('./')
-sys.path.append('./statespace')
+sys.path.append('./processors')
 sys.path.append('./models')
-# sys.path.append('./cmake-build-debug/libstatespace')
 
-from statespace.classical import Classical
+from processors.classical import Classical
 from models.onestate import Onestate
 
 processor, model = Classical(), Onestate()
-processor.ekfud(model)
-processor.innovs.plot_model()
+processor.ekf(model)
+model.eval.plot_estimate(processor.log)
 

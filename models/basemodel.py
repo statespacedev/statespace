@@ -26,6 +26,8 @@ class PFBase():
 
 class EvalBase():
     def __init__(self): pass
+    def plot_model(self): return None
+    def plot_estimate(self): return None
 
 if __name__ == "__main__":
     pass
