@@ -9,5 +9,5 @@ from models.onestate import Onestate
 
 processor, model = Classical(), Onestate()
 processor.ekfud(model)
-processor.innovs.plot()
+processor.innovs.plot_model()
 

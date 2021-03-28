@@ -62,12 +62,12 @@ models
 
 will probably be moving towards a higher-level statespace model, encompassing specific lower-level models - possibly something involoving a translator / converter / adaptor... the models here are already an extrememly primitive form of that - making them as similar as possible from the perspective of the classical, modern, particle processors. we can think about these becoming specific cases of something more fundamental.
 
-modelbase.py
+basemodel.py
 -------------
 
 placeholder for what could grow to become a higher-level statespace model - with individual cases inheriting and overriding.
 
-.. automodule:: models.modelbase
+.. automodule:: models.basemodel
     :members:
 
 onestate.py

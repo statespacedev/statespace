@@ -1,8 +1,8 @@
 import math
 import numpy as np
-from modelbase import ModelBase, SPKFBase, PFBase
+from basemodel import BaseModel, SPKFBase, PFBase
 
-class Threestate(ModelBase):
+class Threestate(BaseModel):
     '''three-state reference model'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0

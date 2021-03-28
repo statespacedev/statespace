@@ -3,21 +3,22 @@ np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
 import sys; sys.path.append('../'); sys.path.append('../cmake-build-debug/libstatespace')
 from models.threestate import Threestate
 from models.onestate import Onestate
-from innovations import Innovs
+from models.bearingsonly import BearingsOnly
 
 def main():
     processor = Classical()
-    model = Onestate()
+    model = BearingsOnly()
+    # model = Onestate()
     # model = Threestate()
     processor.ekf(model)
     # processor.ekfud(model)
-    processor.innovs.plot()
+    model.eval.plot_model()
 
 class Classical():
     '''classical kalman filter'''
 
     def __init__(self, *args, **kwargs):
-        self.args, self.kwargs, self.innovs = args, kwargs, Innovs()
+        self.args, self.kwargs, self.log = args, kwargs, []
 
     def ekf(self, model):
         '''basic form'''
@@ -29,7 +30,7 @@ class Classical():
             K = P @ H(xe) / (H(xe) @ P @ H(xe) + R)
             xe = xe + K * (y - ye)
             P = (1 - K * H(xe)) * P
-            self.innovs.add(t, x, y, xe, ye)
+            self.log.append([t, xe, ye])
 
     def ekfud(self, model):
         '''UD factorized form'''
@@ -39,7 +40,7 @@ class Classical():
         for t, x, y in sim():
             xe, U, D = self.temporal(f(xe), U, D, F(xe), G, Q)
             xe, U, D, ye = self.observational(xe, U, D, H(xe), y, R, h(xe))
-            self.innovs.add(t, x, y, xe, ye)
+            self.log.append([t, xe, ye])
 
     def ekfudcpp(self, model):
         '''UD factorized form in cpp'''
@@ -53,7 +54,7 @@ class Classical():
             xe, U, D = cpp[0].flatten(), cpp[1], cpp[2]
             cpp = api.observational(xe, U, D, H(xe), y, R, h(xe))
             xe, U, D, ye = cpp[0].flatten(), cpp[1], cpp[2], h(xe)
-            self.innovs.add(t, x, y, xe, ye)
+            self.log.append([t, xe, ye])
 
     def udfactorize(self, M):
         '''UD factorization'''

@@ -1,8 +1,9 @@
 import math
 import numpy as np
-from modelbase import ModelBase, SPKFBase, PFBase
+import matplotlib.pyplot as plt
+from basemodel import BaseModel, SPKFBase, PFBase, EvalBase
 
-class BearingsOnly(ModelBase):
+class BearingsOnly(BaseModel):
     '''bearings-only tracking problem'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
@@ -12,31 +13,32 @@ class BearingsOnly(ModelBase):
 
     def __init__(self):
         super().__init__()
-        self.tsteps = 72 # 2hr = 7200sec / 100
+        self.tsteps = 100 # 2hr = 7200sec / 100
         self.dt = .02 # hrs, .02 hr = 72 sec
         self.x = np.array([0., 15., 20., -10.])
         self.Rww = 1e-6 * np.array([1, 1, 1, 1])
         self.R = 3.05e-4 # rad**2 for deltat 0.33hr
-        self.x0 = np.array([0., 0., 0., 0.])
-        self.P0 = 1. * np.eye(4)
+        self.x0 = np.array([0., 15., 20., -10.])
+        self.P0 = 1e0 * np.eye(4)
         self.G = np.eye(4)
         self.Q = np.diag(self.Rww)
         self.SPKF = SPKF(self)
         self.PF = PF(self)
+        self.eval = Eval(self)
 
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
             self.x = self.f(self.x, 0)
-            if t == 0.5: self.x[2] += -24.; self.x[3] += 10. # course change at 0.5 hrs
+            if t == 0.5: self.x[2] = -4.; self.x[3] = 0. # course change at 0.5 hrs
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
             self.log.append([t, self.x, self.y])
             yield (t, self.x, self.y)
 
     def f(self, x, *args):
-        w = np.multiply(np.random.randn(1, 4), np.sqrt(np.diag(self.Rww)))
-        base = np.array([x[0] + self.dt * x[2], x[1] + self.dt * x[3], x[2], x[3]]) + np.diag(w)
+        w = np.multiply(np.random.randn(1, 4), np.sqrt(self.Rww)).flatten()
+        base = np.array([x[0] + self.dt * x[2], x[1] + self.dt * x[3], x[2], x[3]]) + w
         if 0 in args: return base + w
         return base
 
@@ -48,12 +50,13 @@ class BearingsOnly(ModelBase):
 
     def h(self, x, *args):
         v = math.sqrt(self.R) * np.random.randn()
-        base = x[0] ** 2 + x[0] ** 3 + v
+        base = np.arctan2(x[0], x[1])
         if 0 in args: return base + v
         return base
 
     def H(self, x):
-        return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])
+        dsqr = x[0]**2 + x[1]**2
+        return np.array([x[1] / dsqr, -x[0] / dsqr, 0, 0])
 
 class SPKF(SPKFBase):
 
@@ -134,6 +137,23 @@ class PF(PFBase):
 
     def H(self, y, x):
         return np.exp(-np.log(2. * np.pi * self.parent.R) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R))
+
+class Eval(EvalBase):
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+
+    def plot_model(self):
+        lw = 1
+        t = np.array([x[0] for x in self.parent.log])
+        x = np.array([x[1] for x in self.parent.log])
+        y = np.array([x[2] for x in self.parent.log])
+        plt.subplot(3, 2, 1), plt.plot(t, x[:, 0], linewidth=lw), plt.ylabel('x[0]')
+        plt.subplot(3, 2, 2), plt.plot(t, x[:, 1], linewidth=lw), plt.ylabel('x[1]')
+        plt.subplot(3, 2, 3), plt.plot(t, x[:, 2], linewidth=lw), plt.ylabel('x[2]')
+        plt.subplot(3, 2, 4), plt.plot(t, x[:, 3], linewidth=lw), plt.ylabel('x[3]')
+        plt.subplot(3, 2, 5), plt.plot(t, y, linewidth=lw), plt.ylabel('y')
+        plt.show()
 
 if __name__ == "__main__":
     pass

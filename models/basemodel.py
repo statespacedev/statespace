@@ -1,5 +1,5 @@
 
-class ModelBase:
+class BaseModel:
     def ekf(self): return None
     def ekfud(self): return None
     def sp(self): return None
@@ -23,6 +23,9 @@ class PFBase():
     def __init__(self): pass
     def F(self, x): return None
     def H(self, y, x): return None
+
+class EvalBase():
+    def __init__(self): pass
 
 if __name__ == "__main__":
     pass
