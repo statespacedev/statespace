@@ -98,6 +98,7 @@ class Eval(EvalBase):
 
     def plot_estimate(self, estlog):
         lw = 1
+        plt.figure()
         t = np.array([x[0] for x in self.parent.log])
         x = np.array([x[1] for x in self.parent.log])
         y = np.array([x[2] for x in self.parent.log])
@@ -110,7 +111,6 @@ class Eval(EvalBase):
         plt.subplot(3, 2, 4), plt.plot(te, ye, linewidth=lw), plt.ylabel('ye')
         plt.subplot(3, 2, 5), plt.plot(te, x[:, 0] - xe[:, 0], linewidth=lw), plt.ylabel('xe[0] err')
         plt.subplot(3, 2, 6), plt.plot(te, y - ye, linewidth=lw), plt.ylabel('ye err')
-        plt.show()
 
 if __name__ == "__main__":
     pass

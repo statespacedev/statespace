@@ -145,6 +145,7 @@ class Eval(EvalBase):
 
     def plot_model(self):
         lw = 1
+        plt.figure()
         t = np.array([x[0] for x in self.parent.log])
         x = np.array([x[1] for x in self.parent.log])
         y = np.array([x[2] for x in self.parent.log])
@@ -153,7 +154,22 @@ class Eval(EvalBase):
         plt.subplot(3, 2, 3), plt.plot(t, x[:, 2], linewidth=lw), plt.ylabel('x[2]')
         plt.subplot(3, 2, 4), plt.plot(t, x[:, 3], linewidth=lw), plt.ylabel('x[3]')
         plt.subplot(3, 2, 5), plt.plot(t, y, linewidth=lw), plt.ylabel('y')
-        plt.show()
+
+    def plot_estimate(self, estlog):
+        lw = 1
+        plt.figure()
+        t = np.array([x[0] for x in self.parent.log])
+        x = np.array([x[1] for x in self.parent.log])
+        y = np.array([x[2] for x in self.parent.log])
+        te = np.array([x[0] for x in estlog])
+        xe = np.array([x[1] for x in estlog])
+        ye = np.array([x[2] for x in estlog])
+        plt.subplot(3, 2, 1), plt.plot(t, x[:, 0], linewidth=lw), plt.ylabel('x[0]')
+        plt.subplot(3, 2, 2), plt.plot(t, y, linewidth=lw), plt.ylabel('y')
+        plt.subplot(3, 2, 3), plt.plot(te, xe[:, 0], linewidth=lw), plt.ylabel('xe[0]')
+        plt.subplot(3, 2, 4), plt.plot(te, ye, linewidth=lw), plt.ylabel('ye')
+        plt.subplot(3, 2, 5), plt.plot(te, x[:, 0] - xe[:, 0], linewidth=lw), plt.ylabel('xe[0] err')
+        plt.subplot(3, 2, 6), plt.plot(te, y - ye, linewidth=lw), plt.ylabel('ye err')
 
 if __name__ == "__main__":
     pass

@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 
 class BaseModel:
     def ekf(self): return None
@@ -27,7 +28,8 @@ class PFBase():
 class EvalBase():
     def __init__(self): pass
     def plot_model(self): return None
-    def plot_estimate(self): return None
+    def plot_estimate(self, estlog): return None
+    def show(self): plt.show()
 
 if __name__ == "__main__":
     pass
