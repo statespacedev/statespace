@@ -34,10 +34,12 @@ def bearingsonly_ekf():
     model = BearingsOnly()
     processor = Kalman()
     processor.ekf(model)
-    model.eval.model()
+    # model.eval.model()
     model.eval.estimate(processor.log)
-    model.eval.autocorr.run(processor.log)
+    # model.eval.autocorr.run(processor.log)
     model.eval.show()
 
 if __name__ == "__main__":
     main()
+
+

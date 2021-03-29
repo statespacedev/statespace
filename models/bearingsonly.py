@@ -43,10 +43,10 @@ class BearingsOnly(BaseModel):
         return base
 
     def F(self, x):
-        A = np.eye(4)
-        A[0, 2] = self.dt
-        A[1, 3] = self.dt
-        return A
+        F = np.eye(4)
+        F[0, 2] = self.dt
+        F[1, 3] = self.dt
+        return F
 
     def h(self, x, *args):
         v = math.sqrt(self.R) * np.random.randn()
