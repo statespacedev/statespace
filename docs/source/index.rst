@@ -27,20 +27,20 @@ build-test-deploy to `pypi <https://pypi.org/project/statespace>`__ is mostly a 
 processors
 ==================================================================================================================
 
-classical.py
+kalman.py
 ---------------
 
 baseline extended kalman filters. both the standard textbook form, and the ud factorized form.
 
-.. automodule:: processors.classical
+.. automodule:: processors.kalman
     :members:
 
-modern.py
------------
+sigmapoint.py
+----------------
 
 sigma-point sampling kalman filters.
 
-.. automodule:: processors.modern
+.. automodule:: processors.sigmapoint
     :members:
 
 particle.py
