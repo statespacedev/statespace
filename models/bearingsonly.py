@@ -19,7 +19,7 @@ class BearingsOnly(BaseModel):
         self.Rww = 1e-6 * np.array([1, 1, 1, 1])
         self.R = 3.05e-4 # rad**2 for deltat 0.33hr
         self.x0 = np.array([0., 15., 20., -10.])
-        self.P0 = 1e0 * np.eye(4)
+        self.P0 = 1e1 * np.eye(4)
         self.G = np.eye(4)
         self.Q = np.diag(self.Rww)
         self.SPKF = SPKF(self)
@@ -156,12 +156,22 @@ class Eval(EvalBase):
     def estimate(self, proclog):
         lw, logm, logp = 1, Log(self.parent.log), Log(proclog)
         plt.figure()
-        plt.subplot(3, 2, 1), plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x[0]')
-        plt.subplot(3, 2, 2), plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
-        plt.subplot(3, 2, 3), plt.plot(logp.t, logp.x[:, 0], linewidth=lw), plt.ylabel('xe[0]')
-        plt.subplot(3, 2, 4), plt.plot(logp.t, logp.y, linewidth=lw), plt.ylabel('ye')
-        plt.subplot(3, 2, 5), plt.plot(logp.t, logm.x[:, 0] - logp.x[:, 0], linewidth=lw), plt.ylabel('xe[0] err')
-        plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('ye err')
+        plt.subplot(3, 2, 1)
+        plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x0')
+        plt.plot(logp.t, logp.x[:, 0], 'r--', linewidth=lw)
+        plt.subplot(3, 2, 2)
+        plt.plot(logm.t, logm.x[:, 1], linewidth=lw), plt.ylabel('x1')
+        plt.plot(logp.t, logp.x[:, 1], 'r--', linewidth=lw)
+        plt.subplot(3, 2, 3)
+        plt.plot(logm.t, logm.x[:, 2], linewidth=lw), plt.ylabel('x2')
+        plt.plot(logp.t, logp.x[:, 2], 'r--', linewidth=lw)
+        plt.subplot(3, 2, 4)
+        plt.plot(logm.t, logm.x[:, 3], linewidth=lw), plt.ylabel('x3')
+        plt.plot(logp.t, logp.x[:, 3], 'r--', linewidth=lw)
+        plt.subplot(3, 2, 5)
+        plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
+        plt.plot(logp.t, logp.y, 'r--', linewidth=lw)
+        # plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('y err')
 
 if __name__ == "__main__":
     pass

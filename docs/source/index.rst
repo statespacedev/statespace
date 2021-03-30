@@ -32,7 +32,7 @@ classical.py
 
 baseline extended kalman filters. both the standard textbook form, and the ud factorized form.
 
-.. automodule:: statespace.classical
+.. automodule:: processors.classical
     :members:
 
 modern.py
@@ -40,7 +40,7 @@ modern.py
 
 sigma-point sampling kalman filters.
 
-.. automodule:: statespace.modern
+.. automodule:: processors.modern
     :members:
 
 particle.py
@@ -48,7 +48,7 @@ particle.py
 
 particle filters, sequential monte carlo sampling processors.
 
-.. automodule:: statespace.particle
+.. automodule:: processors.particle
     :members:
 
 api.py
