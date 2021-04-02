@@ -5,7 +5,7 @@ sys.path.append('./models')
 
 def main():
     # onestate_ekf()
-    # threestate_ekfud()
+    # threestate_ekf()
     bearingsonly_ekf()
 
 def onestate_ekf():
@@ -18,12 +18,12 @@ def onestate_ekf():
     model.eval.autocorr.run(processor.log)
     model.eval.show()
 
-def threestate_ekfud():
-    from models.onestate import Onestate
+def threestate_ekf():
+    from models.threestate import Threestate
     from processors.kalman import Kalman
-    model = Onestate()
+    model = Threestate()
     processor = Kalman()
-    processor.ekfud(model)
+    processor.ekf(model)
     model.eval.estimate(processor.log)
     model.eval.autocorr.run(processor.log)
     model.eval.show()

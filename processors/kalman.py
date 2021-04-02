@@ -8,23 +8,22 @@ class Kalman():
 
     def ekf(self, model):
         '''basic form'''
-        sim, f, h, F, H, R, x, P = model.ekf()
-        for t, obs in sim():
-            x = f(x)
+        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
+        for t, obs, u in sim():
+            x = f(x) + u
             y = h(x)
-            P = F(x) @ P @ F(x)
-            K = P @ H(x) / (H(x) @ P @ H(x) + R)
+            P = F(x) @ P @ F(x).T + G @ Q @ G.T
+            K = P @ H(x).T / (H(x) @ P @ H(x).T + R)
             x = x + K * (obs - y)
             P = (1 - K * H(x)) * P
             self.log.append([t, x, y])
 
     def ekfud(self, model):
         '''UD factorized form'''
-        sim, f, h, F, H, R, x, P = model.ekf()
-        G, Q = model.ekfud()
+        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         U, D = self.udfactorize(P)
-        for t, obs in sim():
-            x, U, D = self.temporal(f(x), U, D, F(x), G, Q)
+        for t, obs, u in sim():
+            x, U, D = self.temporal(f(x) + u, U, D, F(x), G, Q)
             x, U, D, y = self.observational(x, U, D, H(x), obs, R, h(x))
             self.log.append([t, x, y])
 
@@ -32,8 +31,7 @@ class Kalman():
         '''UD factorized form in cpp'''
         import libstatespace
         api = libstatespace.Api()
-        sim, f, h, F, H, R, x, P = model.ekf()
-        G, Q = model.ekfud()
+        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         ud = api.udfactorize(P); U, D = ud[0], np.diag(ud[1].transpose()[0])
         for t, obs in sim():
             cpp = api.temporal(f(x), U, D, H(x), G, Q)

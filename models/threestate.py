@@ -6,8 +6,7 @@ from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
 class Threestate(BaseModel):
     '''three-state reference model'''
 
-    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
-    def ekfud(self): return self.G, self.Q
+    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
@@ -24,15 +23,17 @@ class Threestate(BaseModel):
         self.Q = np.diag(self.Rww)
         self.SPKF = SPKF(self)
         self.PF = PF(self)
+        self.eval = Eval(self)
 
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
-            self.x = self.f(self.x, 0)
+            u = np.array([0, 0, 0])
+            self.x = self.f(self.x, 0) + u
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
             self.log.append([t, self.x, self.y])
-            yield (t, self.y)
+            yield (t, self.y, u)
 
     def f(self, x, *args):
         w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Rww)))

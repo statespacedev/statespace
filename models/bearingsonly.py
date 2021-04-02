@@ -6,8 +6,7 @@ from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
 class BearingsOnly(BaseModel):
     '''bearings-only tracking problem'''
 
-    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.x0, self.P0
-    def ekfud(self): return self.G, self.Q
+    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
@@ -17,11 +16,11 @@ class BearingsOnly(BaseModel):
         self.dt = .02 # hrs, .02 hr = 72 sec
         self.x = np.array([0., 15., 20., -10.])
         self.Rww = 1e-6 * np.array([1, 1, 1, 1])
-        self.R = 3.05e-4 # rad**2 for deltat 0.33hr
-        self.x0 = np.array([0., 15., 20., -10.])
-        self.P0 = 1e1 * np.eye(4)
+        self.R = 3e-4 # rad**2 for deltat 0.33hr
+        self.x0 = np.array([0., 40., 20., -10.])
+        self.P0 = 1 * np.eye(4)
         self.G = np.eye(4)
-        self.Q = np.diag(self.Rww)
+        self.Q = np.diag(self.Rww) * 1
         self.SPKF = SPKF(self)
         self.PF = PF(self)
         self.eval = Eval(self)
@@ -29,12 +28,13 @@ class BearingsOnly(BaseModel):
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
-            self.x = self.f(self.x, 0)
-            if t == 0.5: self.x[2] = -4.; self.x[3] = 0. # course change at 0.5 hrs
+            u = np.array([0., 0., 0., 0.])
+            if t == 0.5: u[2] = -24.; u[3] = 10. # course change at 0.5 hrs
+            self.x = self.f(self.x, 0) + u
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
             self.log.append([t, self.x, self.y])
-            yield (t, self.y)
+            yield (t, self.y, u)
 
     def f(self, x, *args):
         w = np.multiply(np.random.randn(1, 4), np.sqrt(self.Rww)).flatten()
@@ -156,19 +156,13 @@ class Eval(EvalBase):
     def estimate(self, proclog):
         lw, logm, logp = 1, Log(self.parent.log), Log(proclog)
         plt.figure()
-        plt.subplot(3, 2, 1)
+        plt.subplot(2, 2, 1)
         plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x0')
         plt.plot(logp.t, logp.x[:, 0], 'r--', linewidth=lw)
-        plt.subplot(3, 2, 2)
+        plt.subplot(2, 2, 2)
         plt.plot(logm.t, logm.x[:, 1], linewidth=lw), plt.ylabel('x1')
         plt.plot(logp.t, logp.x[:, 1], 'r--', linewidth=lw)
-        plt.subplot(3, 2, 3)
-        plt.plot(logm.t, logm.x[:, 2], linewidth=lw), plt.ylabel('x2')
-        plt.plot(logp.t, logp.x[:, 2], 'r--', linewidth=lw)
-        plt.subplot(3, 2, 4)
-        plt.plot(logm.t, logm.x[:, 3], linewidth=lw), plt.ylabel('x3')
-        plt.plot(logp.t, logp.x[:, 3], 'r--', linewidth=lw)
-        plt.subplot(3, 2, 5)
+        plt.subplot(2, 2, 3)
         plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
         plt.plot(logp.t, logp.y, 'r--', linewidth=lw)
         # plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('y err')
