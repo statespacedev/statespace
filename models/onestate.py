@@ -75,7 +75,7 @@ class SPKF(SPKFBase):
         return [xhat, xhat + math.sqrt(self.k0 * Ptil), xhat - math.sqrt(self.k0 * Ptil)]
 
     def X2(self, X):
-        return [X[0], X[1] + self.kappa * math.sqrt(self.parent.Rww), X[2] - self.kappa * math.sqrt(self.parent.Rww)]
+        return [X[0], X[1] + self.kappa * math.sqrt(self.parent.varproc), X[2] - self.kappa * math.sqrt(self.parent.varproc)]
 
 class PF(PFBase):
 
@@ -86,7 +86,7 @@ class PF(PFBase):
         self.nsamp = 250
 
     def F(self, x):
-        return (1 - .05 * self.parent.dt) * x + (.04 * self.parent.dt) * x ** 2 + math.sqrt(self.parent.Rww) * np.random.randn(self.nsamp)
+        return (1 - .05 * self.parent.dt) * x + (.04 * self.parent.dt) * x ** 2 + math.sqrt(self.parent.varproc) * np.random.randn(self.nsamp)
 
     def H(self, y, x):
         return np.exp(-np.log(2. * np.pi * self.parent.R) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R))

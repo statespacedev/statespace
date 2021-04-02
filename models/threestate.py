@@ -64,7 +64,7 @@ class SPKF(SPKFBase):
         self.parent = parent
         P0 = .1 * np.eye(3)
         self.S = np.linalg.cholesky(P0)
-        self.Sw = np.linalg.cholesky(np.diag(parent.Rww))
+        self.Sw = np.linalg.cholesky(np.diag(parent.varproc))
         self.Sv = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
         n = 3
         kappa = 1

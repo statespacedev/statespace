@@ -6,7 +6,7 @@ from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
 class BearingsOnly(BaseModel):
     '''bearings-only tracking problem'''
 
-    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
+    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.varobs, self.Q, self.G, self.x0, self.P0
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
@@ -14,13 +14,17 @@ class BearingsOnly(BaseModel):
         super().__init__()
         self.tsteps = 100 # 2hr = 7200sec / 100
         self.dt = .02 # hrs, .02 hr = 72 sec
+        self.varproc = 1e-6
+        self.varobs = 3e-4
         self.x = np.array([0., 15., 20., -10.])
-        self.Rww = 1e-6 * np.array([1, 1, 1, 1])
-        self.R = 3e-4 # rad**2 for deltat 0.33hr
         self.x0 = np.array([0., 40., 20., -10.])
         self.P0 = 1 * np.eye(4)
-        self.G = np.eye(4)
-        self.Q = np.diag(self.Rww) * 1
+        self.Q = self.varproc * np.eye(2)
+        self.G = np.zeros([4, 2])
+        self.G[0, 0] = self.dt**2 / 2
+        self.G[1, 1] = self.dt**2 / 2
+        self.G[2, 0] = self.dt
+        self.G[3, 1] = self.dt
         self.SPKF = SPKF(self)
         self.PF = PF(self)
         self.eval = Eval(self)
@@ -37,14 +41,8 @@ class BearingsOnly(BaseModel):
             yield (t, self.y, u)
 
     def f(self, x, *args):
-        G = np.zeros([4, 2])
-        G[0, 0] = self.dt**2 / 2
-        G[1, 1] = self.dt**2 / 2
-        G[2, 0] = self.dt
-        G[3, 1] = self.dt
-        w = np.multiply(np.random.randn(1, 2), np.sqrt(1e-6 * np.array([1, 1]))).flatten()
         base = np.array([x[0] + self.dt * x[2], x[1] + self.dt * x[3], x[2], x[3]])
-        if 0 in args: return base + G @ w
+        if 0 in args: return base + self.G @ np.multiply(np.random.randn(2), math.sqrt(self.varproc))
         return base
 
     def F(self, x):
@@ -54,7 +52,7 @@ class BearingsOnly(BaseModel):
         return F
 
     def h(self, x, *args):
-        v = math.sqrt(self.R) * np.random.randn()
+        v = math.sqrt(self.varobs) * np.random.randn()
         base = np.arctan2(x[0], x[1])
         if 0 in args: return base + v
         return base
@@ -70,8 +68,8 @@ class SPKF(SPKFBase):
         self.parent = parent
         P0 = .1 * np.eye(3)
         self.S = np.linalg.cholesky(P0)
-        self.Sw = np.linalg.cholesky(np.diag(parent.Rww))
-        self.Sv = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
+        self.Sw = np.linalg.cholesky(np.diag(parent.varproc * np.array([1, 1])))
+        self.Sv = np.linalg.cholesky(np.diag(parent.varobs * np.array([1])))
         n = 3
         kappa = 1
         alpha = 1

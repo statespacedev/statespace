@@ -25,7 +25,7 @@ class Particle():
         '''particle filter'''
         sim, f, h, F, H, R, x, P = model.ekf()
         nsamp, F, H = model.pf()
-        x = x + np.sqrt(model.Rww) * np.random.randn(model.PF.nsamp, len(x))
+        x = x + np.sqrt(model.varproc) * np.random.randn(model.PF.nsamp, len(x))
         W = np.ones((nsamp, 3)) / nsamp
         for t, obs in sim():
             x[:, 0], x[:, 1], x[:, 2] = self.resample(x[:, 0], W[:, 0]), self.roughen(x[:, 1]), self.roughen(x[:, 2])

@@ -17,7 +17,7 @@ class SigmaPoint():
             Y = h(X2(X))
             x = W @ X
             y = W @ Y
-            P = W @ np.power(X - x, 2) + model.Rww
+            P = W @ np.power(X - x, 2) + model.varproc
             K = (W @ np.multiply(X - x, Y - y)) / (W @ np.power(Y - y, 2) + R)
             x = x + K * (obs - y)
             P = P - K * (W @ np.power(Y - y, 2) + R) * K
