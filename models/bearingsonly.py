@@ -37,9 +37,14 @@ class BearingsOnly(BaseModel):
             yield (t, self.y, u)
 
     def f(self, x, *args):
-        w = np.multiply(np.random.randn(1, 4), np.sqrt(self.Rww)).flatten()
-        base = np.array([x[0] + self.dt * x[2], x[1] + self.dt * x[3], x[2], x[3]]) + w
-        if 0 in args: return base + w
+        G = np.zeros([4, 2])
+        G[0, 0] = self.dt**2 / 2
+        G[1, 1] = self.dt**2 / 2
+        G[2, 0] = self.dt
+        G[3, 1] = self.dt
+        w = np.multiply(np.random.randn(1, 2), np.sqrt(1e-6 * np.array([1, 1]))).flatten()
+        base = np.array([x[0] + self.dt * x[2], x[1] + self.dt * x[3], x[2], x[3]])
+        if 0 in args: return base + G @ w
         return base
 
     def F(self, x):
