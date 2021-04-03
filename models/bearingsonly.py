@@ -6,7 +6,7 @@ from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
 class BearingsOnly(BaseModel):
     '''bearings-only tracking problem'''
 
-    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.varobs, self.Q, self.G, self.x0, self.P0
+    def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
@@ -15,10 +15,11 @@ class BearingsOnly(BaseModel):
         self.tsteps = 100 # 2hr = 7200sec / 100
         self.dt = .02 # hrs, .02 hr = 72 sec
         self.varproc = 1e-6
-        self.varobs = 3e-4
+        self.varobs = 6e-4
         self.x = np.array([0., 15., 20., -10.])
-        self.x0 = np.array([0., 40., 20., -10.])
+        self.x0 = np.array([0., 17., 20., -10.])
         self.P0 = 1 * np.eye(4)
+        self.R = self.varobs
         self.Q = self.varproc * np.eye(2)
         self.G = np.zeros([4, 2])
         self.G[0, 0] = self.dt**2 / 2
@@ -33,7 +34,7 @@ class BearingsOnly(BaseModel):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
             u = np.array([0., 0., 0., 0.])
-            if t == 0.5: u[2] = -24.; u[3] = 10. # course change at 0.5 hrs
+            if t == 0.5: u[2] = -24.; u[3] = 10.
             self.x = self.f(self.x, 0) + u
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
@@ -52,7 +53,7 @@ class BearingsOnly(BaseModel):
         return F
 
     def h(self, x, *args):
-        v = math.sqrt(self.varobs) * np.random.randn()
+        v = np.random.randn() * math.sqrt(self.varobs)
         base = np.arctan2(x[0], x[1])
         if 0 in args: return base + v
         return base
@@ -159,16 +160,22 @@ class Eval(EvalBase):
     def estimate(self, proclog):
         lw, logm, logp = 1, Log(self.parent.log), Log(proclog)
         plt.figure()
-        plt.subplot(2, 2, 1)
+        plt.subplot(3, 2, 1)
         plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x0')
         plt.plot(logp.t, logp.x[:, 0], 'r--', linewidth=lw)
-        plt.subplot(2, 2, 2)
+        plt.subplot(3, 2, 2)
         plt.plot(logm.t, logm.x[:, 1], linewidth=lw), plt.ylabel('x1')
         plt.plot(logp.t, logp.x[:, 1], 'r--', linewidth=lw)
-        plt.subplot(2, 2, 3)
+        plt.subplot(3, 2, 3)
+        plt.plot(logm.t, logm.x[:, 2], linewidth=lw), plt.ylabel('x2')
+        plt.plot(logp.t, logp.x[:, 2], 'r--', linewidth=lw)
+        plt.subplot(3, 2, 4)
+        plt.plot(logm.t, logm.x[:, 3], linewidth=lw), plt.ylabel('x3')
+        plt.plot(logp.t, logp.x[:, 3], 'r--', linewidth=lw)
+        plt.subplot(3, 2, 5)
         plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
         plt.plot(logp.t, logp.y, 'r--', linewidth=lw)
-        # plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('y err')
+        plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('y err')
 
 if __name__ == "__main__":
     pass
