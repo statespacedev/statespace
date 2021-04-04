@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class BaseModel:
+    '''base model'''
     def ekf(self): return None
     def ekfud(self): return None
     def sp(self): return None
