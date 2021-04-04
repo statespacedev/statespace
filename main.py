@@ -6,15 +6,15 @@ from models.onestate import Onestate
 from models.threestate import Threestate
 from models.bearingsonly import BearingsOnly
 
-cases =[
-    [Onestate(), Kalman('ekf')],
-    [Threestate(), Kalman('ekf')],
-    [BearingsOnly(), Kalman('ekf')],
-    ]
-case = 2
+cases ={
+    '1a': {'model': Onestate(), 'processor': Kalman('ekf')},
+    '1b': {'model': Threestate(), 'processor': Kalman('ekf')},
+    '1c': {'model': BearingsOnly(), 'processor': Kalman('ekf')},
+}
+case = '1c'
 
 def main():
-    model, processor = cases[case][0], cases[case][1]
+    model, processor = cases[case]['model'], cases[case]['processor']
     processor.run(model)
     model.eval.estimate(processor.log)
     model.eval.autocorr.run(processor.log)
