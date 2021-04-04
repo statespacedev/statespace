@@ -5,9 +5,9 @@ class Kalman():
 
     def __init__(self, model, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
-        if 'ekfud' in args: self.ekfud(model)
-        elif 'ekfudcpp' in args: self.ekfudcpp(model)
-        else: self.ekf(model)
+        if 'ekfud' in args: self.run = self.ekfud
+        elif 'ekfudcpp' in args: self.run = self.ekfudcpp
+        else: self.run = self.ekf
 
     def ekf(self, model):
         '''basic form'''

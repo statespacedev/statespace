@@ -15,14 +15,12 @@ build-test-deploy to `pypi <https://pypi.org/project/statespace>`__ is mostly a 
 .. code-block:: bash
 
     sudo apt-get -qq update -qy
-    sudo apt-get -qq install -y python3.6 python3-venv python3-pip
+    sudo apt-get -qq install -y python3 python3-venv python3-pip
     git clone git@gitlab.com:noahhsmith/statespace.git statespace
     cd statespace
     python3 -m venv venv
     . venv/bin/activate
     python3 setup.py develop
-    pytest
-    python3 statespace --demo
 
 processors
 ==================================================================================================================
@@ -38,7 +36,7 @@ baseline extended kalman filters. both the standard textbook form, and the ud fa
 sigmapoint.py
 ----------------
 
-sigma-point sampling kalman filters.
+sigma-point sampling kalman filters. this is the ukf or unscented kalman filter, or 'modern' kalman filtering. it's essentially somewhere between a classical kalman filter, where uncertainty is represented as gaussian, and a particle filter, where uncertainty has arbitrary shape. here uncertainty is sampled at a small number of points, the sigma points or sigma particles. in a particle filter the number and role of the particles are increased.
 
 .. automodule:: processors.sigmapoint
     :members:
@@ -54,6 +52,8 @@ particle filters, sequential monte carlo sampling processors.
 api.py
 --------
 
+entry point into cpp implementations for use by python code.
+
 .. automodule:: libstatespace_.api
     :members:
 
@@ -65,7 +65,7 @@ will probably be moving towards a higher-level statespace model, encompassing sp
 basemodel.py
 -------------
 
-placeholder for what could grow to become a higher-level statespace model - with individual cases inheriting and overriding.
+placeholder for what could grow to become a higher-level statespace model - with individual models inheriting and overriding.
 
 .. automodule:: models.basemodel
     :members:
@@ -73,11 +73,15 @@ placeholder for what could grow to become a higher-level statespace model - with
 onestate.py
 --------------
 
+a simple as possible one-state example with non linear temporal and observation updates. it's a common example in the candy and jazwinisky books. based on real world reentry vehicle tracking.
+
 .. automodule:: models.onestate
     :members:
 
 threestate.py
 --------------
+
+three-state extension of the the one-state model. non linear temporal and observation updates.
 
 .. automodule:: models.threestate
     :members:
