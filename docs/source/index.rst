@@ -85,7 +85,7 @@ threestate.py
 bearingsonly.py
 ----------------
 
-the bearings only problem has some interesting history - it's basically about being on a ww2 era sub. your sub is travelling along, and you begin hearing the sound of a ship at some bearing. over time, as the bearing changes, you can estimate the position and velocity of the ship. keep in mind that both your sub and the ship are moving the entire time. at some point you make a course change for your sub to pursue the ship.
+the bearings only problem has some interesting history. it's basically about being on a sub. your sub is travelling along steadily and you begin hearing the sound of a ship at some bearing. over time and as the bearing changes, you can estimate the relative position and velocity of the ship. at some point you make a course change for your sub to pursue the ship.
 
 .. automodule:: models.bearingsonly
     :members:

@@ -3,8 +3,11 @@ import numpy as np
 class Kalman():
     '''classical kalman filter'''
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, model, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
+        if 'ekfud' in args: self.ekfud(model)
+        elif 'ekfudcpp' in args: self.ekfudcpp(model)
+        else: self.ekf(model)
 
     def ekf(self, model):
         '''basic form'''

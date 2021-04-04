@@ -2,6 +2,10 @@ import sys
 sys.path.append('./')
 sys.path.append('./processors')
 sys.path.append('./models')
+from processors.kalman import Kalman
+from models.onestate import Onestate
+from models.threestate import Threestate
+from models.bearingsonly import BearingsOnly
 
 def main():
     # onestate_ekf()
@@ -9,32 +13,22 @@ def main():
     bearingsonly_ekf()
 
 def onestate_ekf():
-    from models.onestate import Onestate
-    from processors.kalman import Kalman
     model = Onestate()
-    processor = Kalman()
-    processor.ekf(model)
+    processor = Kalman(model, 'ekf')
     model.eval.estimate(processor.log)
     model.eval.autocorr.run(processor.log)
     model.eval.show()
 
 def threestate_ekf():
-    from models.threestate import Threestate
-    from processors.kalman import Kalman
     model = Threestate()
-    processor = Kalman()
-    processor.ekf(model)
+    processor = Kalman(model, 'ekf')
     model.eval.estimate(processor.log)
     model.eval.autocorr.run(processor.log)
     model.eval.show()
 
 def bearingsonly_ekf():
-    from models.bearingsonly import BearingsOnly
-    from processors.kalman import Kalman
     model = BearingsOnly()
-    processor = Kalman()
-    processor.ekf(model)
-    # model.eval.model()
+    processor = Kalman(model, 'ekf')
     model.eval.estimate(processor.log)
     # model.eval.autocorr.run(processor.log)
     model.eval.show()
