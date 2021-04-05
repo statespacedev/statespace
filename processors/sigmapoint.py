@@ -17,19 +17,27 @@ class SigmaPoint():
         for t, o, u in sim():
             X = f(X1(x, P))
             Y = h(X2(X))
-            x = W @ X.T
-            y = W @ Y
-            P = np.diag(W @ np.power(self.huh(X.copy(), x), 2).T + model.varproc)
-            tmp = np.multiply(self.huh(X.copy(), x), Y - y)
-            K = W @ tmp.T / (W @ np.power(Y - y, 2) + R)
+            x = X @ W.T
+            y = (Y @ W.T)[0, 0]
+            tmp1 = self.huh(X.copy(), x)
+            tmp2 = self.huh2(Y.copy(), y)
+            P = np.power(tmp1, 2) @ W.T + Q
+            K = np.multiply(tmp1, tmp2) @ W.T / (np.power(tmp2, 2) @ W.T + R)
             x = x + K * (o - y)
-            P = P - K * (W @ np.power(Y - y, 2) + R) * K
+            P = P - K @ K.T * (np.power(tmp2, 2) @ W.T + R)
             self.log.append([t, x, y])
 
-    def huh(self, X, x):
-        for i in range(7): X[:, i] -= x
-        return X
+    def huh2(self, Y, y):
+        for i in range(Y.shape[1]):
+            Y[0, i] -= y
+        return Y
 
+    def huh(self, X, x):
+        for i in range(X.shape[1]):
+            X[0, i] -= x[0, 0]
+            X[1, i] -= x[1, 0]
+            X[2, i] -= x[2, 0]
+        return X
 
     def cho(self, model):
         '''cholesky factorized sigma-point sampling kalman filter'''
@@ -63,24 +71,26 @@ class SigmaPoint():
     def temporal(self, x, f, Xtil, X1, Wm, Wc, S, Sproc):
         '''cholesky factorized temporal update'''
         X = f(X1(x, S))
-        x = Wm @ X.T
-        for i in range(7): Xtil[:, i] = X[:, i] - x
-        q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[1]) * Xtil[:, 1:], Sproc], 1))
-        S = self.cholupdate(r.T[0:3, 0:3], Wc[0] * Xtil[:, 0])
+        x = X @ Wm.T
+        for i in range(7): Xtil[:, i] = (X[:, i].reshape(-1, 1) - x).T
+        q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[0, 1]) * Xtil[:, 1:], Sproc], 1))
+        S = self.cholupdate(r.T[0:3, 0:3], Wc[0, 0] * Xtil[:, 0].reshape(-1, 1))
         return x, S, X
 
     def observational(self, x, o, h, X, Xtil, Ytil, X2, Pxy, Wm, Wc, S, Sobs):
         '''cholesky factorized observational update'''
         Y = h(X2(X))
-        y = Wm @ Y.T
-        for i in range(7): Ytil[0, i] = Y[i] - y
-        q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[1]) * Ytil[:, 1:], Sobs], 1))
-        Sy = self.cholupdate(r.T[0:1, 0:1], Wc[0] * Ytil[:, 0])
-        for i in range(7): Pxy[:, 0] = Pxy[:, 0] + Wc[i] * Xtil[:, i] * Ytil.T[i, :]
+        y = (Wm @ Y.T)[0, 0]
+        for i in range(7): Ytil[0, i] = (Y[0, i].reshape(-1, 1) - y).T
+        q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[0, 1]) * Ytil[:, 1:], Sobs], 1))
+        Sy = self.cholupdate(r.T[0:1, 0:1], Wc[0] * Ytil[:, 0].reshape(-1, 1))
+        for i in range(7):
+            tmp = Wc[0, i] * Xtil[:, i].reshape(-1, 1) * Ytil[0, i]
+            Pxy += tmp
         if Sy[0, 0] < math.sqrt(10) or Sy[0, 0] > math.sqrt(1000): Sy[0, 0] = math.sqrt(1000)
         K = Pxy / Sy[0, 0] ** 2
         U = K * Sy
-        x = x + K[:, 0] * (o - y)
+        x = x + K * (o - y)
         S = self.choldowndate(S, U)
         return x, S, y
 

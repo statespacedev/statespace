@@ -16,10 +16,10 @@ class Threestate(BaseModel):
         super().__init__()
         self.tsteps = 1501
         self.dt = .01
-        self.x = np.array([2., .05, .04], ndmin=2).T
-        self.x0 = np.array([2.1, .055, .044], ndmin=2).T
+        self.x = np.array([[2., .05, .04]]).T
+        self.x0 = np.array([[2.1, .055, .044]]).T
         self.P0 = .1 * np.eye(3)
-        self.varproc = 1e-9 * np.array([1, 1, 1], ndmin=2).T
+        self.varproc = 1e-9 * np.array([[1, 1, 1]]).T
         self.varobs = 9e-4
         self.R = self.varobs
         self.Q = self.varproc * np.eye(3)
@@ -31,7 +31,7 @@ class Threestate(BaseModel):
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
-            u = np.array([0, 0, 0], ndmin=2).T
+            u = np.array([[0, 0, 0]]).T
             self.x = self.f(self.x, 0) + u
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
@@ -40,7 +40,7 @@ class Threestate(BaseModel):
 
     def f(self, x, *args):
         w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Q))).T
-        base = np.array([(1 - x[1, 0] * self.dt) * x[0, 0] + x[2, 0] * self.dt * x[0, 0] ** 2, x[1, 0], x[2, 0]], ndmin=2).T
+        base = np.array([[(1 - x[1, 0] * self.dt) * x[0, 0] + x[2, 0] * self.dt * x[0, 0] ** 2, x[1, 0], x[2, 0]]]).T
         if 0 in args: return base + w
         return base
 
@@ -58,7 +58,7 @@ class Threestate(BaseModel):
         return base
 
     def H(self, x):
-        return np.array([2 * x[0, 0] + 3 * x[0, 0] ** 2, 0, 0], ndmin=2)
+        return np.array([[2 * x[0, 0] + 3 * x[0, 0] ** 2, 0, 0]])
 
 class SPKF(SPKFBase):
 
@@ -75,8 +75,8 @@ class SPKF(SPKFBase):
         w0m = lam / float(n + lam)
         w0c = lam / float(n + lam) + (1 - alpha ** 2 + beta)
         self.nlroot = math.sqrt(n + lam)
-        self.W = np.array([w0m, wi, wi, wi, wi, wi, wi])
-        self.Wc = np.array([w0c, wi, wi, wi, wi, wi, wi])
+        self.W = np.array([[w0m, wi, wi, wi, wi, wi, wi]])
+        self.Wc = np.array([[w0c, wi, wi, wi, wi, wi, wi]])
         self.Xtil = np.zeros((3, 7))
         self.Ytil = np.zeros((1, 7))
         self.Pxy = np.zeros((3, 1))
@@ -85,14 +85,13 @@ class SPKF(SPKFBase):
         self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
 
     def X1(self, x, C):
-        X = np.zeros([3, 7])
-        X[:, 0] = x
-        X[:, 1] = x + self.nlroot * C.T[:, 0]
-        X[:, 2] = x + self.nlroot * C.T[:, 1]
-        X[:, 3] = x + self.nlroot * C.T[:, 2]
-        X[:, 4] = x - self.nlroot * C.T[:, 0]
-        X[:, 5] = x - self.nlroot * C.T[:, 1]
-        X[:, 6] = x - self.nlroot * C.T[:, 2]
+        X = np.column_stack((x,
+                             x + self.nlroot * C[:, 0].reshape(-1, 1),
+                             x + self.nlroot * C[:, 1].reshape(-1, 1),
+                             x + self.nlroot * C[:, 2].reshape(-1, 1),
+                             x - self.nlroot * C[:, 0].reshape(-1, 1),
+                             x - self.nlroot * C[:, 1].reshape(-1, 1),
+                             x - self.nlroot * C[:, 2].reshape(-1, 1)))
         return X
 
     def X2(self, X):
@@ -107,12 +106,19 @@ class SPKF(SPKFBase):
         return Xhat
 
     def vf(self, X):
-        for i in range(7): X[:, i] = self.parent.f(X[:, i])
+        for i in range(7):
+            tmp = self.parent.f(X[:, i].reshape(-1, 1))
+            X[0, i] = tmp[0, 0]
+            X[1, i] = tmp[1, 0]
+            X[2, i] = tmp[2, 0]
         return X
 
     def vh(self, Xhat):
-        Y = np.zeros(7)
-        for i in range(7): Y[i] = self.parent.h(Xhat[:, i])
+        Y = np.zeros((1, 7))
+        for i in range(7):
+            tmp = Xhat[:, i].reshape(-1, 1)
+            tmp2 = self.parent.h(tmp)
+            Y[0, i] = self.parent.h(tmp)
         return Y
 
     def Xtil(self, X, W):
