@@ -13,25 +13,31 @@ class SigmaPoint():
     def base(self, model):
         '''sigma-point sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        f, h, X1, X2, W = model.sp()
+        f, h, Xtil, Ytil, X1, X2, Pxy, W, Wc, S, Sproc, Sobs = model.sp()
         for t, o, u in sim():
             X = f(X1(x, P))
             Y = h(X2(X))
-            x = W @ X
+            x = W @ X.T
             y = W @ Y
-            P = W @ np.power(X - x, 2) + model.varproc
-            K = (W @ np.multiply(X - x, Y - y)) / (W @ np.power(Y - y, 2) + R)
+            P = np.diag(W @ np.power(self.huh(X.copy(), x), 2).T + model.varproc)
+            tmp = np.multiply(self.huh(X.copy(), x), Y - y)
+            K = W @ tmp.T / (W @ np.power(Y - y, 2) + R)
             x = x + K * (o - y)
             P = P - K * (W @ np.power(Y - y, 2) + R) * K
             self.log.append([t, x, y])
 
+    def huh(self, X, x):
+        for i in range(7): X[:, i] -= x
+        return X
+
+
     def cho(self, model):
         '''cholesky factorized sigma-point sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        f, h, Xtil, Ytil, X1, X2, Pxy, Wm, Wc, S, Sproc, Sobs = model.sp()
+        f, h, Xtil, Ytil, X1, X2, Pxy, W, Wc, S, Sproc, Sobs = model.sp()
         for t, o, u in sim():
-            x, S, X = self.temporal(x, f, Xtil, X1, Wm, Wc, S, Sproc)
-            x, S, y = self.observational(x, o, h, X, Xtil, Ytil, X2, Pxy, Wm, Wc, S, Sobs)
+            x, S, X = self.temporal(x, f, Xtil, X1, W, Wc, S, Sproc)
+            x, S, y = self.observational(x, o, h, X, Xtil, Ytil, X2, Pxy, W, Wc, S, Sobs)
             self.log.append([t, x, y])
 
     def cholupdate(self, R, z):

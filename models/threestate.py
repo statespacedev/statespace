@@ -9,18 +9,18 @@ class Threestate(BaseModel):
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
                          self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, \
-                         self.SPKF.Wm, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
+                         self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def __init__(self):
         super().__init__()
         self.tsteps = 1501
         self.dt = .01
-        self.x = np.array([2., .05, .04])
-        self.x0 = np.array([2, .055, .044])
-        self.P0 = 1. * np.eye(3)
-        self.varproc = 1e-9 * np.array([1, 1, 1])
-        self.varobs = 9e-2
+        self.x = np.array([2., .05, .04], ndmin=2).T
+        self.x0 = np.array([2.1, .055, .044], ndmin=2).T
+        self.P0 = .1 * np.eye(3)
+        self.varproc = 1e-9 * np.array([1, 1, 1], ndmin=2).T
+        self.varobs = 9e-4
         self.R = self.varobs
         self.Q = self.varproc * np.eye(3)
         self.G = np.eye(3)
@@ -31,7 +31,7 @@ class Threestate(BaseModel):
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
-            u = np.array([0, 0, 0])
+            u = np.array([0, 0, 0], ndmin=2).T
             self.x = self.f(self.x, 0) + u
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
@@ -39,26 +39,26 @@ class Threestate(BaseModel):
             yield (t, self.y, u)
 
     def f(self, x, *args):
-        w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Q)))
-        base = np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]])
-        if 0 in args: return base + np.diag(w)
+        w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Q))).T
+        base = np.array([(1 - x[1, 0] * self.dt) * x[0, 0] + x[2, 0] * self.dt * x[0, 0] ** 2, x[1, 0], x[2, 0]], ndmin=2).T
+        if 0 in args: return base + w
         return base
 
     def F(self, x):
         A = np.eye(3)
-        A[0, 0] = 1 - x[1] * self.dt + 2 * x[2] * self.dt * x[0]
-        A[0, 1] = -self.dt * x[0]
-        A[0, 2] = self.dt * x[0] ** 2
+        A[0, 0] = 1 - x[1, 0] * self.dt + 2 * x[2, 0] * self.dt * x[0, 0]
+        A[0, 1] = -self.dt * x[0, 0]
+        A[0, 2] = self.dt * x[0, 0] ** 2
         return A
 
     def h(self, x, *args):
         v = math.sqrt(self.R) * np.random.randn()
-        base = x[0] ** 2 + x[0] ** 3
+        base = x[0, 0] ** 2 + x[0, 0] ** 3
         if 0 in args: return base + v
         return base
 
     def H(self, x):
-        return np.array([2 * x[0] + 3 * x[0] ** 2, 0, 0])
+        return np.array([2 * x[0, 0] + 3 * x[0, 0] ** 2, 0, 0], ndmin=2)
 
 class SPKF(SPKFBase):
 
@@ -74,9 +74,9 @@ class SPKF(SPKFBase):
         wi = 1 / float(2 * (n + lam))
         w0m = lam / float(n + lam)
         w0c = lam / float(n + lam) + (1 - alpha ** 2 + beta)
-        self.Wm = np.array([w0m, wi, wi, wi, wi, wi, wi])
-        self.Wc = np.array([w0c, wi, wi, wi, wi, wi, wi])
         self.nlroot = math.sqrt(n + lam)
+        self.W = np.array([w0m, wi, wi, wi, wi, wi, wi])
+        self.Wc = np.array([w0c, wi, wi, wi, wi, wi, wi])
         self.Xtil = np.zeros((3, 7))
         self.Ytil = np.zeros((1, 7))
         self.Pxy = np.zeros((3, 1))
@@ -148,12 +148,13 @@ class Eval(EvalBase):
     def estimate(self, proclog):
         lw, logm, logp = 1, Log(self.parent.log), Log(proclog)
         plt.figure()
-        plt.subplot(3, 2, 1), plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x[0]')
-        plt.subplot(3, 2, 2), plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
-        plt.subplot(3, 2, 3), plt.plot(logp.t, logp.x[:, 0], linewidth=lw), plt.ylabel('xe[0]')
-        plt.subplot(3, 2, 4), plt.plot(logp.t, logp.y, linewidth=lw), plt.ylabel('ye')
-        plt.subplot(3, 2, 5), plt.plot(logp.t, logm.x[:, 0] - logp.x[:, 0], linewidth=lw), plt.ylabel('xe[0] err')
-        plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('ye err')
+        plt.subplot(2, 2, 1)
+        plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x[0]')
+        plt.plot(logp.t, logp.x[:, 0], 'r--', linewidth=lw)
+        plt.subplot(2, 2, 2)
+        plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
+        plt.plot(logm.t, logp.y, 'r--', linewidth=lw)
+        plt.subplot(2, 2, 3), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('y err')
 
 if __name__ == "__main__":
     pass

@@ -14,8 +14,8 @@ class BearingsOnly(BaseModel):
         super().__init__()
         self.tsteps = 100 # 2hr = 7200sec / 100
         self.dt = .02 # hrs, .02 hr = 72 sec
-        self.x = np.array([0., 15., 20., -10.])
-        self.x0 = np.array([0., 20., 20., -10.])
+        self.x = np.array([0., 15., 20., -10.], ndmin=2).T
+        self.x0 = np.array([0., 20., 20., -10.], ndmin=2).T
         self.P0 = 1 * np.eye(4)
         self.varproc = 1e-6
         self.varobs = 6e-4
@@ -33,7 +33,7 @@ class BearingsOnly(BaseModel):
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
-            u = np.array([0., 0., 0., 0.])
+            u = np.array([0., 0., 0., 0.], ndmin=2).T
             if t == 0.5: u[2] = -24.; u[3] = 10.
             self.x = self.f(self.x, 0) + u
             self.y = self.h(self.x, 0)
@@ -42,7 +42,7 @@ class BearingsOnly(BaseModel):
             yield (t, self.y, u)
 
     def f(self, x, *args):
-        base = np.array([x[0] + self.dt * x[2], x[1] + self.dt * x[3], x[2], x[3]])
+        base = np.array([x[0, 0] + self.dt * x[2, 0], x[1, 0] + self.dt * x[3, 0], x[2, 0], x[3, 0]], ndmin=2).T
         if 0 in args: return base + self.G @ np.multiply(np.random.randn(2), math.sqrt(self.varproc))
         return base
 
@@ -54,13 +54,13 @@ class BearingsOnly(BaseModel):
 
     def h(self, x, *args):
         v = np.random.randn() * math.sqrt(self.varobs)
-        base = np.arctan2(x[0], x[1])
+        base = np.arctan2(x[0, 0], x[1, 0])
         if 0 in args: return base + v
         return base
 
     def H(self, x):
-        dsqr = x[0]**2 + x[1]**2
-        return np.array([x[1] / dsqr, -x[0] / dsqr, 0, 0])
+        dsqr = x[0, 0]**2 + x[1, 0]**2
+        return np.array([x[1, 0] / dsqr, -x[0, 0] / dsqr, 0, 0], ndmin=2)
 
 class SPKF(SPKFBase):
 
@@ -79,8 +79,8 @@ class SPKF(SPKFBase):
         wi = 1 / float(2 * (n + lam))
         w0m = lam / float(n + lam)
         w0c = lam / float(n + lam) + (1 - alpha ** 2 + beta)
-        self.Wm = np.array([w0m, wi, wi, wi, wi, wi, wi])
-        self.Wc = np.array([w0c, wi, wi, wi, wi, wi, wi])
+        self.Wm = np.array([w0m, wi, wi, wi, wi, wi, wi], ndmin=2).T
+        self.Wc = np.array([w0c, wi, wi, wi, wi, wi, wi], ndmin=2).T
         self.nlroot = math.sqrt(n + lam)
         self.Xtil = np.zeros((3, 7))
         self.Ytil = np.zeros((1, 7))

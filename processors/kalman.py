@@ -32,6 +32,7 @@ class Kalman():
 
     def cpp(self, model):
         '''UD factorized form in cpp'''
+        import sys; sys.path.append('./cmake-build-debug/libstatespace')
         import libstatespace
         api = libstatespace.Api()
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
@@ -61,7 +62,7 @@ class Kalman():
 
     def temporal(self, xin, Uin, Din, Phi, Gin, Q):
         '''thornton temporal update'''
-        U, D, G, n, r = np.eye(len(xin)), Din, Gin, len(xin), len(xin)
+        U, D, G, n, r = np.eye(len(xin)), Din, Gin, np.shape(Q)[0], np.shape(Q)[0]
         x, PhiU = Phi @ xin, Phi @ Uin
         for i in reversed(range(len(xin))):
             sigma = 0

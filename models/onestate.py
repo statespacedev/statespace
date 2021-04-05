@@ -7,15 +7,17 @@ class Onestate(BaseModel):
     '''one-state reference model'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
+    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
+                         self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, \
+                         self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def __init__(self):
         super().__init__()
         self.tsteps = 151
         self.dt = .01
-        self.x = np.array([2.])
-        self.x0 = np.array([2.2])
+        self.x = np.array([2.], ndmin=2).T
+        self.x0 = np.array([2.2], ndmin=2).T
         self.P0 = .01 * np.eye(1)
         self.varproc = 1e-6
         self.varobs = 6e-4
@@ -49,12 +51,12 @@ class Onestate(BaseModel):
 
     def h(self, x, *args):
         v = math.sqrt(self.R) * np.random.randn()
-        base = x ** 2 + x ** 3
+        base = x[0, 0] ** 2 + x[0, 0] ** 3
         if 0 in args: return base + v
         return base
 
     def H(self, x):
-        return 2 * x + 3 * x ** 2
+        return np.array(2 * x[0, 0] + 3 * x[0, 0] ** 2, ndmin=2)
 
 class SPKF(SPKFBase):
 
@@ -66,19 +68,32 @@ class SPKF(SPKFBase):
         k1 = self.kappa / float(self.k0)
         k2 = 1 / float(2 * self.k0)
         self.W = np.array([k1, k2, k2])
+        self.Wc = np.array([k1, k2, k2])
+        self.Xtil = np.zeros((1, 3))
+        self.Ytil = np.zeros((1, 3))
+        self.Pxy = np.zeros((1, 1))
         self.S = np.linalg.cholesky(parent.P0)
         self.Sproc = np.linalg.cholesky(parent.Q)
         self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
 
     def X1(self, xhat, Ptil):
-        return [xhat, xhat + math.sqrt(self.k0 * Ptil), xhat - math.sqrt(self.k0 * Ptil)]
+        return np.array([xhat, xhat + math.sqrt(self.k0 * Ptil), xhat - math.sqrt(self.k0 * Ptil)]).T
 
     def X2(self, X):
-        return [X[0], X[1] + self.kappa * math.sqrt(self.parent.varproc), X[2] - self.kappa * math.sqrt(self.parent.varproc)]
+        return np.array([X[:, 0], X[:, 1] + self.kappa * math.sqrt(self.parent.varproc), X[:, 2] - self.kappa * math.sqrt(self.parent.varproc)]).T
 
-    def vf(self): return np.vectorize(self.parent.f)
+    # def vf(self): return np.vectorize(self.parent.f)
+    #
+    # def vh(self): return np.vectorize(self.parent.h)
 
-    def vh(self): return np.vectorize(self.parent.h)
+    def vf(self, X):
+        for i in range(len(X)): X[:, i] = self.parent.f(X[:, i])
+        return X
+
+    def vh(self, Xhat):
+        Y = np.zeros(7)
+        for i in range(len(Xhat)): Y[i] = self.parent.h(Xhat[:, i])
+        return Y
 
 class PF(PFBase):
 
@@ -103,12 +118,13 @@ class Eval(EvalBase):
     def estimate(self, proclog):
         lw, logm, logp = 1, Log(self.parent.log), Log(proclog)
         plt.figure()
-        plt.subplot(3, 2, 1), plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x[0]')
-        plt.subplot(3, 2, 2), plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
-        plt.subplot(3, 2, 3), plt.plot(logp.t, logp.x[:, 0], linewidth=lw), plt.ylabel('xe[0]')
-        plt.subplot(3, 2, 4), plt.plot(logp.t, logp.y, linewidth=lw), plt.ylabel('ye')
-        plt.subplot(3, 2, 5), plt.plot(logp.t, logm.x[:, 0] - logp.x[:, 0], linewidth=lw), plt.ylabel('xe[0] err')
-        plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('ye err')
+        plt.subplot(2, 2, 1)
+        plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x[0]')
+        plt.plot(logp.t, logp.x[:, 0], 'r--', linewidth=lw)
+        plt.subplot(2, 2, 2)
+        plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
+        plt.plot(logm.t, logp.y, 'r--', linewidth=lw)
+        plt.subplot(2, 2, 3), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('y err')
 
 if __name__ == "__main__":
     pass
