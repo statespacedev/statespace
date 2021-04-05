@@ -20,7 +20,7 @@ cases ={
     '5b': {'model': Threestate(), 'processor': SigmaPoint('cho')},
     '5c': {'model': BearingsOnly(), 'processor': SigmaPoint('cho')}, # todo
 }
-case = '4b'
+case = '5b'
 
 def main():
     model, processor = cases[case]['model'], cases[case]['processor']
