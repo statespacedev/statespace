@@ -7,7 +7,9 @@ class Threestate(BaseModel):
     '''three-state reference model'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
+    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
+                         self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, \
+                         self.SPKF.Wm, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def __init__(self):
@@ -15,12 +17,13 @@ class Threestate(BaseModel):
         self.tsteps = 1501
         self.dt = .01
         self.x = np.array([2., .05, .04])
-        self.Rww = 1e-9 * np.array([1, 1, 1])
-        self.R = 9e-2
         self.x0 = np.array([2, .055, .044])
         self.P0 = 1. * np.eye(3)
+        self.varproc = 1e-9 * np.array([1, 1, 1])
+        self.varobs = 9e-2
+        self.R = self.varobs
+        self.Q = self.varproc * np.eye(3)
         self.G = np.eye(3)
-        self.Q = np.diag(self.Rww)
         self.SPKF = SPKF(self)
         self.PF = PF(self)
         self.eval = Eval(self)
@@ -36,7 +39,7 @@ class Threestate(BaseModel):
             yield (t, self.y, u)
 
     def f(self, x, *args):
-        w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Rww)))
+        w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Q)))
         base = np.array([(1 - x[1] * self.dt) * x[0] + x[2] * self.dt * x[0] ** 2, x[1], x[2]])
         if 0 in args: return base + np.diag(w)
         return base
@@ -63,9 +66,6 @@ class SPKF(SPKFBase):
         super().__init__()
         self.parent = parent
         P0 = .1 * np.eye(3)
-        self.S = np.linalg.cholesky(P0)
-        self.Sw = np.linalg.cholesky(np.diag(parent.Rww))
-        self.Sv = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
         n = 3
         kappa = 1
         alpha = 1
@@ -80,7 +80,9 @@ class SPKF(SPKFBase):
         self.Xtil = np.zeros((3, 7))
         self.Ytil = np.zeros((1, 7))
         self.Pxy = np.zeros((3, 1))
-        self.W = self.Wm
+        self.S = np.linalg.cholesky(P0)
+        self.Sproc = np.linalg.cholesky(parent.Q)
+        self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
 
     def X1(self, x, C):
         X = np.zeros([3, 7])
@@ -96,12 +98,12 @@ class SPKF(SPKFBase):
     def X2(self, X):
         Xhat = np.zeros([3, 7])
         Xhat[:, 0] = X[:, 0]
-        Xhat[:, 1] = X[:, 1] + self.nlroot * self.Sw.T[:, 0]
-        Xhat[:, 2] = X[:, 2] + self.nlroot * self.Sw.T[:, 1]
-        Xhat[:, 3] = X[:, 3] + self.nlroot * self.Sw.T[:, 2]
-        Xhat[:, 4] = X[:, 4] - self.nlroot * self.Sw.T[:, 0]
-        Xhat[:, 5] = X[:, 5] - self.nlroot * self.Sw.T[:, 1]
-        Xhat[:, 6] = X[:, 6] - self.nlroot * self.Sw.T[:, 2]
+        Xhat[:, 1] = X[:, 1] + self.nlroot * self.Sproc.T[:, 0]
+        Xhat[:, 2] = X[:, 2] + self.nlroot * self.Sproc.T[:, 1]
+        Xhat[:, 3] = X[:, 3] + self.nlroot * self.Sproc.T[:, 2]
+        Xhat[:, 4] = X[:, 4] - self.nlroot * self.Sproc.T[:, 0]
+        Xhat[:, 5] = X[:, 5] - self.nlroot * self.Sproc.T[:, 1]
+        Xhat[:, 6] = X[:, 6] - self.nlroot * self.Sproc.T[:, 2]
         return Xhat
 
     def vf(self, X):

@@ -16,9 +16,7 @@ class BaseModel:
     def H(self, x): return None
 
 class SPKFBase():
-    def __init__(self):
-        self.vf = None
-        self.vh = None
+    def __init__(self): pass
     def X1(self, xhat, Ptil): return None
     def X2(self, X): return None
 

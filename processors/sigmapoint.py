@@ -7,29 +7,31 @@ class SigmaPoint():
     
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
+        if 'cho' in args: self.run = self.cho
+        else: self.run = self.base
 
-    def spkf(self, model):
+    def base(self, model):
         '''sigma-point sampling kalman filter'''
-        sim, f, h, F, H, R, x, P = model.ekf()
+        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         f, h, X1, X2, W = model.sp()
-        for t, obs in sim():
+        for t, o, u in sim():
             X = f(X1(x, P))
             Y = h(X2(X))
             x = W @ X
             y = W @ Y
             P = W @ np.power(X - x, 2) + model.varproc
             K = (W @ np.multiply(X - x, Y - y)) / (W @ np.power(Y - y, 2) + R)
-            x = x + K * (obs - y)
+            x = x + K * (o - y)
             P = P - K * (W @ np.power(Y - y, 2) + R) * K
             self.log.append([t, x, y])
 
-    def spkfcholeksy(self, model):
+    def cho(self, model):
         '''cholesky factorized sigma-point sampling kalman filter'''
-        steps, f, h, F, H, R, x, P = model.ekf()
-        f, h, X1, X2, W, S = model.sp()
-        for t, obs in steps():
-            x, S, X = self.temporal(x, S, model)
-            x, S, y = self.observational(x, S, X, obs, model)
+        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
+        f, h, Xtil, Ytil, X1, X2, Pxy, Wm, Wc, S, Sproc, Sobs = model.sp()
+        for t, o, u in sim():
+            x, S, X = self.temporal(x, f, Xtil, X1, Wm, Wc, S, Sproc)
+            x, S, y = self.observational(x, o, h, X, Xtil, Ytil, X2, Pxy, Wm, Wc, S, Sobs)
             self.log.append([t, x, y])
 
     def cholupdate(self, R, z):
@@ -52,29 +54,29 @@ class SigmaPoint():
             R[k, k] = rbar
         return R
 
-    def temporal(self, xhat, S, model):
+    def temporal(self, x, f, Xtil, X1, Wm, Wc, S, Sproc):
         '''cholesky factorized temporal update'''
-        X = model.SPKF.vf(model.SPKF.X1(xhat, S))
-        xhat = model.SPKF.Wm @ X.T
-        for i in range(7): model.SPKF.Xtil[:, i] = X[:, i] - xhat
-        q, r = np.linalg.qr(np.concatenate([math.sqrt(model.SPKF.Wc[1]) * model.SPKF.Xtil[:, 1:], model.SPKF.Sw], 1))
-        S = self.cholupdate(r.T[0:3, 0:3], model.SPKF.Wc[0] * model.SPKF.Xtil[:, 0])
-        return xhat, S, X
+        X = f(X1(x, S))
+        x = Wm @ X.T
+        for i in range(7): Xtil[:, i] = X[:, i] - x
+        q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[1]) * Xtil[:, 1:], Sproc], 1))
+        S = self.cholupdate(r.T[0:3, 0:3], Wc[0] * Xtil[:, 0])
+        return x, S, X
 
-    def observational(self, xhat, S, X, obs, model):
+    def observational(self, x, o, h, X, Xtil, Ytil, X2, Pxy, Wm, Wc, S, Sobs):
         '''cholesky factorized observational update'''
-        Y = model.SPKF.vh(model.SPKF.X2(X))
-        yhat = model.SPKF.Wm @ Y.T
-        for i in range(7): model.SPKF.Ytil[0, i] = Y[i] - yhat
-        q, r = np.linalg.qr(np.concatenate([math.sqrt(model.SPKF.Wc[1]) * model.SPKF.Ytil[:, 1:], model.SPKF.Sv], 1))
-        Sy = self.cholupdate(r.T[0:1, 0:1], model.SPKF.Wc[0] * model.SPKF.Ytil[:, 0])
-        for i in range(7): model.SPKF.Pxy[:, 0] = model.SPKF.Pxy[:, 0] + model.SPKF.Wc[i] * model.SPKF.Xtil[:, i] * model.SPKF.Ytil.T[i, :]
+        Y = h(X2(X))
+        y = Wm @ Y.T
+        for i in range(7): Ytil[0, i] = Y[i] - y
+        q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[1]) * Ytil[:, 1:], Sobs], 1))
+        Sy = self.cholupdate(r.T[0:1, 0:1], Wc[0] * Ytil[:, 0])
+        for i in range(7): Pxy[:, 0] = Pxy[:, 0] + Wc[i] * Xtil[:, i] * Ytil.T[i, :]
         if Sy[0, 0] < math.sqrt(10) or Sy[0, 0] > math.sqrt(1000): Sy[0, 0] = math.sqrt(1000)
-        K = model.SPKF.Pxy / Sy[0, 0] ** 2
+        K = Pxy / Sy[0, 0] ** 2
         U = K * Sy
-        xhat = xhat + K[:, 0] * (obs - yhat)
+        x = x + K[:, 0] * (o - y)
         S = self.choldowndate(S, U)
-        return xhat, S, yhat
+        return x, S, y
 
 if __name__ == "__main__":
     pass

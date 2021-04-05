@@ -7,7 +7,7 @@ class Onestate(BaseModel):
     '''one-state reference model'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W
+    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def __init__(self):
@@ -15,12 +15,13 @@ class Onestate(BaseModel):
         self.tsteps = 151
         self.dt = .01
         self.x = np.array([2.])
-        self.Rww = 1e-6 * np.array([1])
-        self.R = 9e-2
         self.x0 = np.array([2.2])
         self.P0 = .01 * np.eye(1)
+        self.varproc = 1e-6
+        self.varobs = 6e-4
+        self.R = self.varobs
+        self.Q = self.varproc * np.eye(1)
         self.G = np.eye(1)
-        self.Q = self.Rww * np.eye(1)
         self.SPKF = SPKF(self)
         self.PF = PF(self)
         self.eval = Eval(self)
@@ -36,7 +37,7 @@ class Onestate(BaseModel):
             yield (t, self.y, u)
 
     def f(self, x, *args):
-        w = math.sqrt(self.Rww) * np.random.randn()
+        w = math.sqrt(self.varproc) * np.random.randn()
         base = (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2
         if 0 in args: return base + w
         return base
@@ -60,22 +61,24 @@ class SPKF(SPKFBase):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        self.vf = np.vectorize(parent.f)
-        self.vh = np.vectorize(parent.h)
-        bignsubx = 1
-        kappa = 1
-        k0 = bignsubx + kappa
-        k1 = kappa / float(k0)
-        k2 = 1 / float(2 * k0)
+        self.kappa = 1
+        self.k0 = 1 + self.kappa
+        k1 = self.kappa / float(self.k0)
+        k2 = 1 / float(2 * self.k0)
         self.W = np.array([k1, k2, k2])
-        self.k0 = k0
-        self.kappa = kappa
+        self.S = np.linalg.cholesky(parent.P0)
+        self.Sproc = np.linalg.cholesky(parent.Q)
+        self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
 
     def X1(self, xhat, Ptil):
         return [xhat, xhat + math.sqrt(self.k0 * Ptil), xhat - math.sqrt(self.k0 * Ptil)]
 
     def X2(self, X):
         return [X[0], X[1] + self.kappa * math.sqrt(self.parent.varproc), X[2] - self.kappa * math.sqrt(self.parent.varproc)]
+
+    def vf(self): return np.vectorize(self.parent.f)
+
+    def vh(self): return np.vectorize(self.parent.h)
 
 class PF(PFBase):
 

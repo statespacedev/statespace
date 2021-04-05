@@ -14,11 +14,11 @@ class BearingsOnly(BaseModel):
         super().__init__()
         self.tsteps = 100 # 2hr = 7200sec / 100
         self.dt = .02 # hrs, .02 hr = 72 sec
-        self.varproc = 1e-6
-        self.varobs = 6e-4
         self.x = np.array([0., 15., 20., -10.])
         self.x0 = np.array([0., 20., 20., -10.])
         self.P0 = 1 * np.eye(4)
+        self.varproc = 1e-6
+        self.varobs = 6e-4
         self.R = self.varobs
         self.Q = self.varproc * np.eye(2)
         self.G = np.zeros([4, 2])
