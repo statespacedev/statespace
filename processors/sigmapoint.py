@@ -19,25 +19,24 @@ class SigmaPoint():
             Y = h(X2(X))
             x = X @ W.T
             y = (Y @ W.T)[0, 0]
-            tmp1 = self.huh(X.copy(), x)
-            tmp2 = self.huh2(Y.copy(), y)
+            tmp1 = self.tmp1(X.copy(), x)
+            tmp2 = self.tmp2(Y.copy(), y)
             P = np.power(tmp1, 2) @ W.T + Q
             K = np.multiply(tmp1, tmp2) @ W.T / (np.power(tmp2, 2) @ W.T + R)
             x = x + K * (o - y)
             P = P - K @ K.T * (np.power(tmp2, 2) @ W.T + R)
             self.log.append([t, x, y])
 
-    def huh2(self, Y, y):
+    def tmp1(self, X, x):
+        for i in range(X.shape[1]):
+            for j in range(X.shape[0]):
+                X[j, i] -= x[j, 0]
+        return X
+
+    def tmp2(self, Y, y):
         for i in range(Y.shape[1]):
             Y[0, i] -= y
         return Y
-
-    def huh(self, X, x):
-        for i in range(X.shape[1]):
-            X[0, i] -= x[0, 0]
-            X[1, i] -= x[1, 0]
-            X[2, i] -= x[2, 0]
-        return X
 
     def cho(self, model):
         '''cholesky factorized sigma-point sampling kalman filter'''
@@ -47,6 +46,32 @@ class SigmaPoint():
             x, S, X = self.temporal(x, f, Xtil, X1, W, Wc, S, Sproc)
             x, S, y = self.observational(x, o, h, X, Xtil, Ytil, X2, Pxy, W, Wc, S, Sobs)
             self.log.append([t, x, y])
+
+    def temporal(self, x, f, Xtil, X1, Wm, Wc, S, Sproc):
+        '''cholesky factorized temporal update'''
+        X = f(X1(x, S))
+        x = X @ Wm.T
+        for i in range(X.shape[1]): Xtil[:, i] = (X[:, i].reshape(-1, 1) - x).T
+        q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[0, 1]) * Xtil[:, 1:], Sproc], 1))
+        S = self.cholupdate(r.T[0:X.shape[0], 0:X.shape[0]], Wc[0, 0] * Xtil[:, 0].reshape(-1, 1))
+        return x, S, X
+
+    def observational(self, x, o, h, X, Xtil, Ytil, X2, Pxy, Wm, Wc, S, Sobs):
+        '''cholesky factorized observational update'''
+        Y = h(X2(X))
+        y = (Wm @ Y.T)[0, 0]
+        for i in range(X.shape[1]): Ytil[0, i] = (Y[0, i].reshape(-1, 1) - y).T
+        q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[0, 1]) * Ytil[:, 1:], Sobs], 1))
+        Sy = self.cholupdate(r.T[0:1, 0:1], Wc[0] * Ytil[:, 0].reshape(-1, 1))
+        for i in range(X.shape[1]):
+            tmp = Wc[0, i] * Xtil[:, i].reshape(-1, 1) * Ytil[0, i]
+            Pxy += tmp
+        if Sy[0, 0] < math.sqrt(10) or Sy[0, 0] > math.sqrt(1000): Sy[0, 0] = math.sqrt(1000)
+        K = Pxy / Sy[0, 0] ** 2
+        U = K * Sy
+        x = x + K * (o - y)
+        S = self.choldowndate(S, U)
+        return x, S, y
 
     def cholupdate(self, R, z):
         '''cholesky update'''
@@ -67,32 +92,6 @@ class SigmaPoint():
                 z[j] = 1. / R[k, k] * (rbar * z[j] - z[k] * R[k, j])
             R[k, k] = rbar
         return R
-
-    def temporal(self, x, f, Xtil, X1, Wm, Wc, S, Sproc):
-        '''cholesky factorized temporal update'''
-        X = f(X1(x, S))
-        x = X @ Wm.T
-        for i in range(7): Xtil[:, i] = (X[:, i].reshape(-1, 1) - x).T
-        q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[0, 1]) * Xtil[:, 1:], Sproc], 1))
-        S = self.cholupdate(r.T[0:3, 0:3], Wc[0, 0] * Xtil[:, 0].reshape(-1, 1))
-        return x, S, X
-
-    def observational(self, x, o, h, X, Xtil, Ytil, X2, Pxy, Wm, Wc, S, Sobs):
-        '''cholesky factorized observational update'''
-        Y = h(X2(X))
-        y = (Wm @ Y.T)[0, 0]
-        for i in range(7): Ytil[0, i] = (Y[0, i].reshape(-1, 1) - y).T
-        q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[0, 1]) * Ytil[:, 1:], Sobs], 1))
-        Sy = self.cholupdate(r.T[0:1, 0:1], Wc[0] * Ytil[:, 0].reshape(-1, 1))
-        for i in range(7):
-            tmp = Wc[0, i] * Xtil[:, i].reshape(-1, 1) * Ytil[0, i]
-            Pxy += tmp
-        if Sy[0, 0] < math.sqrt(10) or Sy[0, 0] > math.sqrt(1000): Sy[0, 0] = math.sqrt(1000)
-        K = Pxy / Sy[0, 0] ** 2
-        U = K * Sy
-        x = x + K * (o - y)
-        S = self.choldowndate(S, U)
-        return x, S, y
 
 if __name__ == "__main__":
     pass

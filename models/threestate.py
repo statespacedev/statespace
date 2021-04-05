@@ -84,14 +84,14 @@ class SPKF(SPKFBase):
         self.Sproc = np.linalg.cholesky(parent.Q)
         self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
 
-    def X1(self, x, C):
+    def X1(self, x, S):
         X = np.column_stack((x,
-                             x + self.nlroot * C[:, 0].reshape(-1, 1),
-                             x + self.nlroot * C[:, 1].reshape(-1, 1),
-                             x + self.nlroot * C[:, 2].reshape(-1, 1),
-                             x - self.nlroot * C[:, 0].reshape(-1, 1),
-                             x - self.nlroot * C[:, 1].reshape(-1, 1),
-                             x - self.nlroot * C[:, 2].reshape(-1, 1)))
+                             x + self.nlroot * S[:, 0].reshape(-1, 1),
+                             x + self.nlroot * S[:, 1].reshape(-1, 1),
+                             x + self.nlroot * S[:, 2].reshape(-1, 1),
+                             x - self.nlroot * S[:, 0].reshape(-1, 1),
+                             x - self.nlroot * S[:, 1].reshape(-1, 1),
+                             x - self.nlroot * S[:, 2].reshape(-1, 1)))
         return X
 
     def X2(self, X):

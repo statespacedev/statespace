@@ -67,8 +67,8 @@ class SPKF(SPKFBase):
         self.k0 = 1 + self.kappa
         k1 = self.kappa / float(self.k0)
         k2 = 1 / float(2 * self.k0)
-        self.W = np.array([k1, k2, k2])
-        self.Wc = np.array([k1, k2, k2])
+        self.W = np.array([[k1, k2, k2]])
+        self.Wc = np.array([[k1, k2, k2]])
         self.Xtil = np.zeros((1, 3))
         self.Ytil = np.zeros((1, 3))
         self.Pxy = np.zeros((1, 1))
@@ -76,23 +76,41 @@ class SPKF(SPKFBase):
         self.Sproc = np.linalg.cholesky(parent.Q)
         self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
 
-    def X1(self, xhat, Ptil):
-        return np.array([xhat, xhat + math.sqrt(self.k0 * Ptil), xhat - math.sqrt(self.k0 * Ptil)]).T
+    def X1(self, x, S):
+        X = np.column_stack((x,
+                             x + self.k0 * S[:, 0].reshape(-1, 1),
+                             x - self.k0 * S[:, 0].reshape(-1, 1),))
+        return X
+        # tmp = np.array([[x[0, 0], x[0, 0] + math.sqrt(self.k0 * S[0, 0]), x[0, 0] - math.sqrt(self.k0 * S[0, 0])]])
+        return tmp
 
     def X2(self, X):
-        return np.array([X[:, 0], X[:, 1] + self.kappa * math.sqrt(self.parent.varproc), X[:, 2] - self.kappa * math.sqrt(self.parent.varproc)]).T
+        Xhat = np.zeros([1, 3])
+        Xhat[:, 0] = X[:, 0]
+        Xhat[:, 1] = X[:, 1] + self.k0 * self.Sproc.T[:, 0]
+        Xhat[:, 2] = X[:, 2] - self.k0 * self.Sproc.T[:, 0]
+        return Xhat
+    # def X2(self, X):
+    #     tmp = np.array([[x[0, 0], x[0, 0] + math.sqrt(self.k0 * S[0, 0]), x[0, 0] - math.sqrt(self.k0 * S[0, 0])]])
+        tmp = np.array([[X[:, 0], X[:, 1] + self.kappa * math.sqrt(self.parent.varproc), X[:, 2] - self.kappa * math.sqrt(self.parent.varproc)]])
+        # return tmp
 
     # def vf(self): return np.vectorize(self.parent.f)
     #
     # def vh(self): return np.vectorize(self.parent.h)
 
     def vf(self, X):
-        for i in range(len(X)): X[:, i] = self.parent.f(X[:, i])
+        for i in range(3):
+            tmp = self.parent.f(X[:, i].reshape(-1, 1))
+            X[0, i] = tmp[0, 0]
         return X
 
     def vh(self, Xhat):
-        Y = np.zeros(7)
-        for i in range(len(Xhat)): Y[i] = self.parent.h(Xhat[:, i])
+        Y = np.zeros((1, 3))
+        for i in range(3):
+            tmp = Xhat[:, i].reshape(-1, 1)
+            tmp2 = self.parent.h(tmp)
+            Y[0, i] = self.parent.h(tmp)
         return Y
 
 class PF(PFBase):
