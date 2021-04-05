@@ -25,11 +25,13 @@ cases ={
 }
 case = '4b'
 
-model, processor = cases[case]['model'], cases[case]['processor']
-processor.run(model)
-model.eval.estimate(processor.log)
-model.eval.autocorr.run(processor.log)
-model.eval.show()
+def main():
+    model, processor = cases[case]['model'], cases[case]['processor']
+    processor.run(model)
+    model.eval.estimate(processor.log)
+    model.eval.autocorr.run(processor.log)
+    model.eval.show()
 
-
+if __name__ == "__main__":
+    main()
 

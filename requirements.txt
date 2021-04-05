@@ -2,6 +2,7 @@ cryptography<3.4
 numpy
 scipy
 matplotlib
-pymc3
-tf-nightly
-tfp-nightly
+pytest
+#pymc3
+#tf-nightly
+#tfp-nightly
