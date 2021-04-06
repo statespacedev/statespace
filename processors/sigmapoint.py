@@ -19,21 +19,21 @@ class SigmaPoint():
             Y = h(X2(X))
             x = X @ W.T
             y = (Y @ W.T)[0, 0]
-            tmp1 = self.tmp1(X.copy(), x)
-            tmp2 = self.tmp2(Y.copy(), y)
-            P = np.power(tmp1, 2) @ W.T + Q
-            K = np.multiply(tmp1, tmp2) @ W.T / (np.power(tmp2, 2) @ W.T + R)
+            Xres = self.Xres(X, x)
+            Yres = self.Yres(Y, y)
+            P = Xres @ Xres.T @ W.T + Q
+            K = Xres @ Yres.T @ W.T / (Yres @ Yres.T @ W.T + R)
             x = x + K * (o - y)
-            P = P - K @ K.T * (np.power(tmp2, 2) @ W.T + R)
+            P = P - K @ Yres @ K.T
             self.log.append([t, x, y])
 
-    def tmp1(self, X, x):
+    def Xres(self, X, x):
         for i in range(X.shape[1]):
             for j in range(X.shape[0]):
                 X[j, i] -= x[j, 0]
         return X
 
-    def tmp2(self, Y, y):
+    def Yres(self, Y, y):
         for i in range(Y.shape[1]):
             Y[0, i] -= y
         return Y

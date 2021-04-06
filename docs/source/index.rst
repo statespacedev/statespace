@@ -36,7 +36,7 @@ baseline extended kalman filters. both the standard textbook form, and the ud fa
 sigmapoint.py
 ----------------
 
-sigma-point sampling kalman filters. this is the ukf or unscented kalman filter, or 'modern' kalman filtering. it's essentially somewhere between a classical kalman filter, where uncertainty is represented as gaussian, and a particle filter, where uncertainty has arbitrary shape. here uncertainty is sampled at a small number of points, the sigma points or sigma particles. in a particle filter the number and role of the particles are increased.
+sigma-point sampling kalman filters. this is the ukf or unscented kalman filter, or 'modern' kalman filtering. it's essentially somewhere between a classical kalman filter, where uncertainty is represented as gaussian, and a particle filter, where uncertainty has arbitrary shape. here uncertainty is deterministically sampled at a small number of points, the sigma points or sigma particles. in a particle filter the number and role of the particles are increased.
 
 .. automodule:: processors.sigmapoint
     :members:
@@ -44,7 +44,7 @@ sigma-point sampling kalman filters. this is the ukf or unscented kalman filter,
 particle.py
 -------------
 
-particle filters, sequential monte carlo sampling processors.
+particle filters, sequential monte carlo sampling processors. sampling here is random, not deterministic as in the sigmapoint processor. and the idea of resampling and growing new particles comes to the fore. the particles are random and new ones can be introduced freely.
 
 .. automodule:: processors.particle
     :members:
