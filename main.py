@@ -8,19 +8,19 @@ from models.bearingsonly import BearingsOnly
 
 cases ={
     '1a': {'model': Onestate(), 'processor': Kalman()},
-    '1b': {'model': Onestate(), 'processor': Kalman('ud')},
-    '1c': {'model': Onestate(), 'processor': SigmaPoint()}, # tuning
-    '1d': {'model': Onestate(), 'processor': SigmaPoint('cho')}, # tuning
-    '2a': {'model': Threestate(), 'processor': Kalman()},
+    '1b': {'model': Threestate(), 'processor': Kalman()},
+    '1c': {'model': BearingsOnly(), 'processor': Kalman()},
+    '2a': {'model': Onestate(), 'processor': Kalman('ud')},
     '2b': {'model': Threestate(), 'processor': Kalman('ud')},
-    '2c': {'model': Threestate(), 'processor': SigmaPoint()}, # tuning
-    '2d': {'model': Threestate(), 'processor': SigmaPoint('cho')},
-    '3a': {'model': BearingsOnly(), 'processor': Kalman()}, # tuning
-    '3b': {'model': BearingsOnly(), 'processor': Kalman('ud')}, # tuning
+    '2c': {'model': BearingsOnly(), 'processor': Kalman('ud')}, # tuning
+    '3a': {'model': Onestate(), 'processor': SigmaPoint()}, # tuning
+    '3b': {'model': Threestate(), 'processor': SigmaPoint()}, # tuning
     '3c': {'model': BearingsOnly(), 'processor': SigmaPoint()}, # todo
-    '3d': {'model': BearingsOnly(), 'processor': SigmaPoint('cho')}, # todo
+    '4a': {'model': Onestate(), 'processor': SigmaPoint('cho')}, # tuning
+    '4b': {'model': Threestate(), 'processor': SigmaPoint('cho')},
+    '4c': {'model': BearingsOnly(), 'processor': SigmaPoint('cho')}, # todo
 }
-case = '1a'
+case = '3b'
 
 def main():
     model, processor = cases[case]['model'], cases[case]['processor']
