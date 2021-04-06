@@ -21,10 +21,11 @@ class SigmaPoint():
             y = (Y @ W.T)[0, 0]
             Xres = self.Xres(X, x)
             Yres = self.Yres(Y, y)
-            P = Xres @ Xres.T @ W.T + G @ Q @ G.T
-            K = Xres @ Yres.T @ W.T / (Yres @ Yres.T @ W.T + R)
+            Wmat = np.tile(W, (X.shape[1], 1))
+            P = Xres @ Wmat @ Xres.T + G @ Q @ G.T
+            K = Xres @ Wmat @ Yres.T / (Yres @ Wmat @ Yres.T + R)
             x = x + K * (o - y)
-            P = P - K @ Yres @ K.T
+            P = P - K @ (Yres @ Wmat @ Yres.T + R) @ K.T
             self.log.append([t, x, y])
 
     def Xres(self, X, x):

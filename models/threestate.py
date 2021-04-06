@@ -155,12 +155,12 @@ class Eval(EvalBase):
         lw, logm, logp = 1, Log(self.parent.log), Log(proclog)
         plt.figure()
         plt.subplot(2, 2, 1)
-        plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x[0]')
+        plt.plot(logm.t, logm.x[:, 0], 'b', linewidth=lw), plt.ylabel('x[0]')
         plt.plot(logp.t, logp.x[:, 0], 'r--', linewidth=lw)
         plt.subplot(2, 2, 2)
-        plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
+        plt.plot(logm.t, logm.y, 'b', linewidth=lw), plt.ylabel('y')
         plt.plot(logm.t, logp.y, 'r--', linewidth=lw)
-        plt.subplot(2, 2, 3), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('y err')
+        plt.subplot(2, 2, 3), plt.plot(logp.t, logm.y - logp.y, 'b', linewidth=lw), plt.ylabel('y err')
 
 if __name__ == "__main__":
     pass
