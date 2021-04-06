@@ -11,7 +11,7 @@ cases ={
     '1b': {'model': Onestate(), 'processor': Kalman('ud')},
     '1c': {'model': Onestate(), 'processor': SigmaPoint()}, # tuning
     '1d': {'model': Onestate(), 'processor': SigmaPoint('cho')}, # tuning
-    '2a': {'model': Threestate(), 'processor': Kalman()}, # tuning ?ud req?
+    '2a': {'model': Threestate(), 'processor': Kalman()},
     '2b': {'model': Threestate(), 'processor': Kalman('ud')},
     '2c': {'model': Threestate(), 'processor': SigmaPoint()}, # tuning
     '2d': {'model': Threestate(), 'processor': SigmaPoint('cho')},
@@ -20,7 +20,7 @@ cases ={
     '3c': {'model': BearingsOnly(), 'processor': SigmaPoint()}, # todo
     '3d': {'model': BearingsOnly(), 'processor': SigmaPoint('cho')}, # todo
 }
-case = '1c'
+case = '1a'
 
 def main():
     model, processor = cases[case]['model'], cases[case]['processor']

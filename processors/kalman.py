@@ -18,7 +18,7 @@ class Kalman():
             P = F(x) @ P @ F(x).T + G @ Q @ G.T
             K = P @ H(x).T / (H(x) @ P @ H(x).T + R)
             x = x + K * (o - y)
-            P = (1 - K * H(x)) * P
+            P = P - K @ H(x) @ P
             self.log.append([t, x, y])
 
     def ud(self, model):

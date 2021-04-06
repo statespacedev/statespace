@@ -21,7 +21,7 @@ class SigmaPoint():
             y = (Y @ W.T)[0, 0]
             Xres = self.Xres(X, x)
             Yres = self.Yres(Y, y)
-            P = Xres @ Xres.T @ W.T + Q
+            P = Xres @ Xres.T @ W.T + G @ Q @ G.T
             K = Xres @ Yres.T @ W.T / (Yres @ Yres.T @ W.T + R)
             x = x + K * (o - y)
             P = P - K @ Yres @ K.T
