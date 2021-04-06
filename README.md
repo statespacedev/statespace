@@ -6,7 +6,9 @@
 
 processors and models from [Bayesian Signal Processing: Classical, Modern, and Particle Filtering](http://a.co/gp4upXd) and [Kalman Filtering: Theory and Practice](http://a.co/6hAa35c).
 
-210404 new model structure is working well, exemplified by the new bearings-only tracking model. this is thoroughly checked out for the kalman processor and next step is to propagate and check the new stuff throughout the sigmapoint and particle processors.
+210404 new model structure is working well, exemplified by the new bearings-only tracking model. this is thoroughly checked out for the kalman processor and next step is to propagate and check the new stuff throughout the sigmapoint and particle processors. bearings-only model is go, last glitch ironed out.
+
+![](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/bearingsonly.png)
 
 210328 new model structure is definitely on the right path - it's already quite essential for working on the new bearings-only tracking model. evaluation and plotting is migrating into a new eval class within the base model. there each model will know how to make its own appropriate plots - definitely including model states and processor states - and perform its own evaluation tests. 
 
