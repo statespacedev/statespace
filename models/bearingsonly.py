@@ -175,7 +175,7 @@ class Eval(EvalBase):
         plt.subplot(3, 2, 5)
         plt.plot(logm.t, logm.y, 'b', linewidth=lw), plt.ylabel('y')
         plt.plot(logp.t, logp.y, 'r--', linewidth=lw)
-        plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, linewidth=lw), plt.ylabel('y err')
+        plt.subplot(3, 2, 6), plt.plot(logp.t, logm.y - logp.y, 'b', linewidth=lw), plt.ylabel('y err')
 
 if __name__ == "__main__":
     pass
