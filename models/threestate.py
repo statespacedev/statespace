@@ -10,6 +10,9 @@ class Threestate(BaseModel):
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
                          self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, \
                          self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
+    def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
+                         self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
+                         self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def __init__(self):
@@ -84,7 +87,30 @@ class SPKF(SPKFBase):
         self.Sproc = np.linalg.cholesky(parent.Q)
         self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
 
-    def X1(self, x, S):
+    def X1(self, x, P):
+        k = 4
+        col1 = x
+        col2 = x + np.sqrt(k * np.array([[P[0, 0], 0, 0]]).T)
+        col3 = x + np.sqrt(k * np.array([[0, P[1, 1], 0]]).T)
+        col4 = x + np.sqrt(k * np.array([[0, 0, P[2, 2]]]).T)
+        col5 = x - np.sqrt(k * np.array([[P[0, 0], 0, 0]]).T)
+        col6 = x - np.sqrt(k * np.array([[0, P[1, 1], 0]]).T)
+        col7 = x - np.sqrt(k * np.array([[0, 0, P[2, 2]]]).T)
+        X = np.column_stack((col1, col2, col3, col4, col5, col6, col7))
+        return X
+
+    def X2(self, X):
+        k = 3
+        X2 = np.column_stack((X[:, 0].reshape(-1, 1),
+                             X[:, 1].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 0].reshape(-1, 1)),
+                             X[:, 2].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 1].reshape(-1, 1)),
+                             X[:, 3].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 2].reshape(-1, 1)),
+                             X[:, 4].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 0].reshape(-1, 1)),
+                             X[:, 5].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 1].reshape(-1, 1)),
+                             X[:, 6].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 2].reshape(-1, 1))))
+        return X2
+
+    def X1cho(self, x, S):
         X = np.column_stack((x,
                              x + self.nlroot * S[:, 0].reshape(-1, 1),
                              x + self.nlroot * S[:, 1].reshape(-1, 1),
@@ -94,7 +120,7 @@ class SPKF(SPKFBase):
                              x - self.nlroot * S[:, 2].reshape(-1, 1)))
         return X
 
-    def X2(self, X):
+    def X2cho(self, X):
         Xhat = np.zeros([3, 7])
         Xhat[:, 0] = X[:, 0]
         Xhat[:, 1] = X[:, 1] + self.nlroot * self.Sproc.T[:, 0]

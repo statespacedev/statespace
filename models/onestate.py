@@ -76,24 +76,24 @@ class SPKF(SPKFBase):
         self.Sproc = np.linalg.cholesky(parent.Q)
         self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
 
-    def X1(self, x, S):
-        X = np.column_stack((x,
-                             x + self.k0 * S[:, 0].reshape(-1, 1),
-                             x - self.k0 * S[:, 0].reshape(-1, 1),))
-        return X
-        # tmp = np.array([[x[0, 0], x[0, 0] + math.sqrt(self.k0 * S[0, 0]), x[0, 0] - math.sqrt(self.k0 * S[0, 0])]])
+    def X1(self, xhat, Ptil):
+        tmp = np.array([[xhat[0, 0], xhat[0, 0] + math.sqrt(self.k0 * Ptil), xhat[0, 0] - math.sqrt(self.k0 * Ptil)]])
         return tmp
-
     def X2(self, X):
-        Xhat = np.zeros([1, 3])
-        Xhat[:, 0] = X[:, 0]
-        Xhat[:, 1] = X[:, 1] + self.k0 * self.Sproc.T[:, 0]
-        Xhat[:, 2] = X[:, 2] - self.k0 * self.Sproc.T[:, 0]
-        return Xhat
+        return np.array([[X[0, 0], X[0, 1] + self.kappa * math.sqrt(self.parent.varproc), X[0, 2] - self.kappa * math.sqrt(self.parent.varproc)]])
+
+    # def X1(self, x, P):
+    #     X = np.column_stack((x,
+    #                          x + np.sqrt(self.k0 * np.diag(P).reshape(-1, 1)),
+    #                          x - np.sqrt(self.k0 * np.diag(P).reshape(-1, 1))))
+    #     return X
+    #
     # def X2(self, X):
-    #     tmp = np.array([[x[0, 0], x[0, 0] + math.sqrt(self.k0 * S[0, 0]), x[0, 0] - math.sqrt(self.k0 * S[0, 0])]])
-        tmp = np.array([[X[:, 0], X[:, 1] + self.kappa * math.sqrt(self.parent.varproc), X[:, 2] - self.kappa * math.sqrt(self.parent.varproc)]])
-        # return tmp
+    #     Xhat = np.zeros([1, 3])
+    #     Xhat[:, 0] = X[:, 0]
+    #     Xhat[:, 1] = X[:, 1] + self.kappa * math.sqrt(self.parent.varobs)
+    #     Xhat[:, 2] = X[:, 2] - self.kappa * math.sqrt(self.parent.varobs)
+    #     return Xhat
 
     # def vf(self): return np.vectorize(self.parent.f)
     #
@@ -101,7 +101,7 @@ class SPKF(SPKFBase):
 
     def vf(self, X):
         for i in range(3):
-            tmp = self.parent.f(X[:, i].reshape(-1, 1))
+            tmp = self.parent.f(X[0, i].reshape(-1, 1))
             X[0, i] = tmp[0, 0]
         return X
 

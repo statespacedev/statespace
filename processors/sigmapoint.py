@@ -14,35 +14,34 @@ class SigmaPoint():
         '''sigma-point sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         f, h, Xtil, Ytil, X1, X2, Pxy, W, Wc, S, Sproc, Sobs = model.sp()
+        Wm = np.tile(W, (Xtil.shape[0], 1))
         for t, o, u in sim():
             X = f(X1(x, P))
             Y = h(X2(X))
-            x = X @ W.T
-            y = (Y @ W.T)[0, 0]
+            x = np.sum(np.multiply(Wm, X), axis=1).reshape(-1, 1)
+            y = np.sum(np.multiply(W, Y), axis=1)[0]
             Xres = self.Xres(X, x)
             Yres = self.Yres(Y, y)
-            Wmat = np.tile(W, (X.shape[1], 1))
-            P = Xres @ Wmat @ Xres.T + G @ Q @ G.T
-            K = Xres @ Wmat @ Yres.T / (Yres @ Wmat @ Yres.T + R)
+            P = np.multiply(Wm, Xres) @ Xres.T + G @ Q @ G.T
+            K = np.multiply(Wm, Xres) @ Yres.T / (np.multiply(W, Yres) @ Yres.T + R)
             x = x + K * (o - y)
-            P = P - K @ (Yres @ Wmat @ Yres.T + R) @ K.T
+            P = P - K @ (np.multiply(W, Yres) @ Yres.T + R) @ K.T
             self.log.append([t, x, y])
 
     def Xres(self, X, x):
-        for i in range(X.shape[1]):
-            for j in range(X.shape[0]):
-                X[j, i] -= x[j, 0]
-        return X
+        Xb = X.copy()
+        for i in range(Xb.shape[1]):
+            for j in range(Xb.shape[0]): Xb[j, i] -= x[j, 0]
+        return Xb
 
     def Yres(self, Y, y):
-        for i in range(Y.shape[1]):
-            Y[0, i] -= y
+        for i in range(Y.shape[1]): Y[0, i] -= y
         return Y
 
     def cho(self, model):
         '''cholesky factorized sigma-point sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        f, h, Xtil, Ytil, X1, X2, Pxy, W, Wc, S, Sproc, Sobs = model.sp()
+        f, h, Xtil, Ytil, X1, X2, Pxy, W, Wc, S, Sproc, Sobs = model.spcho()
         for t, o, u in sim():
             x, S, X = self.temporal(x, f, Xtil, X1, W, Wc, S, Sproc)
             x, S, y = self.observational(x, o, h, X, Xtil, Ytil, X2, Pxy, W, Wc, S, Sobs)
