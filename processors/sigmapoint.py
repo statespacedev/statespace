@@ -7,10 +7,10 @@ class SigmaPoint():
     
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
-        if 'cho' in args: self.run = self.cho
-        else: self.run = self.base
+        if 'cho' in args: self.run = self.spcholesky
+        else: self.run = self.spbase
 
-    def base(self, model):
+    def spbase(self, model):
         '''sigma-point determinstic sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         f, h, Xtil, Ytil, X1, X2, Pxy, W = model.sp()
@@ -26,7 +26,7 @@ class SigmaPoint():
             P = P - K @ (np.multiply(W, Yres) @ Yres.T + R) @ K.T
             self.log.append([t, x, y])
 
-    def cho(self, model):
+    def spcholesky(self, model):
         '''cholesky factorized sigma-point sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         f, h, Xtil, Ytil, X1, X2, Pxy, W, Wc, S, Sproc, Sobs = model.spcho()

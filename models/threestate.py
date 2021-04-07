@@ -100,23 +100,25 @@ class SPKF(SPKFBase):
 
     def X2(self, X):
         k = 3
-        X2 = np.column_stack((X[:, 0].reshape(-1, 1),
-                             X[:, 1].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 0].reshape(-1, 1)),
-                             X[:, 2].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 1].reshape(-1, 1)),
-                             X[:, 3].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 2].reshape(-1, 1)),
-                             X[:, 4].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 0].reshape(-1, 1)),
-                             X[:, 5].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 1].reshape(-1, 1)),
-                             X[:, 6].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 2].reshape(-1, 1))))
+        col1 = X[:, 0].reshape(-1, 1)
+        col2 = X[:, 1].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 0].reshape(-1, 1))
+        col3 = X[:, 2].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 1].reshape(-1, 1))
+        col4 = X[:, 3].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 2].reshape(-1, 1))
+        col5 = X[:, 4].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 0].reshape(-1, 1))
+        col6 = X[:, 5].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 1].reshape(-1, 1))
+        col7 = X[:, 6].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 2].reshape(-1, 1))
+        X2 = np.column_stack((col1, col2, col3, col4, col5, col6, col7))
         return X2
 
     def X1cho(self, x, S):
-        X = np.column_stack((x,
-                             x + self.nlroot * S[:, 0].reshape(-1, 1),
-                             x + self.nlroot * S[:, 1].reshape(-1, 1),
-                             x + self.nlroot * S[:, 2].reshape(-1, 1),
-                             x - self.nlroot * S[:, 0].reshape(-1, 1),
-                             x - self.nlroot * S[:, 1].reshape(-1, 1),
-                             x - self.nlroot * S[:, 2].reshape(-1, 1)))
+        col1 = x
+        col2 = x + self.nlroot * S[:, 0].reshape(-1, 1)
+        col3 = x + self.nlroot * S[:, 1].reshape(-1, 1)
+        col4 = x + self.nlroot * S[:, 2].reshape(-1, 1)
+        col5 = x - self.nlroot * S[:, 0].reshape(-1, 1)
+        col6 = x - self.nlroot * S[:, 1].reshape(-1, 1)
+        col7 = x - self.nlroot * S[:, 2].reshape(-1, 1)
+        X = np.column_stack((col1, col2, col3, col4, col5, col6, col7))
         return X
 
     def X2cho(self, X):
@@ -142,7 +144,6 @@ class SPKF(SPKFBase):
         Y = np.zeros((1, 7))
         for i in range(7):
             tmp = Xhat[:, i].reshape(-1, 1)
-            tmp2 = self.parent.h(tmp)
             Y[0, i] = self.parent.h(tmp)
         return Y
 

@@ -8,18 +8,20 @@ class Onestate(BaseModel):
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
-                         self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, \
-                         self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
+                         self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, self.SPKF.W
+    def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
+                            self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
+                            self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def __init__(self):
         super().__init__()
         self.tsteps = 151
         self.dt = .01
-        self.x = np.array([2.], ndmin=2).T
-        self.x0 = np.array([2.2], ndmin=2).T
-        self.P0 = .01 * np.eye(1)
-        self.varproc = 1e-6
+        self.x = np.array([[2.]]).T
+        self.x0 = np.array([[2.2]]).T
+        self.P0 = .1 * np.eye(1)
+        self.varproc = 1e-6 * np.array([[1]]).T
         self.varobs = 6e-4
         self.R = self.varobs
         self.Q = self.varproc * np.eye(1)
@@ -31,7 +33,7 @@ class Onestate(BaseModel):
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
-            u = np.array([0.])
+            u = np.array([0]).T
             self.x = self.f(self.x, 0) + u
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
@@ -56,7 +58,7 @@ class Onestate(BaseModel):
         return base
 
     def H(self, x):
-        return np.array(2 * x[0, 0] + 3 * x[0, 0] ** 2, ndmin=2)
+        return np.array([[2 * x[0, 0] + 3 * x[0, 0] ** 2]])
 
 class SPKF(SPKFBase):
 
@@ -67,6 +69,7 @@ class SPKF(SPKFBase):
         self.k0 = 1 + self.kappa
         k1 = self.kappa / float(self.k0)
         k2 = 1 / float(2 * self.k0)
+        self.nlroot = math.sqrt(self.k0)
         self.W = np.array([[k1, k2, k2]])
         self.Wc = np.array([[k1, k2, k2]])
         self.Xtil = np.zeros((1, 3))
@@ -76,28 +79,35 @@ class SPKF(SPKFBase):
         self.Sproc = np.linalg.cholesky(parent.Q)
         self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
 
-    def X1(self, xhat, Ptil):
-        tmp = np.array([[xhat[0, 0], xhat[0, 0] + math.sqrt(self.k0 * Ptil), xhat[0, 0] - math.sqrt(self.k0 * Ptil)]])
-        return tmp
+    def X1(self, x, P):
+        k = 1
+        col1 = x
+        col2 = x + np.sqrt(k * np.array([[P[0, 0]]]).T)
+        col3 = x - np.sqrt(k * np.array([[P[0, 0]]]).T)
+        X = np.column_stack((col1, col2, col3))
+        return X
+
     def X2(self, X):
-        return np.array([[X[0, 0], X[0, 1] + self.kappa * math.sqrt(self.parent.varproc), X[0, 2] - self.kappa * math.sqrt(self.parent.varproc)]])
+        k = 1
+        col1 = X[:, 0].reshape(-1, 1)
+        col2 = X[:, 1].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 0].reshape(-1, 1))
+        col3 = X[:, 2].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 0].reshape(-1, 1))
+        X2 = np.column_stack((col1, col2, col3))
+        return X2
 
-    # def X1(self, x, P):
-    #     X = np.column_stack((x,
-    #                          x + np.sqrt(self.k0 * np.diag(P).reshape(-1, 1)),
-    #                          x - np.sqrt(self.k0 * np.diag(P).reshape(-1, 1))))
-    #     return X
-    #
-    # def X2(self, X):
-    #     Xhat = np.zeros([1, 3])
-    #     Xhat[:, 0] = X[:, 0]
-    #     Xhat[:, 1] = X[:, 1] + self.kappa * math.sqrt(self.parent.varobs)
-    #     Xhat[:, 2] = X[:, 2] - self.kappa * math.sqrt(self.parent.varobs)
-    #     return Xhat
+    def X1cho(self, x, S):
+        col1 = x
+        col2 = x + self.nlroot * S[:, 0].reshape(-1, 1)
+        col3 = x - self.nlroot * S[:, 0].reshape(-1, 1)
+        X = np.column_stack((col1, col2, col3))
+        return X
 
-    # def vf(self): return np.vectorize(self.parent.f)
-    #
-    # def vh(self): return np.vectorize(self.parent.h)
+    def X2cho(self, X):
+        Xhat = np.zeros([1, 3])
+        Xhat[:, 0] = X[:, 0]
+        Xhat[:, 1] = X[:, 1] + self.nlroot * self.Sproc.T[:, 0]
+        Xhat[:, 2] = X[:, 2] - self.nlroot * self.Sproc.T[:, 0]
+        return Xhat
 
     def vf(self, X):
         for i in range(3):
@@ -109,7 +119,6 @@ class SPKF(SPKFBase):
         Y = np.zeros((1, 3))
         for i in range(3):
             tmp = Xhat[:, i].reshape(-1, 1)
-            tmp2 = self.parent.h(tmp)
             Y[0, i] = self.parent.h(tmp)
         return Y
 
