@@ -13,7 +13,7 @@ class SigmaPoint():
     def base(self, model):
         '''sigma-point determinstic sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        f, h, Xtil, Ytil, X1, X2, Pxy, W, Wc, S, Sproc, Sobs = model.sp()
+        f, h, Xtil, Ytil, X1, X2, Pxy, W = model.sp()
         Wm = np.tile(W, (Xtil.shape[0], 1))
         for t, o, u in sim():
             X = f(X1(x, P))

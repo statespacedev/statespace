@@ -6,6 +6,7 @@ class BaseModel:
     def ekf(self): return None
     def ekfud(self): return None
     def sp(self): return None
+    def spcho(self): return None
     def pf(self): return None
     def __init__(self):
         self.log = []

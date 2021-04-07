@@ -8,8 +8,7 @@ class Threestate(BaseModel):
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
     def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
-                         self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, \
-                         self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
+                         self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, self.SPKF.W
     def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
                          self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
                          self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
