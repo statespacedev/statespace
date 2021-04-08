@@ -3,14 +3,14 @@ import numpy as np
 from scipy.linalg.blas import drot, drotg
 
 class SigmaPoint():
-    '''modern sigma-point or ukf filter'''
+    '''modern sigma-point deterministic sampling kalman filter'''
     
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
-        if 'cho' in args: self.run = self.spcholesky
-        else: self.run = self.spbase
+        if 'cho' in args: self.run = self.spfcholesky
+        else: self.run = self.spfbase
 
-    def spbase(self, model):
+    def spfbase(self, model):
         '''sigma-point determinstic sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         f, h, Xtil, Ytil, X1, X2, Pxy, W = model.sp()
@@ -26,7 +26,7 @@ class SigmaPoint():
             P = P - K @ (np.multiply(W, Yres) @ Yres.T + R) @ K.T
             self.log.append([t, x, y])
 
-    def spcholesky(self, model):
+    def spfcholesky(self, model):
         '''cholesky factorized sigma-point sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         f, h, Xtil, Ytil, X1, X2, Pxy, W, Wc, S, Sproc, Sobs = model.spcho()

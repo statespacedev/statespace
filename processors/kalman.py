@@ -1,15 +1,15 @@
 import numpy as np
 
 class Kalman():
-    '''classical kalman filter'''
+    '''classical extended kalman filter'''
 
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
-        if 'ud' in args: self.run = self.ud
-        elif 'cpp' in args: self.run = self.cpp
-        else: self.run = self.base
+        if 'ud' in args: self.run = self.ekfud
+        elif 'cpp' in args: self.run = self.ekfudcpp
+        else: self.run = self.ekfbase
 
-    def base(self, model):
+    def ekfbase(self, model):
         '''basic form'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         for t, o, u in sim():
@@ -21,7 +21,7 @@ class Kalman():
             P = P - K @ H(x) @ P
             self.log.append([t, x, y])
 
-    def ud(self, model):
+    def ekfud(self, model):
         '''UD factorized form'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         U, D = self.udfactorize(P)
@@ -30,7 +30,7 @@ class Kalman():
             x, U, D, y = self.observational(x, U, D, H(x), o, R, h(x))
             self.log.append([t, x, y])
 
-    def cpp(self, model):
+    def ekfudcpp(self, model):
         '''UD factorized form in cpp'''
         import sys; sys.path.append('./cmake-build-debug/libstatespace')
         import libstatespace
