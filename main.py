@@ -19,11 +19,11 @@ cases ={
     '4a': {'model': Onestate(), 'processor': SigmaPoint('cho')},
     '4b': {'model': Threestate(), 'processor': SigmaPoint('cho')},
     '4c': {'model': BearingsOnly(), 'processor': SigmaPoint('cho')}, # todo
-    '5a': {'model': Onestate(), 'processor': Particle()}, # todo
+    '5a': {'model': Onestate(), 'processor': Particle('pf1')}, # tuning
     '5b': {'model': Threestate(), 'processor': Particle()}, # todo
     '5c': {'model': BearingsOnly(), 'processor': Particle()}, # todo
 }
-case = '5b'
+case = '5a'
 
 def main():
     model, processor = cases[case]['model'], cases[case]['processor']

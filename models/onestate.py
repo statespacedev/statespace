@@ -19,7 +19,7 @@ class Onestate(BaseModel):
         self.tsteps = 151
         self.dt = .01
         self.x = np.array([[2.]]).T
-        self.x0 = np.array([[2.2]]).T
+        self.x0 = np.array([[2.1]]).T
         self.P0 = .1 * np.eye(1)
         self.varproc = 1e-6 * np.array([[1]]).T
         self.varobs = 6e-4
@@ -127,14 +127,15 @@ class PF(PFBase):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        self.xhat0 = 2.05
         self.nsamp = 250
 
     def F(self, x):
         return (1 - .05 * self.parent.dt) * x + (.04 * self.parent.dt) * x ** 2 + math.sqrt(self.parent.varproc) * np.random.randn(self.nsamp)
 
     def H(self, y, x):
-        return np.exp(-np.log(2. * np.pi * self.parent.R) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R))
+        k = 5
+        tmp = np.exp(-np.log(2. * np.pi * self.parent.R * k) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R * k))
+        return tmp
 
 class Eval(EvalBase):
     def __init__(self, parent):

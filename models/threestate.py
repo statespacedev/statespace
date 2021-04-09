@@ -169,7 +169,12 @@ class PF(PFBase):
         return (1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2
 
     def H(self, y, x):
-        return np.exp(-np.log(2. * np.pi * self.parent.R) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R))
+        k = 100
+        a = -np.log(2. * np.pi * self.parent.R * k) / 2.
+        b = (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R * k)
+        c = a - b
+        tmp = np.exp(c)
+        return tmp.reshape(1, -1)
 
 class Eval(EvalBase):
     def __init__(self, parent):
