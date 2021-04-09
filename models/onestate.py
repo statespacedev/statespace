@@ -13,7 +13,7 @@ class Onestate(BaseModel):
     def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
                             self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
                             self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
-    def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
+    def pf(self): return self.PF.nsamp, self.PF.F, self.PF.likelihood
 
     def __init__(self):
         super().__init__()
@@ -133,7 +133,7 @@ class PF(PFBase):
     def F(self, x):
         return (1 - .05 * self.parent.dt) * x + (.04 * self.parent.dt) * x ** 2 + math.sqrt(self.parent.varproc) * np.random.randn(self.nsamp)
 
-    def H(self, y, x):
+    def likelihood(self, y, x):
         return norm.pdf(x**2 + x**3, y, np.sqrt(self.parent.R))
 
 class Eval(EvalBase):

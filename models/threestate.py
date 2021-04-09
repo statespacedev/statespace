@@ -13,7 +13,7 @@ class Threestate(BaseModel):
     def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
                          self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
                          self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
-    def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
+    def pf(self): return self.PF.nsamp, self.PF.F, self.PF.likelihood
 
     def __init__(self):
         super().__init__()
@@ -170,8 +170,9 @@ class PF(PFBase):
     def F(self, x):
         return (1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2
 
-    def H(self, y, x):
-        return norm.pdf(x**2 + x**3, y, np.sqrt(self.parent.R)).reshape(1, -1)
+    def likelihood(self, y, X):
+        tmp = norm.pdf(X[0, :]**2 + X[0, :]**3, y, np.sqrt(self.parent.R)).reshape(1, -1)
+        return tmp
 
 class Eval(EvalBase):
     def __init__(self, parent):

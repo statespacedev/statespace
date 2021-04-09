@@ -12,25 +12,25 @@ class Particle():
     def pf(self, model):
         '''particle filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        n, F, H = model.pf()
+        n, F, likelihood = model.pf()
         X = x + math.sqrt(Q[0, 0]) * np.random.randn(n)
         W = self.normalize(np.ones((1, X.shape[1])))
         for t, o, u in sim():
             X = self.resample(X, W)
             X = F(X)
-            W = self.normalize(H(o, X))
+            W = self.normalize(likelihood(o, X))
             self.log.append([t, W @ X.T, h(W @ X.T)])
 
     def pfb(self, model):
         '''particle filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        n, F, H = model.pf()
+        n, F, likelihood = model.pf()
         X = x + np.multiply(np.random.randn(x.shape[0], n), np.diag(np.sqrt(Q)).reshape(-1, 1))
         W = np.ones((1, n)) / n
         for t, o, u in sim():
             X = np.row_stack((self.resample(X[0, :], W), self.roughen(X[1, :]), self.roughen(X[2, :])))
             X[0, :] = np.apply_along_axis(F, 0, X)
-            W = self.normalize(H(o, X[0, :]))
+            W = self.normalize(likelihood(o, X))
             self.log.append([t, (W @ X.T).reshape(-1, 1), h((W @ X.T).reshape(-1, 1))])
 
     def resample(self, xi, Wi):
@@ -60,7 +60,6 @@ class Particle():
 
     def normalize(self, W):
         W = W / np.sum(W)
-        # if np.isnan(W).any(): W = np.ones((1, W.shape[1])) / W.shape[1]
         return W
 
 if __name__ == "__main__":

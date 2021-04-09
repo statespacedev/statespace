@@ -24,7 +24,7 @@ class SPKFBase():
 class PFBase():
     def __init__(self): pass
     def F(self, x): return None
-    def H(self, y, x): return None
+    def likelihood(self, y, x): return None
 
 class EvalBase():
     def __init__(self):
