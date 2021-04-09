@@ -6,6 +6,8 @@ class Particle():
     
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
+        if 'pf1' in args: self.run = self.pf1
+        else: self.run = self.pf2
 
     def pf1(self, model): # todo still scalar
         '''particle filter'''
@@ -23,15 +25,15 @@ class Particle():
 
     def pf2(self, model):
         '''particle filter'''
-        sim, f, h, F, H, R, x, P = model.ekf()
-        nsamp, F, H = model.pf()
-        x = x + np.sqrt(model.varproc) * np.random.randn(model.PF.nsamp, len(x))
-        W = np.ones((nsamp, 3)) / nsamp
-        for t, obs in sim():
+        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
+        n, F, H = model.pf()
+        x = x + np.multiply(np.random.randn(x.shape[0], n), np.diag(np.sqrt(Q)).reshape(-1, 1))
+        W = np.ones((x.shape[0], n)) / n
+        for t, o, u in sim():
             x[:, 0], x[:, 1], x[:, 2] = self.resample(x[:, 0], W[:, 0]), self.roughen(x[:, 1]), self.roughen(x[:, 2])
             x[:, 0] = np.apply_along_axis(F, 1, x)
-            y = model.h(x)
-            W[:, 0] = self.normalize(H(obs, x[:, 0]))
+            y = h(x)
+            W[:, 0] = self.normalize(H(o, x[:, 0]))
             x = [W[:, 0].T @ x[:, 0], W[:, 1].T @ x[:, 1], W[:, 2].T @ x[:, 2]]
             self.log.append([t, x, y])
 
