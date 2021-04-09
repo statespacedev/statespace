@@ -6,10 +6,10 @@ class Particle():
     
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
-        if 'pf1' in args: self.run = self.pf1
-        else: self.run = self.pf2
+        if 'pfb' in args: self.run = self.pfb
+        else: self.run = self.pf
 
-    def pf1(self, model):
+    def pf(self, model):
         '''particle filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         n, F, H = model.pf()
@@ -21,17 +21,17 @@ class Particle():
             W = self.normalize(H(o, X))
             self.log.append([t, W @ X.T, h(W @ X.T)])
 
-    def pf2(self, model):
+    def pfb(self, model):
         '''particle filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         n, F, H = model.pf()
-        x = x + np.multiply(np.random.randn(x.shape[0], n), np.diag(np.sqrt(Q)).reshape(-1, 1))
+        X = x + np.multiply(np.random.randn(x.shape[0], n), np.diag(np.sqrt(Q)).reshape(-1, 1))
         W = np.ones((1, n)) / n
         for t, o, u in sim():
-            x = np.row_stack((self.resample(x[0, :], W), self.roughen(x[1, :]), self.roughen(x[2, :])))
-            x[0, :] = np.apply_along_axis(F, 0, x)
-            W = self.normalize(H(o, x[0, :]))
-            self.log.append([t, (W @ x.T).reshape(-1, 1), h((W @ x.T).reshape(-1, 1))])
+            X = np.row_stack((self.resample(X[0, :], W), self.roughen(X[1, :]), self.roughen(X[2, :])))
+            X[0, :] = np.apply_along_axis(F, 0, X)
+            W = self.normalize(H(o, X[0, :]))
+            self.log.append([t, (W @ X.T).reshape(-1, 1), h((W @ X.T).reshape(-1, 1))])
 
     def resample(self, xi, Wi):
         '''particle resampling.'''
@@ -55,11 +55,13 @@ class Particle():
 
     def roughen(self, x):
         x = x.reshape(1, -1)
-        tmp = x + .1 * np.random.randn(1, x.shape[1])
+        tmp = x + .001 * np.random.randn(1, x.shape[1])
         return tmp
 
     def normalize(self, W):
-        return W / np.sum(W)
+        W = W / np.sum(W)
+        # if np.isnan(W).any(): W = np.ones((1, W.shape[1])) / W.shape[1]
+        return W
 
 if __name__ == "__main__":
     pass

@@ -2,6 +2,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
+from scipy.stats import norm
 
 class Threestate(BaseModel):
     '''three-state reference model'''
@@ -19,7 +20,8 @@ class Threestate(BaseModel):
         self.tsteps = 1501
         self.dt = .01
         self.x = np.array([[2., .05, .04]]).T
-        self.x0 = np.array([[2.1, .055, .044]]).T
+        # self.x0 = np.array([[2.1, .055, .044]]).T
+        self.x0 = np.array([[2., .055, .044]]).T
         self.P0 = .1 * np.eye(3)
         self.varproc = 1e-9 * np.array([[1, 1, 1]]).T
         self.varobs = 9e-4
@@ -169,12 +171,7 @@ class PF(PFBase):
         return (1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2
 
     def H(self, y, x):
-        k = 100
-        a = -np.log(2. * np.pi * self.parent.R * k) / 2.
-        b = (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R * k)
-        c = a - b
-        tmp = np.exp(c)
-        return tmp.reshape(1, -1)
+        return norm.pdf(x**2 + x**3, y, np.sqrt(self.parent.R)).reshape(1, -1)
 
 class Eval(EvalBase):
     def __init__(self, parent):

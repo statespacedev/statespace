@@ -2,6 +2,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
+from scipy.stats import norm
 
 class Onestate(BaseModel):
     '''one-state reference model'''
@@ -133,9 +134,7 @@ class PF(PFBase):
         return (1 - .05 * self.parent.dt) * x + (.04 * self.parent.dt) * x ** 2 + math.sqrt(self.parent.varproc) * np.random.randn(self.nsamp)
 
     def H(self, y, x):
-        k = 5
-        tmp = np.exp(-np.log(2. * np.pi * self.parent.R * k) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R * k))
-        return tmp
+        return norm.pdf(x**2 + x**3, y, np.sqrt(self.parent.R))
 
 class Eval(EvalBase):
     def __init__(self, parent):
