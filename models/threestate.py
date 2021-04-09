@@ -167,8 +167,10 @@ class PF(PFBase):
         self.xhat0 = np.array([2.0, .055, .044])
         self.nsamp = 250
 
-    def F(self, x):
-        return (1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2
+    def F(self, X):
+        def tmp(x): return (1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2
+        X[0, :] = np.apply_along_axis(tmp, 0, X)
+        return X
 
     def likelihood(self, y, X):
         tmp = norm.pdf(X[0, :]**2 + X[0, :]**3, y, np.sqrt(self.parent.R)).reshape(1, -1)

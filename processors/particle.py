@@ -6,14 +6,14 @@ class Particle():
     
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
-        if 'pfb' in args: self.run = self.pfb
-        else: self.run = self.pf
+        if 'pfb' in args: self.run = self.bootstrap2
+        else: self.run = self.bootstrap
 
-    def pf(self, model):
+    def bootstrap(self, model):
         '''particle filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         n, F, likelihood = model.pf()
-        X = x + math.sqrt(Q[0, 0]) * np.random.randn(n)
+        X = x + np.multiply(np.random.randn(x.shape[0], n), np.diag(np.sqrt(Q)).reshape(-1, 1))
         W = self.normalize(np.ones((1, X.shape[1])))
         for t, o, u in sim():
             X = self.resample(X, W)
@@ -21,15 +21,15 @@ class Particle():
             W = self.normalize(likelihood(o, X))
             self.log.append([t, W @ X.T, h(W @ X.T)])
 
-    def pfb(self, model):
+    def bootstrap2(self, model):
         '''particle filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         n, F, likelihood = model.pf()
         X = x + np.multiply(np.random.randn(x.shape[0], n), np.diag(np.sqrt(Q)).reshape(-1, 1))
-        W = np.ones((1, n)) / n
+        W = self.normalize(np.ones((1, X.shape[1])))
         for t, o, u in sim():
             X = np.row_stack((self.resample(X[0, :], W), self.roughen(X[1, :]), self.roughen(X[2, :])))
-            X[0, :] = np.apply_along_axis(F, 0, X)
+            X = F(X)
             W = self.normalize(likelihood(o, X))
             self.log.append([t, (W @ X.T).reshape(-1, 1), h((W @ X.T).reshape(-1, 1))])
 
