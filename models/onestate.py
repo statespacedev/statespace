@@ -13,7 +13,7 @@ class Onestate(BaseModel):
     def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
                             self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
                             self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
-    def pf(self): return self.PF.nsamp, self.PF.F, self.PF.likelihood
+    def pf(self): return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
 
     def __init__(self):
         super().__init__()
@@ -128,14 +128,38 @@ class PF(PFBase):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        self.nsamp = 250
+        self.n = 250
 
-    def F(self, x):
-        return (1 - .05 * self.parent.dt) * x + (.04 * self.parent.dt) * x ** 2 + math.sqrt(self.parent.varproc) * np.random.randn(self.nsamp)
+    def X0(self):
+        tmp = self.parent.x0 + np.multiply(np.random.randn(self.parent.x0.shape[0], self.n), np.diag(np.sqrt(self.parent.Q)).reshape(-1, 1))
+        return tmp
 
-    def likelihood(self, y, x):
-        tmp = y - (x**2 + x**3)
-        return norm.pdf(x**2 + x**3, y, np.sqrt(self.parent.R))
+    def predict(self, X):
+        X = (1 - .05 * self.parent.dt) * X + (.04 * self.parent.dt) * X ** 2 + math.sqrt(self.parent.varproc) * np.random.randn(self.n)
+        return X
+
+    def update(self, X, o):
+        W = norm.pdf(X**2 + X**3, o, np.sqrt(self.parent.R))
+        return W / np.sum(W)
+
+    def resample(self, xi, Wi):
+        tmp, xi = [], xi.reshape(1, -1)
+        for i in range(xi.shape[1]):
+            tmp.append([xi[0, i], Wi[0, i]])
+        tmp = sorted(tmp, key=lambda x: x[0])
+        cdf = [[tmp[0][0], tmp[0][1]]]
+        for i in range(1, len(tmp)):
+            cdf.append([tmp[i][0], tmp[i][1] + cdf[i - 1][1]])
+        cdf = np.asarray(cdf)
+        uk = np.sort(np.random.uniform(size=xi.shape[0]))
+        xhati, k = [], 0
+        for row in cdf:
+            if k < uk.size and uk[k] <= row[1]:
+                xhati.append(row[0])
+                k += 1
+            else: xhati.append(cdf[0][0])
+        xhati = np.asarray(xhati).reshape(1, -1)
+        return xhati
 
 class Eval(EvalBase):
     def __init__(self, parent):

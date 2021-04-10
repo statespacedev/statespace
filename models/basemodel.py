@@ -23,8 +23,10 @@ class SPKFBase():
 
 class PFBase():
     def __init__(self): pass
-    def F(self, x): return None
-    def likelihood(self, y, x): return None
+    def X0(self): pass
+    def predict(self, X): return None
+    def update(self, X, o): return None
+    def resample(self, X, W): return None
 
 class EvalBase():
     def __init__(self):

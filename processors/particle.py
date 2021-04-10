@@ -2,65 +2,21 @@ import math
 import numpy as np
 
 class Particle():
-    '''particle filter, sequential monte carlo sampling processor, bootstrap particle filter'''
+    '''particle filter, sequential monte carlo sampling processor'''
     
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
-        if 'pfb' in args: self.run = self.bootstrap2
-        else: self.run = self.bootstrap
+        self.run = self.bootstrap
 
     def bootstrap(self, model):
-        '''particle filter'''
+        '''basic sampling-importance-resampling (SIR) particle filter, bootstrap particle filter, condensation particle filter, survival of the fittest algorithm'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        n, F, likelihood = model.pf()
-        X = x + np.multiply(np.random.randn(x.shape[0], n), np.diag(np.sqrt(Q)).reshape(-1, 1))
-        W = self.normalize(np.ones((1, X.shape[1])))
+        X, predict, update, resample = model.pf()
         for t, o, u in sim():
-            X = self.resample(X, W)
-            X = F(X)
-            W = self.normalize(likelihood(o, X))
+            X = predict(X)
+            W = update(X, o)
+            X = resample(X, W)
             self.log.append([t, W @ X.T, h(W @ X.T)])
-
-    def bootstrap2(self, model):
-        '''particle filter'''
-        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        n, F, likelihood = model.pf()
-        X = x + np.multiply(np.random.randn(x.shape[0], n), np.diag(np.sqrt(Q)).reshape(-1, 1))
-        W = self.normalize(np.ones((1, X.shape[1])))
-        for t, o, u in sim():
-            X = np.row_stack((self.resample(X[0, :], W), self.roughen(X[1, :]), self.roughen(X[2, :])))
-            X = F(X)
-            W = self.normalize(likelihood(o, X))
-            self.log.append([t, (W @ X.T).reshape(-1, 1), h((W @ X.T).reshape(-1, 1))])
-
-    def resample(self, xi, Wi):
-        '''particle resampling.'''
-        tmp, xi = [], xi.reshape(1, -1)
-        for i in range(xi.shape[1]):
-            tmp.append([xi[0, i], Wi[0, i]])
-        tmp = sorted(tmp, key=lambda x: x[0])
-        cdf = [[tmp[0][0], tmp[0][1]]]
-        for i in range(1, len(tmp)):
-            cdf.append([tmp[i][0], tmp[i][1] + cdf[i - 1][1]])
-        cdf = np.asarray(cdf)
-        uk = np.sort(np.random.uniform(size=xi.shape[0]))
-        xhati, k = [], 0
-        for row in cdf:
-            if k < uk.size and uk[k] <= row[1]:
-                xhati.append(row[0])
-                k += 1
-            else: xhati.append(cdf[0][0])
-        xhati = np.asarray(xhati).reshape(1, -1)
-        return xhati
-
-    def roughen(self, x):
-        x = x.reshape(1, -1)
-        tmp = x + .001 * np.random.randn(1, x.shape[1])
-        return tmp
-
-    def normalize(self, W):
-        W = W / np.sum(W)
-        return W
 
 if __name__ == "__main__":
     pass

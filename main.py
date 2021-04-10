@@ -20,7 +20,7 @@ cases ={
     '4b': {'model': Threestate(), 'processor': SigmaPoint('cho')},
     '4c': {'model': BearingsOnly(), 'processor': SigmaPoint('cho')}, # todo
     '5a': {'model': Onestate(), 'processor': Particle()}, # tuning
-    '5b': {'model': Threestate(), 'processor': Particle('pfb')}, # tuning
+    '5b': {'model': Threestate(), 'processor': Particle()}, # tuning
     '5c': {'model': BearingsOnly(), 'processor': Particle()}, # todo
 }
 case = '5a'
