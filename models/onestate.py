@@ -9,11 +9,9 @@ class Onestate(BaseModel):
     '''one-state reference model'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, \
-                         self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, self.SPKF.W
-    def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
-                            self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
-                            self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
+    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.X1, self.SPKF.Pxy, self.SPKF.W
+    def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, self.SPKF.X1cho, self.SPKF.Pxy, \
+                            self.SPKF.W, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
     def pf(self): return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
 
     def __init__(self):
@@ -73,7 +71,6 @@ class SPKF(SPKFBase):
         k2 = 1 / float(2 * self.k0)
         self.nlroot = math.sqrt(self.k0)
         self.W = np.array([[k1, k2, k2]])
-        self.Wc = np.array([[k1, k2, k2]])
         self.Xtil = np.zeros((1, 3))
         self.Ytil = np.zeros((1, 3))
         self.Pxy = np.zeros((1, 1))
@@ -89,27 +86,12 @@ class SPKF(SPKFBase):
         X = np.column_stack((col1, col2, col3))
         return X
 
-    def X2(self, X):
-        k = 1
-        col1 = X[:, 0].reshape(-1, 1)
-        col2 = X[:, 1].reshape(-1, 1) + np.sqrt(k * self.parent.Q[:, 0].reshape(-1, 1))
-        col3 = X[:, 2].reshape(-1, 1) - np.sqrt(k * self.parent.Q[:, 0].reshape(-1, 1))
-        X2 = np.column_stack((col1, col2, col3))
-        return X2
-
     def X1cho(self, x, S):
         col1 = x
         col2 = x + self.nlroot * S[:, 0].reshape(-1, 1)
         col3 = x - self.nlroot * S[:, 0].reshape(-1, 1)
         X = np.column_stack((col1, col2, col3))
         return X
-
-    def X2cho(self, X):
-        Xhat = np.zeros([1, 3])
-        Xhat[:, 0] = X[:, 0]
-        Xhat[:, 1] = X[:, 1] + self.nlroot * self.Sproc.T[:, 0]
-        Xhat[:, 2] = X[:, 2] - self.nlroot * self.Sproc.T[:, 0]
-        return Xhat
 
     def vf(self, X, u):
         for i in range(3): X[:, i] = (self.parent.f(X[:, i].reshape(-1, 1)) + u).flatten()

@@ -7,7 +7,7 @@ class BearingsOnly(BaseModel):
     '''bearings-only tracking problem'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, self.SPKF.W
+    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.X1, self.SPKF.Pxy, self.SPKF.W
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def __init__(self):
@@ -90,19 +90,6 @@ class SPKF(SPKFBase):
         col9 = x - np.sqrt((n+k) * np.array([[0, 0, 0, P[3, 3]]]).T)
         X = np.column_stack((col1, col2, col3, col4, col5, col6, col7, col8, col9))
         return X
-
-    def X2(self, X):
-        col1 = X[:, 0].reshape(-1, 1)
-        col2 = X[:, 1].reshape(-1, 1) + self.parent.sigproc * k
-        col3 = X[:, 2].reshape(-1, 1) + self.parent.sigproc * k
-        col4 = X[:, 3].reshape(-1, 1) + self.parent.sigproc * k
-        col5 = X[:, 4].reshape(-1, 1) + self.parent.sigproc * k
-        col6 = X[:, 5].reshape(-1, 1) - self.parent.sigproc * k
-        col7 = X[:, 6].reshape(-1, 1) - self.parent.sigproc * k
-        col8 = X[:, 7].reshape(-1, 1) - self.parent.sigproc * k
-        col9 = X[:, 8].reshape(-1, 1) - self.parent.sigproc * k
-        X2 = np.column_stack((col1, col2, col3, col4, col5, col6, col7, col8, col9))
-        return X2
 
     def vf(self, X, u):
         for i in range(9): X[:, i] = (self.parent.f(X[:, i].reshape(-1, 1)) + u).flatten()
