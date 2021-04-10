@@ -134,6 +134,7 @@ class PF(PFBase):
         return (1 - .05 * self.parent.dt) * x + (.04 * self.parent.dt) * x ** 2 + math.sqrt(self.parent.varproc) * np.random.randn(self.nsamp)
 
     def likelihood(self, y, x):
+        tmp = y - (x**2 + x**3)
         return norm.pdf(x**2 + x**3, y, np.sqrt(self.parent.R))
 
 class Eval(EvalBase):
