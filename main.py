@@ -23,7 +23,7 @@ cases ={
     '5b': {'model': Threestate(), 'processor': Particle('pfb')}, # tuning
     '5c': {'model': BearingsOnly(), 'processor': Particle()}, # todo
 }
-case = '5b'
+case = '5a'
 
 def main():
     model, processor = cases[case]['model'], cases[case]['processor']
