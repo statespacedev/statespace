@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
 from scipy.stats import norm
+from filterpy.monte_carlo import systematic_resample
 
 class Onestate(BaseModel):
     '''one-state reference model'''
@@ -129,37 +130,20 @@ class PF(PFBase):
         super().__init__()
         self.parent = parent
         self.n = 250
+        self.x0 = np.array([[2.05]]).T
 
     def X0(self):
-        tmp = self.parent.x0 + np.multiply(np.random.randn(self.parent.x0.shape[0], self.n), np.diag(np.sqrt(self.parent.Q)).reshape(-1, 1))
-        return tmp
+        return self.x0 + np.multiply(np.random.randn(self.x0.shape[0], self.n), np.diag(np.sqrt(self.parent.Q)).reshape(-1, 1))
 
     def predict(self, X):
-        X = (1 - .05 * self.parent.dt) * X + (.04 * self.parent.dt) * X ** 2 + math.sqrt(self.parent.varproc) * np.random.randn(self.n)
-        return X
+        return (1 - .05 * self.parent.dt) * X + (.04 * self.parent.dt) * X ** 2 + math.sqrt(self.parent.varproc) * np.random.randn(self.n)
 
     def update(self, X, o):
         W = norm.pdf(X**2 + X**3, o, np.sqrt(self.parent.R))
         return W / np.sum(W)
 
-    def resample(self, xi, Wi):
-        tmp, xi = [], xi.reshape(1, -1)
-        for i in range(xi.shape[1]):
-            tmp.append([xi[0, i], Wi[0, i]])
-        tmp = sorted(tmp, key=lambda x: x[0])
-        cdf = [[tmp[0][0], tmp[0][1]]]
-        for i in range(1, len(tmp)):
-            cdf.append([tmp[i][0], tmp[i][1] + cdf[i - 1][1]])
-        cdf = np.asarray(cdf)
-        uk = np.sort(np.random.uniform(size=xi.shape[0]))
-        xhati, k = [], 0
-        for row in cdf:
-            if k < uk.size and uk[k] <= row[1]:
-                xhati.append(row[0])
-                k += 1
-            else: xhati.append(cdf[0][0])
-        xhati = np.asarray(xhati).reshape(1, -1)
-        return xhati
+    def resample(self, x, W):
+        return x[:, systematic_resample(W.T)]
 
 class Eval(EvalBase):
     def __init__(self, parent):

@@ -6,6 +6,8 @@
 
 processors and models from [Bayesian Signal Processing: Classical, Modern, and Particle Filtering](http://a.co/gp4upXd) and [Kalman Filtering: Theory and Practice](http://a.co/6hAa35c).
 
+210410 vector and matrix math just like in the textbooks is now pretty much everywhere. why numpy makes this so round-about remains a mystery. during all this reconstruction, brought in particle [resampling from filterpy](https://filterpy.readthedocs.io/en/latest/monte_carlo/resampling.html). good stuff. [rlabbe's work](https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/12-Particle-Filters.ipynb) is highly recommended.
+
 210404 new model structure is working well, exemplified by the new bearings-only tracking model. this is thoroughly checked out for the kalman processor and next step is to propagate and check the new stuff throughout the sigmapoint and particle processors. bearings-only model is go, last glitch ironed out.
 
 ![](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/bearingsonly.png)

@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
 from scipy.stats import norm
+from filterpy.monte_carlo import systematic_resample
 
 class Threestate(BaseModel):
     '''three-state reference model'''
@@ -13,15 +14,14 @@ class Threestate(BaseModel):
     def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
                          self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
                          self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
-    def pf(self): return self.PF.nsamp, self.PF.F, self.PF.likelihood
+    def pf(self): return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
 
     def __init__(self):
         super().__init__()
         self.tsteps = 1501
         self.dt = .01
         self.x = np.array([[2., .05, .04]]).T
-        # self.x0 = np.array([[2.1, .055, .044]]).T
-        self.x0 = np.array([[2., .055, .044]]).T
+        self.x0 = np.array([[2.1, .055, .044]]).T
         self.P0 = .1 * np.eye(3)
         self.varproc = 1e-9 * np.array([[1, 1, 1]]).T
         self.varobs = 9e-4
@@ -164,17 +164,31 @@ class PF(PFBase):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        self.xhat0 = np.array([2.0, .055, .044])
-        self.nsamp = 250
+        self.n = 250
+        self.x0 = np.array([[2.05, .055, .044]]).T
+        self.Q = self.parent.Q
+        tmp = 1e-8
+        self.Q[1, 1] = tmp
+        self.Q[2, 2] = tmp
 
-    def F(self, X):
-        def tmp(x): return (1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2
-        X[0, :] = np.apply_along_axis(tmp, 0, X)
+    def X0(self):
+        return self.x0 + np.multiply(np.random.randn(self.x0.shape[0], self.n), np.diag(np.sqrt(self.parent.Q)).reshape(-1, 1))
+
+    def predict(self, X):
+        def f(x):
+            w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Q))).T
+            base = np.array([[(1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2, x[1], x[2]]]).T
+            return base + w
+        for i in range(X.shape[1]): X[:, i] = f(X[:, i]).flatten()
         return X
 
-    def likelihood(self, y, X):
-        tmp = norm.pdf(X[0, :]**2 + X[0, :]**3, y, np.sqrt(self.parent.R)).reshape(1, -1)
-        return tmp
+    def update(self, X, o):
+        W = norm.pdf(X[0, :]**2 + X[0, :]**3, o, np.sqrt(self.parent.R)).reshape(1, -1)
+        return W / np.sum(W)
+
+    def resample(self, x, W):
+        ndxs = systematic_resample(W.T)
+        return x[:, ndxs]
 
 class Eval(EvalBase):
     def __init__(self, parent):

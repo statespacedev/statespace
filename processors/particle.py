@@ -2,7 +2,7 @@ import math
 import numpy as np
 
 class Particle():
-    '''particle filter, sequential monte carlo sampling processor'''
+    '''particle filter, sequential monte carlo processor'''
     
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
@@ -16,7 +16,8 @@ class Particle():
             X = predict(X)
             W = update(X, o)
             X = resample(X, W)
-            self.log.append([t, W @ X.T, h(W @ X.T)])
+            x = np.sum(np.multiply(W, X), axis=1).reshape(-1, 1)
+            self.log.append([t, x, h(x)])
 
 if __name__ == "__main__":
     pass
