@@ -9,11 +9,9 @@ class Threestate(BaseModel):
     '''three-state reference model'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
-                         self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, self.SPKF.W
-    def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
-                         self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
-                         self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
+    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, self.SPKF.W
+    def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
+                            self.SPKF.W, self.SPKF.Wc, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
     def pf(self): return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
 
     def __init__(self):
@@ -134,30 +132,14 @@ class SPKF(SPKFBase):
         Xhat[:, 6] = X[:, 6] - self.nlroot * self.Sproc.T[:, 2]
         return Xhat
 
-    def vf(self, X):
-        for i in range(7):
-            tmp = self.parent.f(X[:, i].reshape(-1, 1))
-            X[0, i] = tmp[0, 0]
-            X[1, i] = tmp[1, 0]
-            X[2, i] = tmp[2, 0]
+    def vf(self, X, u):
+        for i in range(7): X[:, i] = (self.parent.f(X[:, i].reshape(-1, 1)) + u).flatten()
         return X
 
     def vh(self, Xhat):
         Y = np.zeros((1, 7))
-        for i in range(7):
-            tmp = Xhat[:, i].reshape(-1, 1)
-            Y[0, i] = self.parent.h(tmp)
+        for i in range(7): Y[0, i] = self.parent.h(Xhat[:, i].reshape(-1, 1)).flatten()
         return Y
-
-    def Xtil(self, X, W):
-        Xtil = np.zeros((3, 7))
-        for i in range(7): Xtil[:, i] = X[:, i] - W @ X.T
-        return Xtil
-
-    def ksi(self, Y, W):
-        ksi = np.zeros((1, 7))
-        for i in range(7): ksi[0, i] = Y[i] - W @ Y.T
-        return ksi
 
 class PF(PFBase):
 

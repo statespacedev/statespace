@@ -7,15 +7,15 @@ class BearingsOnly(BaseModel):
     '''bearings-only tracking problem'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.X1, self.SPKF.X2, self.SPKF.W, self.SPKF.S
+    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, self.SPKF.W
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def __init__(self):
         super().__init__()
         self.tsteps = 100 # 2hr = 7200sec / 100
         self.dt = .02 # hrs, .02 hr = 72 sec
-        self.x = np.array([0., 15., 20., -10.], ndmin=2).T
-        self.x0 = np.array([0., 20., 20., -10.], ndmin=2).T
+        self.x = np.array([[0., 15., 20., -10.]]).T
+        self.x0 = np.array([[0., 20., 20., -10.]]).T
         self.P0 = 1 * np.eye(4)
         self.varproc = 1e-6
         self.varobs = 6e-4
@@ -26,6 +26,7 @@ class BearingsOnly(BaseModel):
         self.G[1, 1] = self.dt**2 / 2
         self.G[2, 0] = self.dt
         self.G[3, 1] = self.dt
+        self.sigproc = math.sqrt(self.varproc)
         self.SPKF = SPKF(self)
         self.PF = PF(self)
         self.eval = Eval(self)
@@ -33,7 +34,7 @@ class BearingsOnly(BaseModel):
     def sim(self):
         for tstep in range(self.tsteps):
             t = tstep * self.dt
-            u = np.array([0., 0., 0., 0.], ndmin=2).T
+            u = np.array([[0., 0., 0., 0.]]).T
             if t == 0.5: u[2] = -24.; u[3] = 10.
             self.x = self.f(self.x, 0) + u
             self.y = self.h(self.x, 0)
@@ -42,7 +43,7 @@ class BearingsOnly(BaseModel):
             yield (t, self.y, u)
 
     def f(self, x, *args):
-        base = np.array([x[0, 0] + self.dt * x[2, 0], x[1, 0] + self.dt * x[3, 0], x[2, 0], x[3, 0]], ndmin=2).T
+        base = np.array([[x[0, 0] + self.dt * x[2, 0], x[1, 0] + self.dt * x[3, 0], x[2, 0], x[3, 0]]]).T
         if 0 in args: return base + self.G @ np.multiply(np.random.randn(2), math.sqrt(self.varproc))
         return base
 
@@ -60,73 +61,57 @@ class BearingsOnly(BaseModel):
 
     def H(self, x):
         dsqr = x[0, 0]**2 + x[1, 0]**2
-        return np.array([x[1, 0] / dsqr, -x[0, 0] / dsqr, 0, 0], ndmin=2)
+        return np.array([[x[1, 0] / dsqr, -x[0, 0] / dsqr, 0, 0]])
 
+n, k = 4, 1
+w1, w2 = k/(n+k), .5/(n+k)
 class SPKF(SPKFBase):
 
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        P0 = .1 * np.eye(3)
-        self.S = np.linalg.cholesky(P0)
+        self.S = np.linalg.cholesky(self.parent.P0)
         self.Sw = np.linalg.cholesky(np.diag(parent.varproc * np.array([1, 1])))
         self.Sv = np.linalg.cholesky(np.diag(parent.varobs * np.array([1])))
-        n = 3
-        kappa = 1
-        alpha = 1
-        beta = 2
-        lam = alpha ** 2 * (n + kappa) - n
-        wi = 1 / float(2 * (n + lam))
-        w0m = lam / float(n + lam)
-        w0c = lam / float(n + lam) + (1 - alpha ** 2 + beta)
-        self.Wm = np.array([w0m, wi, wi, wi, wi, wi, wi], ndmin=2).T
-        self.Wc = np.array([w0c, wi, wi, wi, wi, wi, wi], ndmin=2).T
-        self.nlroot = math.sqrt(n + lam)
-        self.Xtil = np.zeros((3, 7))
-        self.Ytil = np.zeros((1, 7))
-        self.Pxy = np.zeros((3, 1))
-        self.W = self.Wm
+        self.W = np.array([[w1, w2, w2, w2, w2, w2, w2, w2, w2]])
+        self.Xtil = np.zeros((4, 9))
+        self.Ytil = np.zeros((1, 9))
+        self.Pxy = np.zeros((4, 1))
 
-    def X1(self, x, C):
-        X = np.zeros([3, 7])
-        X[:, 0] = x
-        X[:, 1] = x + self.nlroot * C.T[:, 0]
-        X[:, 2] = x + self.nlroot * C.T[:, 1]
-        X[:, 3] = x + self.nlroot * C.T[:, 2]
-        X[:, 4] = x - self.nlroot * C.T[:, 0]
-        X[:, 5] = x - self.nlroot * C.T[:, 1]
-        X[:, 6] = x - self.nlroot * C.T[:, 2]
+    def X1(self, x, P):
+        col1 = x
+        col2 = x + np.sqrt((n+k) * np.array([[P[0, 0], 0, 0, 0]]).T)
+        col3 = x + np.sqrt((n+k) * np.array([[0, P[1, 1], 0, 0]]).T)
+        col4 = x + np.sqrt((n+k) * np.array([[0, 0, P[2, 2], 0]]).T)
+        col5 = x + np.sqrt((n+k) * np.array([[0, 0, 0, P[3, 3]]]).T)
+        col6 = x - np.sqrt((n+k) * np.array([[P[0, 0], 0, 0, 0]]).T)
+        col7 = x - np.sqrt((n+k) * np.array([[0, P[1, 1], 0, 0]]).T)
+        col8 = x - np.sqrt((n+k) * np.array([[0, 0, P[2, 2], 0]]).T)
+        col9 = x - np.sqrt((n+k) * np.array([[0, 0, 0, P[3, 3]]]).T)
+        X = np.column_stack((col1, col2, col3, col4, col5, col6, col7, col8, col9))
         return X
 
     def X2(self, X):
-        Xhat = np.zeros([3, 7])
-        Xhat[:, 0] = X[:, 0]
-        Xhat[:, 1] = X[:, 1] + self.nlroot * self.Sw.T[:, 0]
-        Xhat[:, 2] = X[:, 2] + self.nlroot * self.Sw.T[:, 1]
-        Xhat[:, 3] = X[:, 3] + self.nlroot * self.Sw.T[:, 2]
-        Xhat[:, 4] = X[:, 4] - self.nlroot * self.Sw.T[:, 0]
-        Xhat[:, 5] = X[:, 5] - self.nlroot * self.Sw.T[:, 1]
-        Xhat[:, 6] = X[:, 6] - self.nlroot * self.Sw.T[:, 2]
-        return Xhat
+        col1 = X[:, 0].reshape(-1, 1)
+        col2 = X[:, 1].reshape(-1, 1) + self.parent.sigproc * k
+        col3 = X[:, 2].reshape(-1, 1) + self.parent.sigproc * k
+        col4 = X[:, 3].reshape(-1, 1) + self.parent.sigproc * k
+        col5 = X[:, 4].reshape(-1, 1) + self.parent.sigproc * k
+        col6 = X[:, 5].reshape(-1, 1) - self.parent.sigproc * k
+        col7 = X[:, 6].reshape(-1, 1) - self.parent.sigproc * k
+        col8 = X[:, 7].reshape(-1, 1) - self.parent.sigproc * k
+        col9 = X[:, 8].reshape(-1, 1) - self.parent.sigproc * k
+        X2 = np.column_stack((col1, col2, col3, col4, col5, col6, col7, col8, col9))
+        return X2
 
-    def vf(self, X):
-        for i in range(7): X[:, i] = self.parent.f(X[:, i])
+    def vf(self, X, u):
+        for i in range(9): X[:, i] = (self.parent.f(X[:, i].reshape(-1, 1)) + u).flatten()
         return X
 
     def vh(self, Xhat):
-        Y = np.zeros(7)
-        for i in range(7): Y[i] = self.parent.h(Xhat[:, i])
+        Y = np.zeros((1, 9))
+        for i in range(9): Y[0, i] = self.parent.h(Xhat[:, i].reshape(-1, 1)).flatten()
         return Y
-
-    def Xtil(self, X, W):
-        Xtil = np.zeros((3, 7))
-        for i in range(7): Xtil[:, i] = X[:, i] - W @ X.T
-        return Xtil
-
-    def ksi(self, Y, W):
-        ksi = np.zeros((1, 7))
-        for i in range(7): ksi[0, i] = Y[i] - W @ Y.T
-        return ksi
 
 class PF(PFBase):
 

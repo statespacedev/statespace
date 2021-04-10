@@ -13,10 +13,10 @@ class SigmaPoint():
     def spfbase(self, model):
         '''sigma-point determinstic sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        f, h, Xtil, Ytil, X1, X2, Pxy, W = model.sp()
+        f, h, Xtil, X1, X2, Pxy, W = model.sp()
         Wm = np.tile(W, (Xtil.shape[0], 1))
         for t, o, u in sim():
-            X = f(X1(x, P))
+            X = f(X1(x, P), u)
             Y = h(X2(X))
             x, y = np.sum(np.multiply(Wm, X), axis=1).reshape(-1, 1), np.sum(np.multiply(W, Y), axis=1)[0]
             Xres, Yres = self.Xres(X.copy(), x), self.Yres(Y, y)
@@ -31,7 +31,7 @@ class SigmaPoint():
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         f, h, Xtil, Ytil, X1, X2, Pxy, W, Wc, S, Sproc, Sobs = model.spcho()
         for t, o, u in sim():
-            x, S, X = self.temporal(x, f, Xtil, X1, W, Wc, S, Sproc)
+            x, S, X = self.temporal(x, f, Xtil, X1, W, Wc, S, Sproc, u)
             x, S, y = self.observational(x, o, h, X, Xtil, Ytil, X2, Pxy, W, Wc, S, Sobs)
             self.log.append([t, x, y])
 
@@ -44,9 +44,9 @@ class SigmaPoint():
         for i in range(Y.shape[1]): Y[0, i] -= y
         return Y
 
-    def temporal(self, x, f, Xtil, X1, Wm, Wc, S, Sproc):
+    def temporal(self, x, f, Xtil, X1, Wm, Wc, S, Sproc, u):
         '''cholesky factorized temporal update'''
-        X = f(X1(x, S))
+        X = f(X1(x, S), u)
         x = X @ Wm.T
         for i in range(X.shape[1]): Xtil[:, i] = (X[:, i].reshape(-1, 1) - x).T
         q, r = np.linalg.qr(np.concatenate([math.sqrt(Wc[0, 1]) * Xtil[:, 1:], Sproc], 1))

@@ -5,7 +5,7 @@
 introduction
 ==================================================================================================================
 
-this project focuses on reference problems in kalman, sigma-point, and particle processors - in particular, numpy and eigen implementations.
+this project focuses on reference problems in kalman, sigma-point, and particle processors - in particular, numpy and eigen implementations, using classic vector and matrix representations so things look like what's in the literature.
 
 install
 ------------------------------------------------------------------------------------------------------------------

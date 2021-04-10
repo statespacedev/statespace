@@ -9,7 +9,7 @@ class Onestate(BaseModel):
     '''one-state reference model'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
+    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, \
                          self.SPKF.X1, self.SPKF.X2, self.SPKF.Pxy, self.SPKF.W
     def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, \
                             self.SPKF.X1cho, self.SPKF.X2cho, self.SPKF.Pxy, \
@@ -111,17 +111,13 @@ class SPKF(SPKFBase):
         Xhat[:, 2] = X[:, 2] - self.nlroot * self.Sproc.T[:, 0]
         return Xhat
 
-    def vf(self, X):
-        for i in range(3):
-            tmp = self.parent.f(X[0, i].reshape(-1, 1))
-            X[0, i] = tmp[0, 0]
+    def vf(self, X, u):
+        for i in range(3): X[:, i] = (self.parent.f(X[:, i].reshape(-1, 1)) + u).flatten()
         return X
 
     def vh(self, Xhat):
         Y = np.zeros((1, 3))
-        for i in range(3):
-            tmp = Xhat[:, i].reshape(-1, 1)
-            Y[0, i] = self.parent.h(tmp)
+        for i in range(3): Y[0, i] = self.parent.h(Xhat[:, i].reshape(-1, 1)).flatten()
         return Y
 
 class PF(PFBase):

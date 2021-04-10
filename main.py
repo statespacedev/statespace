@@ -23,7 +23,7 @@ cases ={
     '5b': {'model': Threestate(), 'processor': Particle()},
     '5c': {'model': BearingsOnly(), 'processor': Particle()}, # todo
 }
-case = '5b'
+case = '3c'
 
 def main():
     model, processor = cases[case]['model'], cases[case]['processor']
