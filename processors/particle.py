@@ -14,9 +14,8 @@ class Particle():
         X, predict, update, resample = model.pf()
         for t, o, u in sim():
             X = predict(X)
-            W = update(X, o)
+            W = update(X, o); x = np.sum(np.multiply(W, X), axis=1).reshape(-1, 1)
             X = resample(X, W)
-            x = np.sum(np.multiply(W, X), axis=1).reshape(-1, 1)
             self.log.append([t, x, h(x)])
 
 if __name__ == "__main__":
