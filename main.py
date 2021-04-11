@@ -12,7 +12,6 @@ cases ={
     '1c': {'model': BearingsOnly(), 'processor': Kalman()},
     '2a': {'model': Onestate(), 'processor': Kalman('ud')},
     '2b': {'model': Threestate(), 'processor': Kalman('ud')},
-    '2c': {'model': BearingsOnly(), 'processor': Kalman('ud')}, # tuning
     '3a': {'model': Onestate(), 'processor': SigmaPoint()},
     '3b': {'model': Threestate(), 'processor': SigmaPoint()},
     '3c': {'model': BearingsOnly(), 'processor': SigmaPoint()}, # tuning
@@ -22,7 +21,7 @@ cases ={
     '5b': {'model': Threestate(), 'processor': Particle()},
     '5c': {'model': BearingsOnly(), 'processor': Particle()}, # todo
 }
-case = '4b'
+case = '3c'
 
 def main():
     model, processor = cases[case]['model'], cases[case]['processor']

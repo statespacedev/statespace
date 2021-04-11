@@ -9,7 +9,7 @@ class Onestate(BaseModel):
     '''one-state reference model'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.X1, self.SPKF.Pxy, self.SPKF.W
+    def sp(self): return self.SPKF.XY, self.SPKF.W, self.SPKF.WM
     def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, self.SPKF.X1cho, self.SPKF.Pxy, \
                             self.SPKF.W, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
     def pf(self): return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
@@ -60,31 +60,37 @@ class Onestate(BaseModel):
     def H(self, x):
         return np.array([[2 * x[0, 0] + 3 * x[0, 0] ** 2]])
 
+n, k = 1, 1
+w1, w2 = k/(n+k), .5/(n+k)
 class SPKF(SPKFBase):
-
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
+        self.W = np.array([[w1, w2, w2]])
+        self.WM = np.tile(self.W, (self.parent.x.shape[0], 1))
+
         self.kappa = 1
         self.k0 = 1 + self.kappa
         k1 = self.kappa / float(self.k0)
         k2 = 1 / float(2 * self.k0)
         self.nlroot = math.sqrt(self.k0)
-        self.W = np.array([[k1, k2, k2]])
-        self.Xtil = np.zeros((1, 3))
-        self.Ytil = np.zeros((1, 3))
-        self.Pxy = np.zeros((1, 1))
         self.S = np.linalg.cholesky(parent.P0)
         self.Sproc = np.linalg.cholesky(parent.Q)
         self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
+        self.Xtil = np.zeros((1, 3))
+        self.Ytil = np.zeros((1, 3))
+        self.Pxy = np.zeros((1, 1))
 
-    def X1(self, x, P):
+    def XY(self, x, P, u):
         k = 1
         col1 = x
         col2 = x + np.sqrt(k * np.array([[P[0, 0]]]).T)
         col3 = x - np.sqrt(k * np.array([[P[0, 0]]]).T)
         X = np.column_stack((col1, col2, col3))
-        return X
+        for i in range(3): X[:, i] = (self.parent.f(X[:, i].reshape(-1, 1)) + u).flatten()
+        Y = np.zeros((1, 3))
+        for i in range(3): Y[0, i] = self.parent.h(X[:, i].reshape(-1, 1)).flatten()
+        return X, Y
 
     def X1cho(self, x, S):
         col1 = x
@@ -92,15 +98,6 @@ class SPKF(SPKFBase):
         col3 = x - self.nlroot * S[:, 0].reshape(-1, 1)
         X = np.column_stack((col1, col2, col3))
         return X
-
-    def vf(self, X, u):
-        for i in range(3): X[:, i] = (self.parent.f(X[:, i].reshape(-1, 1)) + u).flatten()
-        return X
-
-    def vh(self, Xhat):
-        Y = np.zeros((1, 3))
-        for i in range(3): Y[0, i] = self.parent.h(Xhat[:, i].reshape(-1, 1)).flatten()
-        return Y
 
 class PF(PFBase):
 

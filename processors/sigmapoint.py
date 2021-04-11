@@ -8,16 +8,14 @@ class SigmaPoint():
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
         if 'cho' in args: self.run = self.spfcholesky
-        else: self.run = self.spfbase
+        else: self.run = self.spf
 
-    def spfbase(self, model):
+    def spf(self, model):
         '''sigma-point deterministic sampling kalman filter'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        f, h, Xtil, X1, Pxy, W = model.sp()
-        WM = np.tile(W, (Xtil.shape[0], 1))
+        XY, W, WM = model.sp()
         for t, o, u in sim():
-            X = f(X1(x, P), u)
-            Y = h(X)
+            X, Y = XY(x, P, u)
             x, y = np.sum(np.multiply(WM, X), axis=1).reshape(-1, 1), np.sum(np.multiply(W, Y), axis=1)[0]
             Xres, Yres = self.Xres(X.copy(), x), self.Yres(Y, y)
             P = np.multiply(WM, Xres) @ Xres.T + G @ Q @ G.T

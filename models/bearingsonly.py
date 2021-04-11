@@ -7,7 +7,7 @@ class BearingsOnly(BaseModel):
     '''bearings-only tracking problem'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-    def sp(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.X1, self.SPKF.Pxy, self.SPKF.W
+    def sp(self): return self.SPKF.XY, self.SPKF.W, self.SPKF.WM
     def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
 
     def __init__(self):
@@ -26,7 +26,6 @@ class BearingsOnly(BaseModel):
         self.G[1, 1] = self.dt**2 / 2
         self.G[2, 0] = self.dt
         self.G[3, 1] = self.dt
-        self.sigproc = math.sqrt(self.varproc)
         self.SPKF = SPKF(self)
         self.PF = PF(self)
         self.eval = Eval(self)
@@ -66,19 +65,13 @@ class BearingsOnly(BaseModel):
 n, k = 4, 1
 w1, w2 = k/(n+k), .5/(n+k)
 class SPKF(SPKFBase):
-
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        self.S = np.linalg.cholesky(self.parent.P0)
-        self.Sw = np.linalg.cholesky(np.diag(parent.varproc * np.array([1, 1])))
-        self.Sv = np.linalg.cholesky(np.diag(parent.varobs * np.array([1])))
         self.W = np.array([[w1, w2, w2, w2, w2, w2, w2, w2, w2]])
-        self.Xtil = np.zeros((4, 9))
-        self.Ytil = np.zeros((1, 9))
-        self.Pxy = np.zeros((4, 1))
+        self.WM = np.tile(self.W, (self.parent.x.shape[0], 1))
 
-    def X1(self, x, P):
+    def XY(self, x, P, u):
         col1 = x
         col2 = x + np.sqrt((n+k) * np.array([[P[0, 0], 0, 0, 0]]).T)
         col3 = x + np.sqrt((n+k) * np.array([[0, P[1, 1], 0, 0]]).T)
@@ -89,16 +82,10 @@ class SPKF(SPKFBase):
         col8 = x - np.sqrt((n+k) * np.array([[0, 0, P[2, 2], 0]]).T)
         col9 = x - np.sqrt((n+k) * np.array([[0, 0, 0, P[3, 3]]]).T)
         X = np.column_stack((col1, col2, col3, col4, col5, col6, col7, col8, col9))
-        return X
-
-    def vf(self, X, u):
         for i in range(9): X[:, i] = (self.parent.f(X[:, i].reshape(-1, 1)) + u).flatten()
-        return X
-
-    def vh(self, Xhat):
         Y = np.zeros((1, 9))
-        for i in range(9): Y[0, i] = self.parent.h(Xhat[:, i].reshape(-1, 1)).flatten()
-        return Y
+        for i in range(9): Y[0, i] = self.parent.h(X[:, i].reshape(-1, 1)).flatten()
+        return X, Y
 
 class PF(PFBase):
 

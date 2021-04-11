@@ -7,9 +7,9 @@ class Kalman():
         self.args, self.kwargs, self.log = args, kwargs, []
         if 'ud' in args: self.run = self.ekfud
         elif 'cpp' in args: self.run = self.ekfudcpp
-        else: self.run = self.ekfbase
+        else: self.run = self.ekf
 
-    def ekfbase(self, model):
+    def ekf(self, model):
         '''basic form'''
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         for t, o, u in sim():
