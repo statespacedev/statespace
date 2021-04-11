@@ -110,7 +110,7 @@ class PF(PFBase):
     def X0(self):
         return self.x0 + np.multiply(np.random.randn(self.x0.shape[0], self.n), np.diag(np.sqrt(self.parent.Q)).reshape(-1, 1))
 
-    def predict(self, X):
+    def predict(self, X, u):
         return (1 - .05 * self.parent.dt) * X + (.04 * self.parent.dt) * X ** 2 + math.sqrt(self.parent.varproc) * np.random.randn(self.n)
 
     def update(self, X, o):

@@ -2,13 +2,15 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
+from scipy.stats import norm
+from filterpy.monte_carlo import systematic_resample
 
 class BearingsOnly(BaseModel):
     '''bearings-only tracking problem'''
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
     def sp(self): return self.SPKF.XY, self.SPKF.W, self.SPKF.WM
-    def pf(self): return self.PF.nsamp, self.PF.F, self.PF.H
+    def pf(self): return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
 
     def __init__(self):
         super().__init__()
@@ -93,14 +95,29 @@ class PF(PFBase):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        self.xhat0 = np.array([2.0, .055, .044])
-        self.nsamp = 250
+        self.n = 250
+        self.x0 = np.array([[0., 20., 20., -10.]]).T
+        self.Q = self.parent.G @ self.parent.Q @ self.parent.G.T
 
-    def F(self, x):
-        return (1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2
+    def X0(self):
+        return self.x0 + np.multiply(np.random.randn(self.x0.shape[0], self.n), np.diag(np.sqrt(self.Q)).reshape(-1, 1))
 
-    def H(self, y, x):
-        return np.exp(-np.log(2. * np.pi * self.parent.R) / 2. - (y - x ** 2 - x ** 3) ** 2 / (2. * self.parent.R))
+    def predict(self, X, u):
+        def f(x):
+            w = np.multiply(np.random.randn(1, x.shape[0]), np.sqrt(np.diag(self.Q))).T
+            base = np.array([[x[0] + self.parent.dt * x[2], x[1] + self.parent.dt * x[3], x[2], x[3]]]).T
+            return base + w + u
+        for i in range(X.shape[1]): X[:, i] = f(X[:, i]).flatten()
+        return X
+
+    def update(self, X, o):
+        dsqr = X[0, :]**2 + X[1, :]**2
+        W = norm.pdf((X[1, :] - X[0, :]) / dsqr, o, np.sqrt(self.parent.R)).reshape(1, -1)
+        return W / np.sum(W)
+
+    def resample(self, x, W):
+        ndxs = systematic_resample(W.T)
+        return x[:, ndxs]
 
 class Eval(EvalBase):
     def __init__(self, parent):

@@ -13,7 +13,7 @@ class Particle():
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         X, predict, update, resample = model.pf()
         for t, o, u in sim():
-            X = predict(X)
+            X = predict(X, u)
             W = update(X, o); x = np.sum(np.multiply(W, X), axis=1).reshape(-1, 1)
             X = resample(X, W)
             self.log.append([t, x, h(x)])

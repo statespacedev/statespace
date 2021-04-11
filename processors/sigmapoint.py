@@ -7,7 +7,7 @@ class SigmaPoint():
     
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
-        if 'cho' in args: self.run = self.spfcholesky
+        if 'cholesky' in args: self.run = self.spfcholesky
         else: self.run = self.spf
 
     def spf(self, model):

@@ -127,7 +127,7 @@ class PF(PFBase):
     def X0(self):
         return self.x0 + np.multiply(np.random.randn(self.x0.shape[0], self.n), np.diag(np.sqrt(self.parent.Q)).reshape(-1, 1))
 
-    def predict(self, X):
+    def predict(self, X, u):
         def f(x):
             w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Q))).T
             base = np.array([[(1 - x[1] * self.parent.dt) * x[0] + x[2] * self.parent.dt * x[0] ** 2, x[1], x[2]]]).T
