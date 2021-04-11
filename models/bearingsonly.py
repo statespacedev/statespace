@@ -64,6 +64,7 @@ class BearingsOnly(BaseModel):
 
 n, k = 4, 1
 w1, w2 = k/(n+k), .5/(n+k)
+
 class SPKF(SPKFBase):
     def __init__(self, parent):
         super().__init__()

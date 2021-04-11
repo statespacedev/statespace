@@ -10,8 +10,7 @@ class Onestate(BaseModel):
 
     def ekf(self): return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
     def sp(self): return self.SPKF.XY, self.SPKF.W, self.SPKF.WM
-    def spcho(self): return self.SPKF.vf, self.SPKF.vh, self.SPKF.Xtil, self.SPKF.Ytil, self.SPKF.X1cho, self.SPKF.Pxy, \
-                            self.SPKF.W, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
+    def spcho(self): return self.SPKF.XYcho, self.SPKF.W, self.SPKF.Xtil, self.SPKF.Ytil, self.SPKF.Pxy, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
     def pf(self): return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
 
     def __init__(self):
@@ -62,17 +61,15 @@ class Onestate(BaseModel):
 
 n, k = 1, 1
 w1, w2 = k/(n+k), .5/(n+k)
+
 class SPKF(SPKFBase):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.W = np.array([[w1, w2, w2]])
         self.WM = np.tile(self.W, (self.parent.x.shape[0], 1))
-
         self.kappa = 1
         self.k0 = 1 + self.kappa
-        k1 = self.kappa / float(self.k0)
-        k2 = 1 / float(2 * self.k0)
         self.nlroot = math.sqrt(self.k0)
         self.S = np.linalg.cholesky(parent.P0)
         self.Sproc = np.linalg.cholesky(parent.Q)
@@ -92,12 +89,15 @@ class SPKF(SPKFBase):
         for i in range(3): Y[0, i] = self.parent.h(X[:, i].reshape(-1, 1)).flatten()
         return X, Y
 
-    def X1cho(self, x, S):
+    def XYcho(self, x, S, u):
         col1 = x
         col2 = x + self.nlroot * S[:, 0].reshape(-1, 1)
         col3 = x - self.nlroot * S[:, 0].reshape(-1, 1)
         X = np.column_stack((col1, col2, col3))
-        return X
+        for i in range(3): X[:, i] = (self.parent.f(X[:, i].reshape(-1, 1)) + u).flatten()
+        Y = np.zeros((1, 3))
+        for i in range(3): Y[0, i] = self.parent.h(X[:, i].reshape(-1, 1)).flatten()
+        return X, Y
 
 class PF(PFBase):
 
