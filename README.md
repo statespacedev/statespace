@@ -8,7 +8,7 @@ processors and models from [Bayesian Signal Processing: Classical, Modern, and P
 
 210410 classical vector-matrix notation is go pretty much everywhere. why numpy makes this such a pain remains a mystery. during all this reconstruction, brought in [resampling from filterpy](https://filterpy.readthedocs.io/en/latest/monte_carlo/resampling.html). good stuff. [rlabbe's work](https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/12-Particle-Filters.ipynb) is highly recommended.
 
-210404 new model structure is working well, exemplified by the new bearings-only tracking model. this is thoroughly checked out for the kalman processor and next step is to propagate and check the new stuff throughout the sigmapoint and particle processors. bearings-only model is go, last glitch ironed out.
+210404 new model structure is working well - thoroughly checked out for kalman processor and now propagating to sigmapoint and particle processors. bearings-only model is go.
 
 ![](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/bearingsonly.png)
 
