@@ -4,7 +4,9 @@
 [![pypi](https://img.shields.io/badge/pypi-latest-brightgreen.svg)](https://pypi.org/project/statespace/)
 [![docs](https://readthedocs.org/projects/statespace/badge/?version=latest)](https://statespace.readthedocs.io/en/latest/?badge=latest)
 
-processors and models from [Bayesian Signal Processing: Classical, Modern, and Particle Filtering](http://a.co/gp4upXd) and [Kalman Filtering: Theory and Practice](http://a.co/6hAa35c).
+processors and models from [Bayesian Signal Processing: Classical, Modern, and Particle Filtering](http://a.co/gp4upXd), [Kalman Filtering: Theory and Practice](http://a.co/6hAa35c), [Time Series Analysis by State Space Methods](http://ssfpack.com/DKbook.html).
+
+210418 returning to some of the business / economic / social models orbiting around [state space time series analysis](http://ssfpack.com/DKbook.html). brought in the data files for the durbin koopman textbook. nile model brought back from at least partially in line with this others. ideally we'd like state space time series models to fit organically into the new model structure - the model structure should encompass both business time series models and engineering models. we'd be bringing two worlds together right here. so this is a perfect time to get started - while we're still shaping the foundations of the model structure. 
 
 210410 classical vector-matrix notation is go pretty much everywhere. why numpy makes this such a pain remains a mystery. during all this reconstruction, brought in [resampling from filterpy](https://filterpy.readthedocs.io/en/latest/monte_carlo/resampling.html). good stuff. [rlabbe's work](https://github.com/rlabbe/Kalman-and-Bayesian-Filters-in-Python/blob/master/12-Particle-Filters.ipynb) is highly recommended.
 
