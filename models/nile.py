@@ -3,11 +3,11 @@ import numpy as np
 import math
 
 def main():
-    e1 = Exp1()
-    e1.filtering()
-    e1.state_smoothing()
-    e1.simulation()
-    e1.plot()
+    model = Model()
+    model.filtering()
+    model.state_smoothing()
+    model.simulation()
+    model.plot()
     plt.show()
 
 # inverse-gamma distributions of the disturbance variances sigsqrepsilon and sigsqreta
@@ -26,7 +26,7 @@ class Params():
             self.theta1[1] += .5 * epsilons[j]**2
             self.theta2[1] += .5 * etas[j]**2
 
-class Exp1():
+class Model():
     def __init__(self):
         self.ts = [float(rec[0]) for rec in nile()]
         self.y = [float(rec[1]) for rec in nile()]
