@@ -60,7 +60,7 @@ entry point into cpp implementations for use by python code.
 models
 ==================================================================================================================
 
-will probably be moving towards a higher-level statespace model, encompassing specific lower-level models - possibly something involoving a translator / converter / adaptor... the models here are already an extrememly primitive form of that - making them as similar as possible from the perspective of the classical, modern, particle processors. we can think about these becoming specific cases of something more fundamental.
+will probably be moving towards a higher-level statespace model, encompassing specific lower-level models - possibly something involving a translator / converter / adaptor... the models here are already an extrememly primitive form of that - making them as similar as possible from the perspective of the classical, modern, particle processors. we can think about these becoming specific cases of something more fundamental.
 
 basemodel.py
 -------------
