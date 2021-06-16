@@ -21,7 +21,7 @@ cases ={
     'bo2': {'model': BearingsOnly(), 'processor': SigmaPoint()}, # tuning
     'bo3': {'model': BearingsOnly(), 'processor': Particle()}, # tuning
 }
-case = 'bo1'
+case = '1b'
 
 def main():
     model, processor = cases[case]['model'], cases[case]['processor']

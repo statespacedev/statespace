@@ -38,7 +38,7 @@ deploy_staging:
     - tags
   script:
     - pip install twine
-    - twine upload --repository-url $TESTPYPI_URL dist/*
+#    - twine upload --repository-url $TESTPYPI_URL dist/*
 
 deploy_production:
   stage: deploy
