@@ -4,6 +4,7 @@ scipy
 matplotlib
 pytest
 filterpy
+gitpython
 #pymc3
 #tf-nightly
 #tfp-nightly

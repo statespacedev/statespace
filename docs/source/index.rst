@@ -57,7 +57,7 @@ basemodel.py
 
 placeholder for what could grow to become a higher-level statespace model - with individual models inheriting and overriding.
 
-.. automodule:: statespace.basemodel
+.. automodule:: statespace.models.basemodel
     :members:
 
 onestate.py
@@ -65,7 +65,7 @@ onestate.py
 
 a simple as possible one-state example with non linear temporal and observation updates. it's a common example in the candy and jazwinisky books. based on real world reentry vehicle tracking.
 
-.. automodule:: statespace.onestate
+.. automodule:: statespace.models.onestate
     :members:
 
 threestate.py
@@ -73,7 +73,7 @@ threestate.py
 
 three-state extension of the the one-state model. non linear temporal and observation updates.
 
-.. automodule:: statespace.threestate
+.. automodule:: statespace.models.threestate
     :members:
 
 bearingsonly.py
@@ -81,6 +81,6 @@ bearingsonly.py
 
 the bearings only problem has some interesting history. it's basically about being on a sub. your sub is travelling along steadily and you begin hearing the sound of a ship at some bearing. over time and as the bearing changes, you can estimate the relative position and velocity of the ship. at some point you make a course change for your sub to pursue the ship.
 
-.. automodule:: statespace.bearingsonly
+.. automodule:: statespace.models.bearingsonly
     :members:
 

@@ -4,6 +4,5 @@ include README.md
 include requirements.txt
 include CMakeLists.txt
 include setup.py
-include main.py
 graft statespace
 graft libstatespace

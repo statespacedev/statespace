@@ -1,9 +1,9 @@
 from statespace.processors.kalman import Kalman
 from statespace.processors.sigmapoint import SigmaPoint
 from statespace.processors.particle import Particle
-from statespace.onestate import Onestate
-from statespace.threestate import Threestate
-from statespace.bearingsonly import BearingsOnly
+from statespace.models.onestate import Onestate
+from statespace.models.threestate import Threestate
+from statespace.models.bearingsonly import BearingsOnly
 
 cases = {
     '1a': {'model': Onestate(), 'processor': Kalman()},

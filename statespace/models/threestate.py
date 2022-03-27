@@ -1,7 +1,7 @@
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from statespace.basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
+from statespace.models.basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
 from scipy.stats import norm
 from filterpy.monte_carlo import systematic_resample
 

@@ -1,4 +1,4 @@
-from statespace.threestate import Threestate
+from statespace.models.threestate import Threestate
 from statespace.processors.kalman import Kalman
 
 
