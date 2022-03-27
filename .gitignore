@@ -4,7 +4,12 @@ dist/*
 build/*
 *egg-info*
 venv/*
-version
-/venv38/
 /docs/build/
 /docs/liboregon/octaveworkspace
+/build/
+/dist/
+/venv/
+/.pytest_cache/
+
+*.so
+/libstatespace.cpython-38-x86_64-linux-gnu.so

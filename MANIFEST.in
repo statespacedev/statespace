@@ -5,9 +5,5 @@ include requirements.txt
 include CMakeLists.txt
 include setup.py
 include main.py
-recursive-include processors *
-recursive-include models *
-recursive-include libstatespace *
-recursive-exclude docs *
-
-
+graft statespace
+graft libstatespace

@@ -3,8 +3,11 @@
 [![pipeline](https://gitlab.com/noahhsmith/starid/badges/master/pipeline.svg)](https://gitlab.com/noahhsmith/statespace/pipelines)
 [![pypi](https://img.shields.io/badge/pypi-latest-brightgreen.svg)](https://pypi.org/project/statespace/)
 [![docs](https://readthedocs.org/projects/statespace/badge/?version=latest)](https://statespace.readthedocs.io/en/latest/?badge=latest)
+[![docker](https://img.shields.io/docker/v/noahhsmith/statespace)](https://hub.docker.com/repository/docker/noahhsmith/statespace)
 
 processors and models from [Bayesian Signal Processing: Classical, Modern, and Particle Filtering](http://a.co/gp4upXd), [Kalman Filtering: Theory and Practice](http://a.co/6hAa35c), [Time Series Analysis by State Space Methods](http://ssfpack.com/DKbook.html), [An Introduction to State Space Time Series Analysis](http://ssfpack.com/CKbook.html), [Forecasting, Structural Time Series Models and the Kalman Filter](https://www.amazon.de/-/en/Andrew-C-Harvey/dp/0521321964/ref=sr_1_5?dchild=1&keywords=harvey+time+series&qid=1618740688&sr=8-5).
+
+220327 switch to container build environment and deploying to docker hub as well as pypi.
 
 210418 returning to some of the business / economic / social models orbiting around [state space time series analysis](http://ssfpack.com/DKbook.html). brought in the data files for the durbin koopman and commandeur koopman books. earlier work on the nile model brought somewhat up to date. ideally we'd like state space time series models to fit organically into the new model structure so it encompasses both business models and engineering models.
 

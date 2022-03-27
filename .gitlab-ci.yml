@@ -11,7 +11,7 @@ build:
     paths:
       - dist/
   script:
-    - python setup.py sdist
+    - echo "build"
 
 test:
   stage: test
@@ -19,7 +19,7 @@ test:
   dependencies:
     - build
   script:
-    - pip install -e .
+    - echo "test"
 
 deploy_staging:
   stage: deploy
@@ -37,7 +37,8 @@ deploy_staging:
   except:
     - tags
   script:
-    - pip install twine
+    - echo "deploy staging"
+#    - pip install twine
 #    - twine upload --repository-url $TESTPYPI_URL dist/*
 
 deploy_production:
@@ -56,6 +57,7 @@ deploy_production:
   except:
     - branches
   script:
-    - pip install twine
-    - twine upload dist/*
+    - echo "deploy production"
+#    - pip install twine
+#    - twine upload dist/*
 

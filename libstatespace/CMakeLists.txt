@@ -6,14 +6,5 @@ find_package( Eigen3 )
 include_directories( /usr/local/include /usr/include/mkl ${EIGEN3_INCLUDE_DIRS} )
 link_directories( /usr/local/lib /usr/lib )
 
-set( CMAKE_CXX_STANDARD 14 )
-set( CMAKE_CXX_FLAGS "-mavx -mfma -openmp -DEIGEN_USE_MKL_ALL" )
-set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0" )
-set( CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -Ofast" )
-
-add_subdirectory( pybind11 )
-
+add_subdirectory( /tmp/pybind11 cmake-build-debug )
 pybind11_add_module( libstatespace SHARED api.cpp )
-
-target_link_libraries( libstatespace PRIVATE blas lapack )
-
