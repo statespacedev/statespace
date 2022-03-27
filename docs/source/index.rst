@@ -10,17 +10,7 @@ this project focuses on reference problems in kalman, sigma-point, and particle 
 install
 ------------------------------------------------------------------------------------------------------------------
 
-build-test-deploy to `pypi <https://pypi.org/project/statespace>`__ is mostly a placeholder, ubuntu clone-install-develop of `gitlab repo <https://gitlab.com/noahhsmith/statespace>`__ is assumed for now.
-
-.. code-block:: bash
-
-    sudo apt-get -qq update -qy
-    sudo apt-get -qq install -y python3 python3-venv python3-pip
-    git clone git@gitlab.com:noahhsmith/statespace.git statespace
-    cd statespace
-    python3 -m venv venv
-    . venv/bin/activate
-    python3 setup.py develop
+have switched to a container build environment - reproducible using the dockerfile. everything needed is there and can be reproduced for a local environment. docker image is available on docker hub.
 
 processors
 ==================================================================================================================
@@ -30,7 +20,7 @@ kalman.py
 
 baseline extended kalman filters. both the standard textbook form, and the ud factorized form.
 
-.. automodule:: processors.kalman
+.. automodule:: statespace.processors.kalman
     :members:
 
 sigmapoint.py
@@ -38,7 +28,7 @@ sigmapoint.py
 
 sigma-point sampling kalman filters. this is the ukf or unscented kalman filter, or 'modern' kalman filtering. it's essentially somewhere between a classical kalman filter, where uncertainty is represented as gaussian, and a particle filter, where uncertainty has arbitrary shape. here uncertainty is deterministically sampled at a small number of points, the sigma points or sigma particles. in a particle filter the number and role of the particles are increased.
 
-.. automodule:: processors.sigmapoint
+.. automodule:: statespace.processors.sigmapoint
     :members:
 
 particle.py
@@ -46,7 +36,7 @@ particle.py
 
 particle filters, sequential monte carlo sampling processors. sampling here is random, not deterministic as in the sigmapoint processor. and the idea of resampling and growing new particles comes to the fore. the particles are random and new ones can be introduced freely.
 
-.. automodule:: processors.particle
+.. automodule:: statespace.processors.particle
     :members:
 
 api.py
@@ -67,7 +57,7 @@ basemodel.py
 
 placeholder for what could grow to become a higher-level statespace model - with individual models inheriting and overriding.
 
-.. automodule:: models.basemodel
+.. automodule:: statespace.basemodel
     :members:
 
 onestate.py
@@ -75,7 +65,7 @@ onestate.py
 
 a simple as possible one-state example with non linear temporal and observation updates. it's a common example in the candy and jazwinisky books. based on real world reentry vehicle tracking.
 
-.. automodule:: models.onestate
+.. automodule:: statespace.onestate
     :members:
 
 threestate.py
@@ -83,7 +73,7 @@ threestate.py
 
 three-state extension of the the one-state model. non linear temporal and observation updates.
 
-.. automodule:: models.threestate
+.. automodule:: statespace.threestate
     :members:
 
 bearingsonly.py
@@ -91,6 +81,6 @@ bearingsonly.py
 
 the bearings only problem has some interesting history. it's basically about being on a sub. your sub is travelling along steadily and you begin hearing the sound of a ship at some bearing. over time and as the bearing changes, you can estimate the relative position and velocity of the ship. at some point you make a course change for your sub to pursue the ship.
 
-.. automodule:: models.bearingsonly
+.. automodule:: statespace.bearingsonly
     :members:
 
