@@ -39,14 +39,6 @@ particle filters, sequential monte carlo sampling processors. sampling here is r
 .. automodule:: statespace.processors.particle
     :members:
 
-api.py
---------
-
-entry point into cpp implementations for use by python code.
-
-.. automodule:: libstatespace_.api
-    :members:
-
 models
 ==================================================================================================================
 

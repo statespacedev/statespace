@@ -8,8 +8,6 @@ class Kalman:
         self.args, self.kwargs, self.log = args, kwargs, []
         if 'ud' in args:
             self.run = self.ekfud
-        elif 'cpp' in args:
-            self.run = self.ekfudcpp
         else:
             self.run = self.ekf
 
@@ -33,22 +31,6 @@ class Kalman:
         for t, o, u in sim():
             x, U, D = self.temporal(f(x) + u, U, D, F(x), G, Q)
             x, U, D, y = self.observational(x, U, D, H(x), o, R, h(x))
-            self.log.append([t, x, y])
-
-    def ekfudcpp(self, model):
-        '''UD factorized form in cpp'''
-        import sys;
-        sys.path.append('./cmake-build-debug/libstatespace')
-        import libstatespace
-        api = libstatespace.Api()
-        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        ud = api.udfactorize(P);
-        U, D = ud[0], np.diag(ud[1].transpose()[0])
-        for t, o, u in sim():
-            cpp = api.temporal(f(x) + u, U, D, H(x), G, Q)
-            x, U, D = cpp[0].flatten(), cpp[1], cpp[2]
-            cpp = api.observational(x, U, D, H(x), o, R, h(x))
-            x, U, D, y = cpp[0].flatten(), cpp[1], cpp[2], h(x)
             self.log.append([t, x, y])
 
     def udfactorize(self, M):

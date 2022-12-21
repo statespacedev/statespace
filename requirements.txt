@@ -1,10 +1,6 @@
-cryptography<3.4
 numpy
 scipy
 matplotlib
 pytest
 filterpy
 gitpython
-#pymc3
-#tf-nightly
-#tfp-nightly

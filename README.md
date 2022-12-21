@@ -7,6 +7,8 @@
 
 processors and models from [Bayesian Signal Processing: Classical, Modern, and Particle Filtering](http://a.co/gp4upXd), [Kalman Filtering: Theory and Practice](http://a.co/6hAa35c), [Time Series Analysis by State Space Methods](http://ssfpack.com/DKbook.html), [An Introduction to State Space Time Series Analysis](http://ssfpack.com/CKbook.html), [Forecasting, Structural Time Series Models and the Kalman Filter](https://www.amazon.de/-/en/Andrew-C-Harvey/dp/0521321964/ref=sr_1_5?dchild=1&keywords=harvey+time+series&qid=1618740688&sr=8-5).
 
+221221 second thoughts about about cpp python extension here - let's leave that for project starid. in practical terms, project statespace is pure python and pycharm, project starid is cpp python extension and clion.
+
 220327 switch to container build environment and deploying to docker hub as well as pypi.
 
 210418 returning to some of the business / economic / social models orbiting around [state space time series analysis](http://ssfpack.com/DKbook.html). brought in the data files for the durbin koopman and commandeur koopman books. earlier work on the nile model brought somewhat up to date. ideally we'd like state space time series models to fit organically into the new model structure so it encompasses both business models and engineering models.
