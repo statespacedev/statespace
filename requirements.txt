@@ -3,4 +3,5 @@ scipy
 matplotlib
 pytest
 filterpy
-gitpython
+sphinx
+sphinx_rtd_theme
