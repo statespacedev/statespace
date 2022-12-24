@@ -1,9 +1,9 @@
-from statespace.processors.kalman import Kalman
-from statespace.processors.sigmapoint import SigmaPoint
-from statespace.processors.particle import Particle
-from statespace.models.onestate import Onestate
-from statespace.models.threestate import Threestate
-from statespace.models.bearingsonly import BearingsOnly
+from statespace.processors.extended_kalman_filter import Kalman
+from statespace.processors.sigma_point_kalman_filter import SigmaPoint
+from statespace.processors.particle_filter import Particle
+from statespace.models.one_state import Onestate
+from statespace.models.three_state import Threestate
+from statespace.models.bearings_only import BearingsOnly
 
 cases = {
     '1a': {'model': Onestate(), 'processor': Kalman()},
@@ -20,7 +20,7 @@ cases = {
     'bo2': {'model': BearingsOnly(), 'processor': SigmaPoint()},  # tuning
     'bo3': {'model': BearingsOnly(), 'processor': Particle()},  # tuning
 }
-case = '1b'
+case = '3b'
 
 
 def main():

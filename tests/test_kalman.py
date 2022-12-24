@@ -1,5 +1,5 @@
-from statespace.models.threestate import Threestate
-from statespace.processors.kalman import Kalman
+from statespace.processors.extended_kalman_filter import Kalman
+from statespace.models.three_state import Threestate
 
 
 def test_basic():

@@ -1,25 +1,16 @@
+"""a simple as possible one-state example with non linear temporal and observation updates. it's a common example in
+the candy and jazwinisky books. based on real world reentry vehicle tracking. """
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from statespace.models.basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
+from statespace.models.model import Model, SPKFCommon, PFCommon, EvalCommon, Autocorr, Log
 from scipy.stats import norm
+# noinspection PyProtectedMember
 from filterpy.monte_carlo import systematic_resample
 
 
-class Onestate(BaseModel):
-    '''one-state reference model'''
-
-    def ekf(self):
-        return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-
-    def sp(self):
-        return self.SPKF.XY, self.SPKF.W, self.SPKF.WM
-
-    def spcho(self):
-        return self.SPKF.XYcho, self.SPKF.W, self.SPKF.Xtil, self.SPKF.Ytil, self.SPKF.Pxy, self.SPKF.S, self.SPKF.Sproc, self.SPKF.Sobs
-
-    def pf(self):
-        return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
+class Onestate(Model):
+    """one-state reference model"""
 
     def __init__(self):
         super().__init__()
@@ -37,7 +28,25 @@ class Onestate(BaseModel):
         self.PF = PF(self)
         self.eval = Eval(self)
 
+    def ekf(self):
+        """entities needed for an extended kalman filter processor. """
+        return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
+
+    def spkf(self):
+        """entities needed for a sigma point kalman filter processor. """
+        return self.SPKF.XY, self.SPKF.W, self.SPKF.WM
+
+    def spkf_cholesky(self):
+        """entities need for cholesky factorization sigma point kalman filter processor. """
+        return self.SPKF.XYcho, self.SPKF.W, self.SPKF.Xtil, self.SPKF.Ytil, self.SPKF.Pxy, self.SPKF.S, \
+            self.SPKF.Sproc, self.SPKF.Sobs
+
+    def pf(self):
+        """entities needed for a particle filter processor. """
+        return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
+
     def sim(self):
+        """simulation states. a time series of true states and obs. """
         for tstep in range(self.tsteps):
             t = tstep * self.dt
             u = np.array([0]).T
@@ -45,37 +54,41 @@ class Onestate(BaseModel):
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
             self.log.append([t, self.x, self.y])
-            yield (t, self.y, u)
+            yield t, self.y, u
 
     def f(self, x, *args):
+        """state evolution equation. """
         w = math.sqrt(self.varproc) * np.random.randn()
         base = (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2
         if 0 in args: return base + w
         return base
 
     def F(self, x):
+        """state evolution matrix. """
         A = np.eye(1)
         A[0, 0] = 1 - .05 * self.dt + .08 * self.dt * x
         return A
 
     def h(self, x, *args):
+        """observation equation. """
         v = math.sqrt(self.R) * np.random.randn()
         base = x[0, 0] ** 2 + x[0, 0] ** 3
         if 0 in args: return base + v
         return base
 
     def H(self, x):
+        """observation sensitivity matrix. """
         return np.array([[2 * x[0, 0] + 3 * x[0, 0] ** 2]])
 
 
-n, k = 1, 1
-w1, w2 = k / (n + k), .5 / (n + k)
+class SPKF(SPKFCommon):
+    """what's common across sigma point kalman filter models? """
 
-
-class SPKF(SPKFBase):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
+        n, k = 1, 1
+        w1, w2 = k / (n + k), .5 / (n + k)
         self.W = np.array([[w1, w2, w2]])
         self.WM = np.tile(self.W, (self.parent.x.shape[0], 1))
         self.kappa = 1
@@ -89,6 +102,7 @@ class SPKF(SPKFBase):
         self.Pxy = np.zeros((1, 1))
 
     def XY(self, x, P, u):
+        """sigma points update. """
         k = 1
         col1 = x
         col2 = x + np.sqrt(k * np.array([[P[0, 0]]]).T)
@@ -100,6 +114,7 @@ class SPKF(SPKFBase):
         return X, Y
 
     def XYcho(self, x, S, u):
+        """cholesky sigma points update. """
         col1 = x
         col2 = x + self.nlroot * S[:, 0].reshape(-1, 1)
         col3 = x - self.nlroot * S[:, 0].reshape(-1, 1)
@@ -110,7 +125,7 @@ class SPKF(SPKFBase):
         return X, Y
 
 
-class PF(PFBase):
+class PF(PFCommon):
 
     def __init__(self, parent):
         super().__init__()
@@ -119,28 +134,35 @@ class PF(PFBase):
         self.x0 = np.array([[2.05]]).T
 
     def X0(self):
+        """initial particles. """
         return self.x0 + np.multiply(np.random.randn(self.x0.shape[0], self.n),
                                      np.diag(np.sqrt(self.parent.Q)).reshape(-1, 1))
 
     def predict(self, X, u):
+        """evolution forward in time of particles. """
         return (1 - .05 * self.parent.dt) * X + (.04 * self.parent.dt) * X ** 2 + math.sqrt(
             self.parent.varproc) * np.random.randn(self.n)
 
     def update(self, X, o):
+        """observational update of particles. """
         W = norm.pdf(X ** 2 + X ** 3, o, np.sqrt(self.parent.R))
         return W / np.sum(W)
 
     def resample(self, x, W):
+        """resampling of particles. """
         return x[:, systematic_resample(W.T)]
 
 
-class Eval(EvalBase):
+class Eval(EvalCommon):
+    """evaluating processor results. """
+
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.autocorr = Autocorr(parent)
 
     def estimate(self, proclog):
+        """plot estimated results. """
         lw, logm, logp = 1, Log(self.parent.log), Log(proclog)
         plt.figure()
         plt.subplot(2, 2, 1)

@@ -1,8 +1,9 @@
+"""baseline extended kalman filters. both the standard textbook form, and the ud factorized form. """
 import numpy as np
 
 
 class Kalman:
-    '''classical extended kalman filter'''
+    """classical extended kalman filter"""
 
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
@@ -12,7 +13,7 @@ class Kalman:
             self.run = self.ekf
 
     def ekf(self, model):
-        '''basic form'''
+        """basic form"""
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         for t, o, u in sim():
             x = f(x) + u
@@ -25,7 +26,7 @@ class Kalman:
         return True
 
     def ekfud(self, model):
-        '''UD factorized form'''
+        """ud factorized form"""
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
         U, D = self.udfactorize(P)
         for t, o, u in sim():
@@ -33,8 +34,9 @@ class Kalman:
             x, U, D, y = self.observational(x, U, D, H(x), o, R, h(x))
             self.log.append([t, x, y])
 
-    def udfactorize(self, M):
-        '''UD factorization'''
+    @staticmethod
+    def udfactorize(M):
+        """ud factorization"""
         assert np.allclose(M, M.T)
         n, M = M.shape[0], np.triu(M)
         U, d = np.eye(n), np.zeros(n)
@@ -51,15 +53,16 @@ class Kalman:
         d[0] = M[0, 0]
         return U, np.diag(d)
 
-    def temporal(self, xin, Uin, Din, Phi, Gin, Q):
-        '''thornton temporal update'''
+    @staticmethod
+    def temporal(xin, Uin, Din, Phi, Gin, Q):
+        """thornton temporal update"""
         U, D, G, n, r = np.eye(len(xin)), Din, Gin, np.shape(Q)[0], np.shape(Q)[0]
         x, PhiU = Phi @ xin, Phi @ Uin
         for i in reversed(range(len(xin))):
             sigma = 0
             for j in range(n):
                 sigma = sigma + PhiU[i, j] ** 2 * Din[j, j]
-                if (j <= r - 1): sigma = sigma + G[i, j] ** 2 + Q[j, j]
+                if j <= r - 1: sigma = sigma + G[i, j] ** 2 + Q[j, j]
             D[i, i] = sigma
             ilim = i - 1
             if ilim > 0:
@@ -72,8 +75,9 @@ class Kalman:
                     for k in range(r): G[j, k] = G[j, k] - U[j, i] * G[i, k]
         return x, U, D
 
-    def observational(self, xin, Uin, Din, H, obs, R, yhat):
-        '''bierman observation update'''
+    @staticmethod
+    def observational(xin, Uin, Din, H, obs, R, yhat):
+        """bierman observation update"""
         x, U, D, dz, alpha, gamma = xin, Uin, Din, obs - yhat, R, 1 / R
         a = U.T @ H.T
         b = D @ a

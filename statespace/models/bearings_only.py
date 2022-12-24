@@ -1,22 +1,18 @@
+"""the bearings only problem has some interesting history. it's basically about being on a sub. your sub is
+travelling along steadily and you begin hearing the sound of a ship at some bearing. over time and as the bearing
+changes, you can estimate the relative position and velocity of the ship. at some point you make a course change for
+your sub to pursue the ship. """
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from statespace.models.basemodel import BaseModel, SPKFBase, PFBase, EvalBase, Autocorr, Log
+from statespace.models.model import Model, SPKFCommon, PFCommon, EvalCommon, Autocorr, Log
 from scipy.stats import norm
+# noinspection PyProtectedMember
 from filterpy.monte_carlo import systematic_resample
 
 
-class BearingsOnly(BaseModel):
-    '''bearings-only tracking problem'''
-
-    def ekf(self):
-        return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-
-    def sp(self):
-        return self.SPKF.XY, self.SPKF.W, self.SPKF.WM
-
-    def pf(self):
-        return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
+class BearingsOnly(Model):
+    """bearings-only tracking problem"""
 
     def __init__(self):
         super().__init__()
@@ -38,51 +34,70 @@ class BearingsOnly(BaseModel):
         self.PF = PF(self)
         self.eval = Eval(self)
 
+    def ekf(self):
+        """entities needed for an extended kalman filter processor. """
+        return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
+
+    def spkf(self):
+        """entities needed for a sigma point kalman filter processor. """
+        return self.SPKF.XY, self.SPKF.W, self.SPKF.WM
+
+    def pf(self):
+        """entities needed for a particle filter processor. """
+        return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
+
     def sim(self):
+        """simulation states. a time series of true states and obs. """
         for tstep in range(self.tsteps):
             t = tstep * self.dt
             u = np.array([[0., 0., 0., 0.]]).T
-            if t == 0.5: u[2] = -24.; u[3] = 10.
+            if t == 0.5: u[2], u[3] = -24., 10.
             self.x = self.f(self.x, 0) + u
             self.y = self.h(self.x, 0)
             if tstep == 0: continue
             self.log.append([t, self.x, self.y])
-            yield (t, self.y, u)
+            yield t, self.y, u
 
     def f(self, x, *args):
+        """state evolution equation. """
         base = np.array([[x[0, 0] + self.dt * x[2, 0], x[1, 0] + self.dt * x[3, 0], x[2, 0], x[3, 0]]]).T
         if 0 in args: return base + self.G @ np.multiply(np.random.randn(2), math.sqrt(self.varproc))
         return base
 
     def F(self, x):
+        """state evolution matrix. """
         F = np.eye(4)
         F[0, 2] = self.dt
         F[1, 3] = self.dt
         return F
 
     def h(self, x, *args):
+        """observation equation. """
         v = np.random.randn() * math.sqrt(self.varobs)
         base = np.arctan2(x[0, 0], x[1, 0])
         if 0 in args: return base + v
         return base
 
     def H(self, x):
+        """observation sensitivity matrix. """
         dsqr = x[0, 0] ** 2 + x[1, 0] ** 2
         return np.array([[x[1, 0] / dsqr, -x[0, 0] / dsqr, 0, 0]])
 
 
-n, k = 4, 1
-w1, w2 = k / (n + k), .5 / (n + k)
+class SPKF(SPKFCommon):
+    """what's common across sigma point kalman filter models? """
 
-
-class SPKF(SPKFBase):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
+        n, k = 4, 1
+        w1, w2 = k / (n + k), .5 / (n + k)
         self.W = np.array([[w1, w2, w2, w2, w2, w2, w2, w2, w2]])
         self.WM = np.tile(self.W, (self.parent.x.shape[0], 1))
 
     def XY(self, x, P, u):
+        """sigma points update. """
+        n, k = 4, 1
         col1 = x
         col2 = x + np.sqrt((n + k) * np.array([[P[0, 0], 0, 0, 0]]).T)
         col3 = x + np.sqrt((n + k) * np.array([[0, P[1, 1], 0, 0]]).T)
@@ -99,7 +114,7 @@ class SPKF(SPKFBase):
         return X, Y
 
 
-class PF(PFBase):
+class PF(PFCommon):
 
     def __init__(self, parent):
         super().__init__()
@@ -109,9 +124,11 @@ class PF(PFBase):
         self.Q = self.parent.G @ self.parent.Q @ self.parent.G.T
 
     def X0(self):
+        """initial particles. """
         return self.x0 + np.multiply(np.random.randn(self.x0.shape[0], self.n), np.diag(np.sqrt(self.Q)).reshape(-1, 1))
 
     def predict(self, X, u):
+        """evolution forward in time of particles. """
         def f(x):
             w = np.multiply(np.random.randn(1, x.shape[0]), np.sqrt(np.diag(self.Q))).T
             base = np.array([[x[0] + self.parent.dt * x[2], x[1] + self.parent.dt * x[3], x[2], x[3]]]).T
@@ -121,22 +138,27 @@ class PF(PFBase):
         return X
 
     def update(self, X, o):
+        """observational update of particles. """
         dsqr = X[0, :] ** 2 + X[1, :] ** 2
         W = norm.pdf((X[1, :] - X[0, :]) / dsqr, o, np.sqrt(self.parent.R)).reshape(1, -1)
         return W / np.sum(W)
 
     def resample(self, x, W):
+        """resampling of particles. """
         ndxs = systematic_resample(W.T)
         return x[:, ndxs]
 
 
-class Eval(EvalBase):
+class Eval(EvalCommon):
+    """evaluating processor results. """
+
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.autocorr = Autocorr(parent)
 
     def model(self):
+        """plot true timeseries. """
         lw, logm = 1, Log(self.parent.log)
         plt.figure()
         plt.subplot(3, 2, 1), plt.plot(logm.t, logm.x[:, 0], linewidth=lw), plt.ylabel('x[0]')
@@ -146,6 +168,7 @@ class Eval(EvalBase):
         plt.subplot(3, 2, 5), plt.plot(logm.t, logm.y, linewidth=lw), plt.ylabel('y')
 
     def estimate(self, proclog):
+        """plot estimated results. """
         lw, logm, logp = 1, Log(self.parent.log), Log(proclog)
         plt.figure()
         plt.subplot(3, 2, 1)

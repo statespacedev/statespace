@@ -1,10 +1,16 @@
+"""sigma-point sampling kalman filters. this is the ukf or unscented kalman filter, or 'modern' kalman filtering.
+it's essentially somewhere between a classical kalman filter, where uncertainty is represented as gaussian,
+and a particle filter, where uncertainty has arbitrary shape. here uncertainty is deterministically sampled at a
+small number of points, the sigma points or sigma particles. in a particle filter the number and role of the
+particles are increased. """
 import math
 import numpy as np
+# noinspection PyProtectedMember
 from scipy.linalg.blas import drot, drotg
 
 
 class SigmaPoint:
-    '''modern sigma-point deterministic sampling kalman filter'''
+    """modern sigma-point deterministic sampling kalman filter"""
 
     def __init__(self, *args, **kwargs):
         self.args, self.kwargs, self.log = args, kwargs, []
@@ -14,9 +20,9 @@ class SigmaPoint:
             self.run = self.spf
 
     def spf(self, model):
-        '''sigma-point deterministic sampling kalman filter'''
+        """sigma-point deterministic sampling kalman filter"""
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        XY, W, WM = model.sp()
+        XY, W, WM = model.spkf()
         for t, o, u in sim():
             X, Y = XY(x, P, u)
             x, y = np.sum(np.multiply(WM, X), axis=1).reshape(-1, 1), np.sum(np.multiply(W, Y), axis=1)[0]
@@ -28,16 +34,16 @@ class SigmaPoint:
             self.log.append([t, x, y])
 
     def spfcholesky(self, model):
-        '''cholesky factorized sigma-point sampling kalman filter'''
+        """cholesky factorized sigma-point sampling kalman filter"""
         sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        XY, W, X2, Y2, P2, S, Sp, So = model.spcho()
+        XY, W, X2, Y2, P2, S, Sp, So = model.spkf_cholesky()
         for t, o, u in sim():
             x, S, X, Y = self.temporal(x, XY, W, X2, S, Sp, u)
             x, S, y = self.observational(x, o, X, Y, W, X2, Y2, P2, S, So)
             self.log.append([t, x, y])
 
     def temporal(self, x, XY, W, Xtil, S, Sproc, u):
-        '''cholesky factorized temporal update'''
+        """cholesky factorized temporal update"""
         X, Y = XY(x, S, u)
         x = X @ W.T
         for i in range(X.shape[1]): Xtil[:, i] = (X[:, i].reshape(-1, 1) - x).T
@@ -46,7 +52,7 @@ class SigmaPoint:
         return x, S, X, Y
 
     def observational(self, x, o, X, Y, W, Xtil, Ytil, Pxy, S, Sobs):
-        '''cholesky factorized observational update'''
+        """cholesky factorized observational update"""
         y = (W @ Y.T)[0, 0]
         for i in range(X.shape[1]): Ytil[0, i] = (Y[0, i].reshape(-1, 1) - y).T
         q, r = np.linalg.qr(np.concatenate([math.sqrt(W[0, 1]) * Ytil[:, 1:], Sobs], 1))
@@ -61,16 +67,18 @@ class SigmaPoint:
         S = self.choldowndate(S, U)
         return x, S, y
 
-    def cholupdate(self, R, z):
-        '''cholesky update'''
+    @staticmethod
+    def cholupdate(R, z):
+        """cholesky update"""
         n = z.shape[0]
         for k in range(n):
             c, s = drotg(R[k, k], z[k])
             drot(R[k, :], z, c, s, overwrite_x=True, overwrite_y=True)
         return R
 
-    def choldowndate(self, R, z):
-        '''cholesky downdate'''
+    @staticmethod
+    def choldowndate(R, z):
+        """cholesky downdate"""
         n = R.shape[0]
         for k in range(n):
             if (R[k, k] - z[k]) * (R[k, k] + z[k]) < 0: return R
@@ -81,13 +89,15 @@ class SigmaPoint:
             R[k, k] = rbar
         return R
 
-    def Xres(self, X, x):
+    @staticmethod
+    def Xres(X, x):
         X2 = X.copy()
         for i in range(X2.shape[1]):
             for j in range(X2.shape[0]): X2[j, i] -= x[j, 0]
         return X2
 
-    def Yres(self, Y, y):
+    @staticmethod
+    def Yres(Y, y):
         for i in range(Y.shape[1]): Y[0, i] -= y
         return Y
 

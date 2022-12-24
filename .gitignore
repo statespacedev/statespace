@@ -3,3 +3,4 @@
 venv/
 _build/
 dist/
+/docs/_static/
