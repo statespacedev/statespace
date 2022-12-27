@@ -7,14 +7,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-      - name: poetry
-        uses: snok/install-poetry@v1
-      - name: install
-        run: poetry install --no-interaction
-      - name: sphinx
-        run: |
-          poetry run sphinx-build docs docs/_build
-#          poetry run sphinx-build docs -W -b linkcheck -d docs/_build/doctrees docs/_build/html
+      - uses: snok/install-poetry@v1
+      - run: poetry install --no-interaction
+      - run: poetry run sphinx-build docs docs/_build
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
