@@ -10,7 +10,7 @@ jobs:
       - name: poetry
         uses: snok/install-poetry@v1
       - name: install
-        run: poetry install --no-interaction --no-root
+        run: poetry install --no-interaction
       - name: sphinx
         run: |
           poetry run sphinx-build docs docs/_build
