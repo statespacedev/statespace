@@ -1,4 +1,5 @@
 #https://coderefinery.github.io/documentation/
+#https://tomasfarias: dev/posts/sphinx-docs-with-poetry-and-github-pages/:
 name: docs
 on: [push, pull_request, workflow_dispatch]
 jobs:
