@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "statespace"
-version = "2023.0.0"
+version = "1.6.0"
 description = ""
 authors = ["noah smith <noah@statespace.dev>"]
 
