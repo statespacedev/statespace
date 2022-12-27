@@ -1,7 +1,0 @@
-numpy
-scipy
-matplotlib
-pytest
-filterpy
-sphinx
-sphinx_rtd_theme
