@@ -1,6 +1,7 @@
-<img src="https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf2-small.png"/>
+<img src="https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf2-small.png" alt=""/>
 
 [![docs](https://github.com/statespacedev/statespace/actions/workflows/docs.yaml/badge.svg)](https://github.com/statespacedev/statespace/actions/workflows/docs.yaml)
+[![pypi](https://github.com/statespacedev/statespace/actions/workflows/pypi.yaml/badge.svg)](https://github.com/statespacedev/statespace/actions/workflows/pypi.yaml)
 
 processors and models from [Bayesian Signal Processing: Classical, Modern, and Particle Filtering](http://a.co/gp4upXd), [Kalman Filtering: Theory and Practice](http://a.co/6hAa35c), [Time Series Analysis by State Space Methods](http://ssfpack.com/DKbook.html), [An Introduction to State Space Time Series Analysis](http://ssfpack.com/CKbook.html), [Forecasting, Structural Time Series Models and the Kalman Filter](https://www.amazon.de/-/en/Andrew-C-Harvey/dp/0521321964/ref=sr_1_5?dchild=1&keywords=harvey+time+series&qid=1618740688&sr=8-5).
 
