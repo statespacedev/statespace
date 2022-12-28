@@ -1,6 +1,11 @@
 processors
 ============
 
+simplex_linear_programming.py
+---------------------------------
+.. automodule:: statespace.processors.simplex_linear_programming
+    :members:
+
 extended_kalman_filter.py
 ---------------------------
 .. automodule:: statespace.processors.extended_kalman_filter
@@ -14,9 +19,4 @@ sigma_point_kalman_filter.py
 particle_filter.py
 ------------------
 .. automodule:: statespace.processors.particle_filter
-    :members:
-
-linear_programming.py
-----------------------
-.. automodule:: statespace.processors.linear_programming
     :members:

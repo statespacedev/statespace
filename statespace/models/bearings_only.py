@@ -5,13 +5,13 @@ your sub to pursue the ship. """
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from statespace.models.model import Model, SPKFCommon, PFCommon, EvalCommon, Autocorr, Log
+from statespace.models.base_model import BaseModel, BaseEKF, BaseSPKF, BasePF, BaseEval, Autocorr, Log
 from scipy.stats import norm
 # noinspection PyProtectedMember
 from filterpy.monte_carlo import systematic_resample
 
 
-class BearingsOnly(Model):
+class BearingsOnly(BaseModel):
     """bearings-only tracking problem"""
 
     def __init__(self, conf):
@@ -19,35 +19,13 @@ class BearingsOnly(Model):
         self.tsteps = 100  # 2hr = 7200sec / 100
         self.dt = .02  # hrs, .02 hr = 72 sec
         self.x = np.array([[0., 15., 20., -10.]]).T
-        self.x0 = np.array([[0., 20., 20., -10.]]).T
-        self.P0 = 1 * np.eye(4)
-        self.varproc = 1e-6
-        self.varobs = 6e-4
-        self.R = self.varobs
-        self.Q = self.varproc * np.eye(2)
-        self.G = np.zeros([4, 2])
-        self.G[0, 0] = self.dt ** 2 / 2
-        self.G[1, 1] = self.dt ** 2 / 2
-        self.G[2, 0] = self.dt
-        self.G[3, 1] = self.dt
-        self.SPKF = SPKF(self)
-        self.PF = PF(self)
+        self.ekf = EKF(self)
+        self.spkf = SPKF(self)
+        self.pf = PF(self)
         self.eval = Eval(self)
 
-    def ekf(self):
-        """entities needed for an extended kalman filter processor. """
-        return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-
-    def spkf(self):
-        """entities needed for a sigma point kalman filter processor. """
-        return self.SPKF.XY, self.SPKF.W, self.SPKF.WM
-
-    def pf(self):
-        """entities needed for a particle filter processor. """
-        return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
-
-    def sim(self):
-        """simulation states. a time series of true states and obs. """
+    def simulation(self):
+        """time series of states x, inputs u, and obs y. """
         for tstep in range(self.tsteps):
             t = tstep * self.dt
             u = np.array([[0., 0., 0., 0.]]).T
@@ -61,22 +39,41 @@ class BearingsOnly(Model):
     def f(self, x, *args):
         """state evolution equation. """
         base = np.array([[x[0, 0] + self.dt * x[2, 0], x[1, 0] + self.dt * x[3, 0], x[2, 0], x[3, 0]]]).T
-        if 0 in args: return base + self.G @ np.multiply(np.random.randn(2), math.sqrt(self.varproc))
+        if 0 in args: return base + self.ekf.G @ np.multiply(np.random.randn(2), math.sqrt(self.ekf.varproc))
         return base
+
+    def h(self, x, *args):
+        """observation equation. """
+        v = np.random.randn() * math.sqrt(self.ekf.varobs)
+        base = np.arctan2(x[0, 0], x[1, 0])
+        if 0 in args: return base + v
+        return base
+
+
+class EKF(BaseEKF):
+    """what's common across kalman filter models. """
+
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.x0 = np.array([[0., 20., 20., -10.]]).T
+        self.P0 = 1 * np.eye(4)
+        self.varproc = 1e-6
+        self.varobs = 6e-4
+        self.R = self.varobs
+        self.Q = self.varproc * np.eye(2)
+        self.G = np.zeros([4, 2])
+        self.G[0, 0] = self.parent.dt ** 2 / 2
+        self.G[1, 1] = self.parent.dt ** 2 / 2
+        self.G[2, 0] = self.parent.dt
+        self.G[3, 1] = self.parent.dt
 
     def F(self, x):
         """state evolution matrix. """
         F = np.eye(4)
-        F[0, 2] = self.dt
-        F[1, 3] = self.dt
+        F[0, 2] = self.parent.dt
+        F[1, 3] = self.parent.dt
         return F
-
-    def h(self, x, *args):
-        """observation equation. """
-        v = np.random.randn() * math.sqrt(self.varobs)
-        base = np.arctan2(x[0, 0], x[1, 0])
-        if 0 in args: return base + v
-        return base
 
     def H(self, x):
         """observation sensitivity matrix. """
@@ -84,8 +81,8 @@ class BearingsOnly(Model):
         return np.array([[x[1, 0] / dsqr, -x[0, 0] / dsqr, 0, 0]])
 
 
-class SPKF(SPKFCommon):
-    """what's common across sigma point kalman filter models? """
+class SPKF(BaseSPKF):
+    """what's common across sigma point kalman filter models. """
 
     def __init__(self, parent):
         super().__init__()
@@ -114,14 +111,15 @@ class SPKF(SPKFCommon):
         return X, Y
 
 
-class PF(PFCommon):
+class PF(BasePF):
+    """what's common across particle filter models. """
 
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
         self.n = 250
         self.x0 = np.array([[0., 20., 20., -10.]]).T
-        self.Q = self.parent.G @ self.parent.Q @ self.parent.G.T
+        self.Q = self.parent.ekf.G @ self.parent.ekf.Q @ self.parent.ekf.G.T
 
     def X0(self):
         """initial particles. """
@@ -149,7 +147,7 @@ class PF(PFCommon):
         return x[:, ndxs]
 
 
-class Eval(EvalCommon):
+class Eval(BaseEval):
     """evaluating processor results. """
 
     def __init__(self, parent):

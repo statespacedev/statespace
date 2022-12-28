@@ -9,13 +9,13 @@ class Particle:
 
     def __init__(self, conf):
         self.conf, self.log = conf, []
-        self.run = self.pf
+        self.run = self.run_model
 
-    def pf(self, model):
+    def run_model(self, model):
         """basic sampling-importance-resampling (SIR) particle filter, bootstrap particle filter, condensation
         particle filter, survival of the fittest algorithm """
-        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        X, predict, update, resample = model.pf()
+        sim, _, h = model.entities()
+        X, predict, update, resample = model.pf.entities()
         for t, o, u in sim():
             X = predict(X, u)
             W = update(X, o)

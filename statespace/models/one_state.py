@@ -3,13 +3,13 @@ the candy and jazwinisky books. based on real world reentry vehicle tracking. ""
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from statespace.models.model import Model, SPKFCommon, PFCommon, EvalCommon, Autocorr, Log
+from statespace.models.base_model import BaseModel, BaseEKF, BaseSPKF, BasePF, BaseEval, Autocorr, Log
 from scipy.stats import norm
 # noinspection PyProtectedMember
 from filterpy.monte_carlo import systematic_resample
 
 
-class Onestate(Model):
+class Onestate(BaseModel):
     """one-state reference model"""
 
     def __init__(self, conf):
@@ -17,36 +17,13 @@ class Onestate(Model):
         self.tsteps = 151
         self.dt = .01
         self.x = np.array([[2.]]).T
-        self.x0 = np.array([[2.1]]).T
-        self.P0 = .1 * np.eye(1)
-        self.varproc = 1e-6 * np.array([[1]]).T
-        self.varobs = 6e-4
-        self.R = self.varobs
-        self.Q = self.varproc * np.eye(1)
-        self.G = np.eye(1)
-        self.SPKF = SPKF(self)
-        self.PF = PF(self)
+        self.ekf = EKF(self)
+        self.spkf = SPKF(self)
+        self.pf = PF(self)
         self.eval = Eval(self)
 
-    def ekf(self):
-        """entities needed for an extended kalman filter processor. """
-        return self.sim, self.f, self.h, self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
-
-    def spkf(self):
-        """entities needed for a sigma point kalman filter processor. """
-        return self.SPKF.XY, self.SPKF.W, self.SPKF.WM
-
-    def spkf_cholesky(self):
-        """entities need for cholesky factorization sigma point kalman filter processor. """
-        return self.SPKF.XYcho, self.SPKF.W, self.SPKF.Xtil, self.SPKF.Ytil, self.SPKF.Pxy, self.SPKF.S, \
-            self.SPKF.Sproc, self.SPKF.Sobs
-
-    def pf(self):
-        """entities needed for a particle filter processor. """
-        return self.PF.X0(), self.PF.predict, self.PF.update, self.PF.resample
-
-    def sim(self):
-        """simulation states. a time series of true states and obs. """
+    def simulation(self):
+        """time series of states x, inputs u, and obs y. """
         for tstep in range(self.tsteps):
             t = tstep * self.dt
             u = np.array([0]).T
@@ -58,31 +35,46 @@ class Onestate(Model):
 
     def f(self, x, *args):
         """state evolution equation. """
-        w = math.sqrt(self.varproc) * np.random.randn()
+        w = math.sqrt(self.ekf.varproc) * np.random.randn()
         base = (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2
         if 0 in args: return base + w
         return base
 
-    def F(self, x):
-        """state evolution matrix. """
-        A = np.eye(1)
-        A[0, 0] = 1 - .05 * self.dt + .08 * self.dt * x
-        return A
-
     def h(self, x, *args):
         """observation equation. """
-        v = math.sqrt(self.R) * np.random.randn()
+        v = math.sqrt(self.ekf.R) * np.random.randn()
         base = x[0, 0] ** 2 + x[0, 0] ** 3
         if 0 in args: return base + v
         return base
+
+
+class EKF(BaseEKF):
+    """what's common across kalman filter models. """
+
+    def __init__(self, parent):
+        super().__init__()
+        self.parent = parent
+        self.x0 = np.array([[2.1]]).T
+        self.P0 = .1 * np.eye(1)
+        self.varproc = 1e-6 * np.array([[1]]).T
+        self.varobs = 6e-4
+        self.R = self.varobs
+        self.Q = self.varproc * np.eye(1)
+        self.G = np.eye(1)
+
+    def F(self, x):
+        """state evolution matrix. """
+        A = np.eye(1)
+        A[0, 0] = 1 - .05 * self.parent.dt + .08 * self.parent.dt * x
+        return A
 
     def H(self, x):
         """observation sensitivity matrix. """
         return np.array([[2 * x[0, 0] + 3 * x[0, 0] ** 2]])
 
 
-class SPKF(SPKFCommon):
-    """what's common across sigma point kalman filter models? """
+class SPKF(BaseSPKF):
+    """what's common across sigma point kalman filter models. """
 
     def __init__(self, parent):
         super().__init__()
@@ -94,9 +86,9 @@ class SPKF(SPKFCommon):
         self.kappa = 1
         self.k0 = 1 + self.kappa
         self.nlroot = math.sqrt(self.k0)
-        self.S = np.linalg.cholesky(parent.P0)
-        self.Sproc = np.linalg.cholesky(parent.Q)
-        self.Sobs = np.linalg.cholesky(np.diag(parent.R * np.array([1])))
+        self.S = np.linalg.cholesky(parent.ekf.P0)
+        self.Sproc = np.linalg.cholesky(parent.ekf.Q)
+        self.Sobs = np.linalg.cholesky(np.diag(parent.ekf.R * np.array([1])))
         self.Xtil = np.zeros((1, 3))
         self.Ytil = np.zeros((1, 3))
         self.Pxy = np.zeros((1, 1))
@@ -125,7 +117,8 @@ class SPKF(SPKFCommon):
         return X, Y
 
 
-class PF(PFCommon):
+class PF(BasePF):
+    """what's common across particle filter models. """
 
     def __init__(self, parent):
         super().__init__()
@@ -153,7 +146,7 @@ class PF(PFCommon):
         return x[:, systematic_resample(W.T)]
 
 
-class Eval(EvalCommon):
+class Eval(BaseEval):
     """evaluating processor results. """
 
     def __init__(self, parent):

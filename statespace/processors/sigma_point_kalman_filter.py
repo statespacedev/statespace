@@ -15,14 +15,14 @@ class SigmaPoint:
     def __init__(self, conf):
         self.conf, self.log = conf, []
         if conf.factorized:
-            self.run = self.spfcholesky
+            self.run = self.spkf_factorized
         else:
-            self.run = self.spf
+            self.run = self.spkf
 
-    def spf(self, model):
+    def spkf(self, model):
         """sigma-point deterministic sampling kalman filter"""
-        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        XY, W, WM = model.spkf()
+        (sim, f, h), (F, H, R, Q, G, x, P) = model.entities(), model.ekf.entities()
+        XY, W, WM = model.spkf.entities()
         for t, o, u in sim():
             X, Y = XY(x, P, u)
             x, y = np.sum(np.multiply(WM, X), axis=1).reshape(-1, 1), np.sum(np.multiply(W, Y), axis=1)[0]
@@ -33,10 +33,10 @@ class SigmaPoint:
             P = P - K @ (np.multiply(W, Yres) @ Yres.T + R) @ K.T
             self.log.append([t, x, y])
 
-    def spfcholesky(self, model):
+    def spkf_factorized(self, model):
         """cholesky factorized sigma-point sampling kalman filter"""
-        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        XY, W, X2, Y2, P2, S, Sp, So = model.spkf_cholesky()
+        (sim, f, h), (F, H, R, Q, G, x, P) = model.entities(), model.ekf.entities()
+        XY, W, X2, Y2, P2, S, Sp, So = model.spkf.entities_cholesky()
         for t, o, u in sim():
             x, S, X, Y = self.temporal(x, XY, W, X2, S, Sp, u)
             x, S, y = self.observational(x, o, X, Y, W, X2, Y2, P2, S, So)
@@ -48,7 +48,7 @@ class SigmaPoint:
         x = X @ W.T
         for i in range(X.shape[1]): Xtil[:, i] = (X[:, i].reshape(-1, 1) - x).T
         q, r = np.linalg.qr(np.concatenate([math.sqrt(W[0, 1]) * Xtil[:, 1:], Sproc], 1))
-        S = self.cholupdate(r.T[0:X.shape[0], 0:X.shape[0]], W[0, 0] * Xtil[:, 0].reshape(-1, 1))
+        S = self.cholesky_update(r.T[0:X.shape[0], 0:X.shape[0]], W[0, 0] * Xtil[:, 0].reshape(-1, 1))
         return x, S, X, Y
 
     def observational(self, x, o, X, Y, W, Xtil, Ytil, Pxy, S, Sobs):
@@ -56,7 +56,7 @@ class SigmaPoint:
         y = (W @ Y.T)[0, 0]
         for i in range(X.shape[1]): Ytil[0, i] = (Y[0, i].reshape(-1, 1) - y).T
         q, r = np.linalg.qr(np.concatenate([math.sqrt(W[0, 1]) * Ytil[:, 1:], Sobs], 1))
-        Sy = self.cholupdate(r.T[0:1, 0:1], W[0] * Ytil[:, 0].reshape(-1, 1))
+        Sy = self.cholesky_update(r.T[0:1, 0:1], W[0] * Ytil[:, 0].reshape(-1, 1))
         for i in range(X.shape[1]):
             tmp = W[0, i] * Xtil[:, i].reshape(-1, 1) * Ytil[0, i]
             Pxy += tmp
@@ -64,11 +64,11 @@ class SigmaPoint:
         K = Pxy / Sy[0, 0] ** 2
         U = K * Sy
         x = x + K * (o - y)
-        S = self.choldowndate(S, U)
+        S = self.cholesky_downdate(S, U)
         return x, S, y
 
     @staticmethod
-    def cholupdate(R, z):
+    def cholesky_update(R, z):
         """cholesky update"""
         n = z.shape[0]
         for k in range(n):
@@ -77,7 +77,7 @@ class SigmaPoint:
         return R
 
     @staticmethod
-    def choldowndate(R, z):
+    def cholesky_downdate(R, z):
         """cholesky downdate"""
         n = R.shape[0]
         for k in range(n):

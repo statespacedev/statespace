@@ -8,13 +8,13 @@ class Kalman:
     def __init__(self, conf):
         self.conf, self.log = conf, []
         if conf.factorized:
-            self.run = self.ekfud
+            self.run = self.ekf_factorized
         else:
             self.run = self.ekf
 
     def ekf(self, model):
         """basic form"""
-        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
+        (sim, f, h), (F, H, R, Q, G, x, P) = model.entities(), model.ekf.entities()
         for t, o, u in sim():
             x = f(x) + u
             y = h(x)
@@ -25,17 +25,17 @@ class Kalman:
             self.log.append([t, x, y])
         return True
 
-    def ekfud(self, model):
+    def ekf_factorized(self, model):
         """ud factorized form"""
-        sim, f, h, F, H, R, Q, G, x, P = model.ekf()
-        U, D = self.udfactorize(P)
+        (sim, f, h), (F, H, R, Q, G, x, P) = model.entities(), model.ekf.entities()
+        U, D = self.ud_factorization(P)
         for t, o, u in sim():
             x, U, D = self.temporal(f(x) + u, U, D, F(x), G, Q)
             x, U, D, y = self.observational(x, U, D, H(x), o, R, h(x))
             self.log.append([t, x, y])
 
     @staticmethod
-    def udfactorize(M):
+    def ud_factorization(M):
         """ud factorization"""
         assert np.allclose(M, M.T)
         n, M = M.shape[0], np.triu(M)

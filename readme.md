@@ -3,7 +3,7 @@
 [![docs](https://github.com/statespacedev/statespace/actions/workflows/docs.yaml/badge.svg)](https://github.com/statespacedev/statespace/actions/workflows/docs.yaml)
 [![pypi](https://github.com/statespacedev/statespace/actions/workflows/pypi.yaml/badge.svg)](https://github.com/statespacedev/statespace/actions/workflows/pypi.yaml)
 
-processors and models from [Bayesian Signal Processing: Classical, Modern, and Particle Filtering](http://a.co/gp4upXd), [Kalman Filtering: Theory and Practice](http://a.co/6hAa35c), [Time Series Analysis by State Space Methods](http://ssfpack.com/DKbook.html), [An Introduction to State Space Time Series Analysis](http://ssfpack.com/CKbook.html), [Forecasting, Structural Time Series Models and the Kalman Filter](https://www.amazon.de/-/en/Andrew-C-Harvey/dp/0521321964/ref=sr_1_5?dchild=1&keywords=harvey+time+series&qid=1618740688&sr=8-5).
+221228 bringing various environmental factors as far forward as possible within the github context - poetry replacing venv and pip, docs publishing via github actions to github pages, package publishing to pypi via poetry and github actions.
 
 221221 second thoughts about about cpp python extension here - let's leave that for project starid. in practical terms, project statespace is pure python and pycharm, project starid is cpp python extension and clion.
 

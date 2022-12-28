@@ -9,43 +9,51 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Model:
-    """what's common across our models? """
+class BaseModel:
+    """what's common for the model across various processors? in short, a simulation of states and observations over
+    some time period - a simulation time series. the sim is driven by vector valued functions - generally non-linear
+    - a state evolution equation f, and an observation equation h."""
 
     def __init__(self, conf):
         self.conf = conf
         self.log = []
+        self.ekf = BaseEKF()
+        self.spkf = BaseSPKF()
+        self.pf = BasePF()
 
-    def ekf(self):
-        """entities needed for an extended kalman filter processor. """
-        return None
+    def entities(self):
+        """entities needed for a processor. """
+        return self.simulation, self.f, self.h
 
-    def spkf(self):
-        """entities needed for a sigma point kalman filter processor. """
-        return None
-
-    def spkf_cholesky(self):
-        """entities need for cholesky factorization sigma point kalman filter processor. """
-        return None
-
-    def pf(self):
-        """entities needed for a particle filter processor. """
-        return None
-
-    def sim(self):
-        """simulation states. a time series of true states and obs. """
+    def simulation(self):
+        """time series of states x, inputs u, and obs y. """
         pass
 
     def f(self, x):
         """state evolution equation. """
         return None
 
-    def F(self, x):
-        """state evolution matrix. """
-        return None
-
     def h(self, x):
         """observation equation. """
+        return None
+
+
+class BaseEKF:
+    """what's common across kalman filter models. """
+
+    def __init__(self):
+        self.R = None
+        self.Q = None
+        self.G = None
+        self.x0 = None
+        self.P0 = None
+
+    def entities(self):
+        """entities needed for an extended kalman filter processor. """
+        return self.F, self.H, self.R, self.Q, self.G, self.x0, self.P0
+
+    def F(self, x):
+        """state evolution matrix. """
         return None
 
     def H(self, x):
@@ -54,11 +62,26 @@ class Model:
 
 
 # noinspection PyUnusedLocal
-class SPKFCommon:
-    """what's common across sigma point kalman filter models? """
+class BaseSPKF:
+    """what's common across sigma point kalman filter models. """
 
     def __init__(self):
-        pass
+        self.W = None
+        self.WM = None
+        self.Xtil = None
+        self.Ytil = None
+        self.Pxy = None
+        self.S = None
+        self.Sproc = None
+        self.Sobs = None
+
+    def entities(self):
+        """entities needed for a sigma point kalman filter processor. """
+        return self.XY, self.W, self.WM
+
+    def entities_cholesky(self):
+        """entities needed for cholesky factorization sigma point kalman filter processor. """
+        return self.XYcho, self.W, self.Xtil, self.Ytil, self.Pxy, self.S, self.Sproc, self.Sobs
 
     def XY(self, x, P, u):
         """sigma points update. """
@@ -69,8 +92,15 @@ class SPKFCommon:
         return None
 
 
-class PFCommon:
-    def __init__(self): pass
+class BasePF:
+    """what's common across particle filter models. """
+
+    def __init__(self):
+        pass
+
+    def entities(self):
+        """entities needed for a particle filter processor. """
+        return self.X0(), self.predict, self.update, self.resample
 
     def X0(self):
         """initial particles. """
@@ -89,7 +119,7 @@ class PFCommon:
         return None
 
 
-class EvalCommon:
+class BaseEval:
     """evaluating processor results. """
 
     def __init__(self):
