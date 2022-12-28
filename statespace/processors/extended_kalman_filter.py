@@ -5,9 +5,9 @@ import numpy as np
 class Kalman:
     """classical extended kalman filter"""
 
-    def __init__(self, *args, **kwargs):
-        self.args, self.kwargs, self.log = args, kwargs, []
-        if 'ud' in args:
+    def __init__(self, conf):
+        self.conf, self.log = conf, []
+        if conf.factorized:
             self.run = self.ekfud
         else:
             self.run = self.ekf

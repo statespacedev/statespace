@@ -12,9 +12,9 @@ from scipy.linalg.blas import drot, drotg
 class SigmaPoint:
     """modern sigma-point deterministic sampling kalman filter"""
 
-    def __init__(self, *args, **kwargs):
-        self.args, self.kwargs, self.log = args, kwargs, []
-        if 'cholesky' in args:
+    def __init__(self, conf):
+        self.conf, self.log = conf, []
+        if conf.factorized:
             self.run = self.spfcholesky
         else:
             self.run = self.spf

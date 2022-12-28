@@ -14,8 +14,8 @@ from filterpy.monte_carlo import systematic_resample
 class BearingsOnly(Model):
     """bearings-only tracking problem"""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, conf):
+        super().__init__(conf)
         self.tsteps = 100  # 2hr = 7200sec / 100
         self.dt = .02  # hrs, .02 hr = 72 sec
         self.x = np.array([[0., 15., 20., -10.]]).T

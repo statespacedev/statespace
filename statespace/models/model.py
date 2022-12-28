@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 class Model:
     """what's common across our models? """
 
-    def __init__(self):
+    def __init__(self, conf):
+        self.conf = conf
         self.log = []
 
     def ekf(self):

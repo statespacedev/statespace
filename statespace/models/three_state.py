@@ -11,8 +11,8 @@ from filterpy.monte_carlo import systematic_resample
 class Threestate(Model):
     """three-state reference model"""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, conf):
+        super().__init__(conf)
         self.tsteps = 1501
         self.dt = .01
         self.x = np.array([[2., .05, .04]]).T

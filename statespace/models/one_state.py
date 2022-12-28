@@ -12,8 +12,8 @@ from filterpy.monte_carlo import systematic_resample
 class Onestate(Model):
     """one-state reference model"""
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, conf):
+        super().__init__(conf)
         self.tsteps = 151
         self.dt = .01
         self.x = np.array([[2.]]).T

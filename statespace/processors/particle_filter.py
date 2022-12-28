@@ -7,8 +7,8 @@ import numpy as np
 class Particle:
     """particle filter, sequential monte carlo processor"""
 
-    def __init__(self, *args, **kwargs):
-        self.args, self.kwargs, self.log = args, kwargs, []
+    def __init__(self, conf):
+        self.conf, self.log = conf, []
         self.run = self.pf
 
     def pf(self, model):

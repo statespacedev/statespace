@@ -22,3 +22,7 @@ we'll go with the usual here - column vectors. so the dot product of x with itse
 
 for a (5, 3) matrix A, the product Ax or A @ x is (5, 3)(3, 1) = (5, 1), and the product ATAx or A.T @ A @ x is (3, 5)(5, 3)(3, 1) = (3, 1).
 
+__main__.py
+-----------------
+.. automodule:: statespace.__main__
+    :members:
