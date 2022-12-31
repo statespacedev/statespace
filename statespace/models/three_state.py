@@ -15,7 +15,7 @@ class Threestate(BaseModel):
         super().__init__(conf)
         self.tsteps = 1501
         self.dt = .01
-        self.x = np.array([[2., .05, .04]]).T
+        self.xsim = np.array([[2., .05, .04]]).T
         self.varprocsim = 1e-9 * np.array([[1, 1, 1]]).T
         self.varobssim = 9e-4
         self.Rsim = self.varobssim
@@ -27,28 +27,29 @@ class Threestate(BaseModel):
 
     def simulation(self):
         """time series of states x, inputs u, and obs y. """
-        for tstep in range(self.tsteps):
+        for tstep in range(1, self.tsteps):
             t = tstep * self.dt
             u = np.array([[0, 0, 0]]).T
-            self.x = self.f(self.x, 0) + u
-            self.y = self.h(self.x, 0)
-            if tstep == 0: continue
-            self.log.append([t, self.x, self.y])
-            yield t, self.y, u
+            self.xsim = self.f(self.xsim, 'sim') + u
+            ysim = self.h(self.xsim, 'sim')
+            self.log.append([t, self.xsim, ysim])
+            yield t, ysim, u
 
     def f(self, x, *args):
         """state evolution equation. """
-        w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Qsim))).T
-        base = np.array([[(1 - x[1, 0] * self.dt) * x[0, 0] + x[2, 0] * self.dt * x[0, 0] ** 2, x[1, 0], x[2, 0]]]).T
-        if 0 in args: return base + w
-        return base
+        x = np.array([[(1 - x[1, 0] * self.dt) * x[0, 0] + x[2, 0] * self.dt * x[0, 0] ** 2, x[1, 0], x[2, 0]]]).T
+        if 'sim' in args:
+            w = np.multiply(np.random.randn(1, 3), np.sqrt(np.diag(self.Qsim))).T
+            return x + w
+        return x
 
     def h(self, x, *args):
         """observation equation. """
-        v = math.sqrt(self.Rsim) * np.random.randn()
-        base = x[0, 0] ** 2 + x[0, 0] ** 3
-        if 0 in args: return base + v
-        return base
+        y = x[0, 0] ** 2 + x[0, 0] ** 3
+        if 'sim' in args:
+            v = math.sqrt(self.Rsim) * np.random.randn()
+            return y + v
+        return y
 
 
 class EKF(BaseEKF):
@@ -88,7 +89,7 @@ class SPKF(BaseSPKF):
         n, k = 3, 1
         w1, w2 = k / (n + k), .5 / (n + k)
         self.W = np.array([[w1, w2, w2, w2, w2, w2, w2]])
-        self.WM = np.tile(self.W, (self.parent.x.shape[0], 1))
+        self.WM = np.tile(self.W, (self.parent.xsim.shape[0], 1))
         P0 = .1 * np.eye(3)
         n = 3
         kappa = 1

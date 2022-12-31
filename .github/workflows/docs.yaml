@@ -1,10 +1,7 @@
 #https://coderefinery.github.io/documentation/
 #https://tomasfarias: dev/posts/sphinx-docs-with-poetry-and-github-pages/:
 name: docs
-on:
-  push:
-    tags:
-      - "v*.*.*"
+on: [push, pull_request, workflow_dispatch]
 jobs:
   docs:
     runs-on: ubuntu-latest

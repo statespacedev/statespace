@@ -1,7 +1,4 @@
-<img src="https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf2-small.png" alt=""/>
-
-[![docs](https://github.com/statespacedev/statespace/actions/workflows/docs.yaml/badge.svg)](https://github.com/statespacedev/statespace/actions/workflows/docs.yaml)
-[![pypi](https://github.com/statespacedev/statespace/actions/workflows/pypi.yaml/badge.svg)](https://github.com/statespacedev/statespace/actions/workflows/pypi.yaml)
+<img src="./docs/images/pf2-small.png" alt=""/>
 
 221228 bringing various environmental factors as far forward as possible within the github context - poetry replacing venv and pip, docs publishing via github actions to github pages, package publishing to pypi via poetry and github actions.
 
@@ -15,7 +12,7 @@
 
 210404 new model structure is working well - thoroughly checked out for kalman processor and now propagating to sigmapoint and particle processors. bearings-only model is go.
 
-![](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/bearingsonly.png)
+<img src="./docs/images/bearingsonly.png" alt=""/>
 
 210328 new model structure is definitely on the right path - it's already quite essential for working on the new bearings-only tracking model. evaluation and plotting is migrating into a new eval class within the base model. there each model will know how to make its own appropriate plots - definitely including model states and processor states - and perform its own evaluation tests. 
 
@@ -27,35 +24,31 @@ the bearings only problem has some interesting history - it's basically about be
 
 210308 looking more closely at the oregon library documentation, they have an interesting discussion of objectives - something to think about going forward. is a higher-level statespace model something to consider? putting it this way - adapt/remap a higher-level statespace model into specific lower-level statespace models - we're talking about a translator / converter / adaptor... and we already have an extremely primitive form of that - the rccircuit, jazwinski1, jazwinski2 models are fed into classical, modern, particle. we can think about a higher-level model that can express rccircuit, jazwinski1, and jazwinski2.
 
-designed to allow reuse of a state space definition for state, parameter and joint estimation, using a variety of different inference algorithms. you define your system once in a higher-level state space framework, and then the inference framework generator *geninfds* together with the inference system noise source generator *gensysnoiseds* will adapt/remap that model into a lower-level state space framework needed for whatever type of estimation you want to do. This allows you to focus on defining the model, doing data IO, etc. without having to get bogged down into casting the problem into a different framework each time you want to use a different estimator or want to change the type of inference your doing. I.e. the internal inference implementation is hidden or as transparent as possible with respect to the problem definition by the user. [more](https://gitlab.com/noahhsmith/statespace/-/tree/master/docs/liboregon)
+designed to allow reuse of a state space definition for state, parameter and joint estimation, using a variety of different inference algorithms. you define your system once in a higher-level state space framework, and then the inference framework generator *geninfds* together with the inference system noise source generator *gensysnoiseds* will adapt/remap that model into a lower-level state space framework needed for whatever type of estimation you want to do. This allows you to focus on defining the model, doing data IO, etc. without having to get bogged down into casting the problem into a different framework each time you want to use a different estimator or want to change the type of inference your doing. I.e. the internal inference implementation is hidden or as transparent as possible with respect to the problem definition by the user.
 
 210221 brought the documentation via readthedocs up to a minimal level. cleaned up the project and brought some focus to what's going on here. as the docs now make clear - this project focuses on reference problems from Bayesian Signal Processing: Classical, Modern, and Particle Filtering Methods, Kalman Filtering: Theory and Practice, and Stochastic Processes and Filtering Theory - in particular, using numpy for matrix and vector manipulation.
 
-190418 brief [lit-review](https://www.linkedin.com/pulse/google-state-space-noah-smith/) posted on linkedin.
-
-190331 concise [motivation piece](https://www.linkedin.com/pulse/shape-uncertainty-noah-smith/) posted on linkedin.
-
 190310 decision-function-based detector is go. simplest possible case - linear rc-circuit system-model and linear kalman-filter tracker. log-likelihood decision function for detection, ensembles of 100 runs each for signal case and noise case. output curves shown in the first plot - green signal, blue noise-only. roc curves in the second plot. 
 
-![](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/rccircdecfuncs.png)
- 
-![](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/rccircroc.png)
+<img src="./docs/images/rccircdecfuncs.png" alt=""/>
 
-<a name="190223">190223</a>
+<img src="./docs/images/rccircroc.png" alt=""/>
+
+190223
 
 kl-divergence for evaluating sequential monte-carlo - demonstrated below by three pf's in action during the first second of the jazwinksi problem - start-up and convergence. these are 100 hz dist-curves - each dist-curve is a kernel-density-estimate combining hundreds of monte-carlo samples, the fundamental-particles - green dist-curves for truth, blue dist-curves for pf. state-estimates are two red curves on the x,t-plane beneath the dist-curves.
 
-![pf1](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf1.png)
+<img src="./docs/images/pf1.png" alt=""/>
 
-![pf2](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf2.png)
+<img src="./docs/images/pf2.png" alt=""/>
 
-![pf3](https://gitlab.com/noahhsmith/statespace/raw/master/docs/images/pf3.png)
+<img src="./docs/images/pf3.png" alt=""/>
 
-190105 ukf adaptive jazwinksi switched to square-root filtering, qr-factorization, cholesky-factor update and downdate. improved numerical stability and scaled sampling is clear. still a question around scalar-obs and the obs cholesky-factor and gain. with an adhoc stabilizer on the obs cholesky-factor it's working well overall.
+190105 spkf adaptive jazwinksi switched to square-root filtering, qr-factorization, cholesky-factor update and downdate. improved numerical stability and scaled sampling is clear. still a question around scalar-obs and the obs cholesky-factor and gain. with an adhoc stabilizer on the obs cholesky-factor it's working well overall.
 
 181230 pf adaptive jazwinksi. parameter-roughening.
 
-181226 ukf adaptive jazwinski. sample-and-propagate tuning.
+181226 spkf adaptive jazwinski. sample-and-propagate tuning.
 
 180910 ekf adaptive jazwinski. ud-factorized square-root filtering required for numerical stability.
 

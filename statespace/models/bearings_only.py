@@ -18,7 +18,16 @@ class BearingsOnly(BaseModel):
         super().__init__(conf)
         self.tsteps = 100  # 2hr = 7200sec / 100
         self.dt = .02  # hrs, .02 hr = 72 sec
-        self.x = np.array([[0., 15., 20., -10.]]).T
+        self.xsim = np.array([[0., 15., 20., -10.]]).T
+        self.varprocsim = 1e-6
+        self.varobssim = 6e-4
+        self.Rsim = self.varobssim
+        self.Qsim = self.varprocsim * np.eye(2)
+        self.Gsim = np.zeros([4, 2])
+        self.Gsim[0, 0] = self.dt ** 2 / 2
+        self.Gsim[1, 1] = self.dt ** 2 / 2
+        self.Gsim[2, 0] = self.dt
+        self.Gsim[3, 1] = self.dt
         self.ekf = EKF(self)
         self.spkf = SPKF(self)
         self.pf = PF(self)
@@ -26,28 +35,30 @@ class BearingsOnly(BaseModel):
 
     def simulation(self):
         """time series of states x, inputs u, and obs y. """
-        for tstep in range(self.tsteps):
+        for tstep in range(1, self.tsteps):
             t = tstep * self.dt
             u = np.array([[0., 0., 0., 0.]]).T
             if t == 0.5: u[2], u[3] = -24., 10.
-            self.x = self.f(self.x, 0) + u
-            self.y = self.h(self.x, 0)
-            if tstep == 0: continue
-            self.log.append([t, self.x, self.y])
-            yield t, self.y, u
+            self.xsim = self.f(self.xsim, 'sim') + u
+            ysim = self.h(self.xsim, 'sim')
+            self.log.append([t, self.xsim, ysim])
+            yield t, ysim, u
 
     def f(self, x, *args):
         """state evolution equation. """
-        base = np.array([[x[0, 0] + self.dt * x[2, 0], x[1, 0] + self.dt * x[3, 0], x[2, 0], x[3, 0]]]).T
-        if 0 in args: return base + self.ekf.G @ np.multiply(np.random.randn(2), math.sqrt(self.ekf.varproc))
-        return base
+        x = np.array([[x[0, 0] + self.dt * x[2, 0], x[1, 0] + self.dt * x[3, 0], x[2, 0], x[3, 0]]]).T
+        if 'sim' in args:
+            w = self.Gsim @ np.multiply(np.random.randn(2), math.sqrt(self.varprocsim))
+            return x + w
+        return x
 
     def h(self, x, *args):
         """observation equation. """
-        v = np.random.randn() * math.sqrt(self.ekf.varobs)
-        base = np.arctan2(x[0, 0], x[1, 0])
-        if 0 in args: return base + v
-        return base
+        y = np.arctan2(x[0, 0], x[1, 0])
+        if 'sim' in args:
+            v = np.random.randn() * math.sqrt(self.varobssim)
+            return y + v
+        return y
 
 
 class EKF(BaseEKF):
@@ -90,7 +101,7 @@ class SPKF(BaseSPKF):
         n, k = 4, 1
         w1, w2 = k / (n + k), .5 / (n + k)
         self.W = np.array([[w1, w2, w2, w2, w2, w2, w2, w2, w2]])
-        self.WM = np.tile(self.W, (self.parent.x.shape[0], 1))
+        self.WM = np.tile(self.W, (self.parent.xsim.shape[0], 1))
 
     def XY(self, x, P, u):
         """sigma points update. """

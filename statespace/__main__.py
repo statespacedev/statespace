@@ -1,19 +1,20 @@
-"""what's it all about? just some of the core applications of computing in the 40s, 50s, and 60s that really drove
-those early generations of hardware and what eventually became known as software - what many of those machines in the
-old film clips were actually doing, and why fortran was such a big deal. tons of large scale linear algebra - so
-matrix and vector operations, in a language that didn't need or want character strings. a fundamental dividing line
-between numerical computing and everything else - if you cared about strings, you became a cobol person. that divide
-is still with us today in fortran/c/cpp/python and cobol/lisp/java/everything-else. if your stuff had anything to do
-with high-performance-computing/super-computing/embedded-real-time, you were in the first camp - otherwise, not.
+"""what's it all about? just some of the core applications of computing in the 40s, 50s, and 60s - the stuff that
+really drove forward those early generations of hardware, and what eventually became known as software - what many of
+the machines in the old film clips were actually doing, and why fortran was such a big deal. tons of large scale
+linear algebra - so matrix and vector operations, zero allowance for character strings. a fundamental divide between
+numerical computing and everything else - if you cared about strings, you became a cobol person - which was at the
+root of the eternal divide between the fortran/c/cpp/python tradition and the cobol/lisp/java/everything-else
+tradition. if your stuff had to do with super-computing or embedded-real-time, you were in the former - otherwise, not.
 
 the beginnings were dantzig and von neumann linear programming - all woven through operations research around the
 time of the transition from mechanical to digital computing - let's say, early cold war. one of the things kalman
 brought in on top of this was nonlinear elements capable of representing uncertainty - the classic covariance matrix
 quadratic form ATAx. this was happening across fields, as the same appeared in finance via markowitz portfolio theory
-around the same time - what was driving all this organic evolution was the increasing floating point computing power
-- flops - and the ability to harness it via fortran. and the impact was immediate - let's say high cold war - late
-50s early 60s - with the early integrated circuitry of the apollo guidance computer and minuteman missile guidance
-system. how do you get your life-or-death guidance systems to make better decisions? the birth of machine learning.
+at the same time - what was driving all this organic evolution was the increasing floating point computing power -
+flops - and the ability to harness it via fortran. and the impact was immediate - let's say high cold war - late 50s
+early 60s - with the early integrated circuitry of the apollo guidance computer and minuteman missile guidance
+system. how do you get your life-or-death automated control systems to make better decisions? the birth of machine
+learning - adaptive closed-loop feedback control.
 
 here's a fun story illustrating all this evolution. high cold war - increasing flops and fortran immediately drive
 the appearance of covariance matrices in what was purely linear optimization - but we're definitely on the edge here,
@@ -22,8 +23,8 @@ instability! we don't have enough bits in our floating point representations - p
 happens is a new industry within applied mathematics and electrical engineering - optimize the fortran and floating
 point units, and factorize the matrices! what does factorize the matrices mean? in a nutshell, only represent
 something very much like their square roots - at least internally within our computations. all of this dominates the
-60s, 70s, and 80s - let's say high cold war verging into baroque/neo-classical cold war - the era when the name
-'cray' could inspire awe. one of our objectives here in project statespace is a straightforward minimalistic
+60s, 70s, and 80s - let's say high cold war onward through baroque/neo-classical cold war - the era when the name
+'cray' inspired awe. one of our objectives here in project statespace is a straightforward minimalistic
 representation of the real-world factorized forms, alongside the classic textbook forms. names like thornton and
 bierman aren't widely remembered today - but without the factorized form square root ekf, the apollo guidance
 computer wasn't possible at that time - and they were crucial for the transit/gps satnav systems as well. if you know
@@ -41,9 +42,9 @@ def main():
     cli.add_argument('-f', '--factorized', dest='factorized', action='store_true', default=False)
     conf = cli.parse_args()
     if not len(sys.argv) > 1:
-        conf.processor = 'pf'
-        conf.model = 'three'
-        conf.factorized = True
+        conf.processor = 'ekf'
+        conf.model = 'one'
+        conf.factorized = False
     process_model(conf)
 
 

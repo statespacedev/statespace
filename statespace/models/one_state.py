@@ -16,7 +16,10 @@ class Onestate(BaseModel):
         super().__init__(conf)
         self.tsteps = 151
         self.dt = .01
-        self.x = np.array([[2.]]).T
+        self.xsim = np.array([[2.]]).T
+        self.varprocsim = 1e-6 * np.array([[1]]).T
+        self.varobssim = 6e-4
+        self.Rsim = self.varobssim
         self.ekf = EKF(self)
         self.spkf = SPKF(self)
         self.pf = PF(self)
@@ -24,28 +27,29 @@ class Onestate(BaseModel):
 
     def simulation(self):
         """time series of states x, inputs u, and obs y. """
-        for tstep in range(self.tsteps):
+        for tstep in range(1, self.tsteps):
             t = tstep * self.dt
             u = np.array([0]).T
-            self.x = self.f(self.x, 0) + u
-            self.y = self.h(self.x, 0)
-            if tstep == 0: continue
-            self.log.append([t, self.x, self.y])
-            yield t, self.y, u
+            self.xsim = self.f(self.xsim, 'sim') + u
+            ysim = self.h(self.xsim, 'sim')
+            self.log.append([t, self.xsim, ysim])
+            yield t, ysim, u
 
     def f(self, x, *args):
         """state evolution equation. """
-        w = math.sqrt(self.ekf.varproc) * np.random.randn()
-        base = (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2
-        if 0 in args: return base + w
-        return base
+        x = (1 - .05 * self.dt) * x + (.04 * self.dt) * x ** 2
+        if 'sim' in args:
+            w = math.sqrt(self.varprocsim) * np.random.randn()
+            return x + w
+        return x
 
     def h(self, x, *args):
         """observation equation. """
-        v = math.sqrt(self.ekf.R) * np.random.randn()
-        base = x[0, 0] ** 2 + x[0, 0] ** 3
-        if 0 in args: return base + v
-        return base
+        y = x[0, 0] ** 2 + x[0, 0] ** 3
+        if 'sim' in args:
+            v = math.sqrt(self.Rsim) * np.random.randn()
+            return y + v
+        return y
 
 
 class EKF(BaseEKF):
@@ -82,7 +86,7 @@ class SPKF(BaseSPKF):
         n, k = 1, 1
         w1, w2 = k / (n + k), .5 / (n + k)
         self.W = np.array([[w1, w2, w2]])
-        self.WM = np.tile(self.W, (self.parent.x.shape[0], 1))
+        self.WM = np.tile(self.W, (self.parent.xsim.shape[0], 1))
         self.kappa = 1
         self.k0 = 1 + self.kappa
         self.nlroot = math.sqrt(self.k0)
