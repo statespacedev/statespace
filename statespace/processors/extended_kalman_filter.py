@@ -1,7 +1,7 @@
 """baseline extended kalman filters. both the standard textbook form, and the ud factorized form. 1957 - the space
 race was on for real - why? the ability to move 1000 kg from anywhere to anywhere on the globe in under 30 minutes.
-on top of that, add the capability to do it automatically, without human intervention - might not be any humans
-around to do any intervening.
+on top of that, add the capability to do it automatically, without human intervention - just in case, might not be
+anybody left around to do any intervening.
 
 so we need a closed-loop system with its own internal sensors bringing data in from the outside world - a black box -
 and it needs to make decisions based on its sensors, using a model of the world, and a model of the sensors. is a

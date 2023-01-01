@@ -5,7 +5,7 @@
    introduction
    processors
    models
-   literature
+   notes
 
 statespace
 =============
