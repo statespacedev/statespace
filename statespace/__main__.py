@@ -19,7 +19,7 @@ decisions? the birth of machine learning - adaptive closed-loop feedback control
 
 here's a fun story illustrating this evolution. high cold war - increasing flops and fortran drive the appearance of
 covariance matrices in what was purely linear optimization - but we're definitely on the edge here, because those
-quadtratic forms immediately blow up our numerical ranges - there's a crescendo of cries - numerical instability! we
+quadratic forms immediately blow up our numerical ranges - there's a crescendo of cries - numerical instability! we
 don't have enough bits in our floating point representations - plain and simple. so what immediately happens is a new
 industry within applied mathematics and electrical engineering - optimize the fortran and floating point units,
 and factorize the matrices. what does factorize the matrices mean? in a nutshell, only represent something very much

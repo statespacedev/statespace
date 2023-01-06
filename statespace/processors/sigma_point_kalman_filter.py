@@ -2,7 +2,7 @@
 classical kalman filter, where uncertainty is represented as gaussian, and a particle filter, where uncertainty has
 arbitrary shape. here uncertainty is deterministically sampled at a small number of points, the sigma points or sigma
 particles - later, when we jump up to the particle filter, the number, roles, and significance of the particles are
-increased - spkf and particle are members of a broader group of 'sample-and-progagate' approaches.
+increased - spkf and particle are members of a broader group of 'sample-and-propagate' approaches.
 
 we're rolling up into the 70s and 80s - integrated circuits are entering their large scale and very large scale eras
 - flops are becoming relatively astronomical. what does this new-found computing power enable? well, implicit in our
