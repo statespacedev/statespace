@@ -18,7 +18,7 @@ central point representing our state estimate, the 'mean point' - and a surround
 uncertainty, the 'sigma points'. the sigma points are more or less linked with 'sigmas', as in 'square-roots of
 variances', of our uncertainty model in our state space - that's what makes them deterministic for the spkf - given
 our uncertainty model, we deterministically have our sigma points. spkf is all about the trade-offs between flops and
-more realistic evolution of those sigme-points. picture a three dimensional state space in which our state is our
+more realistic evolution of those sigma-points. picture a three dimensional state space in which our state is our
 estimated position. the sigma points form an ellipsoid of uncertainty around our position, representing a 'one-sigma
 surface' - we believe there's something like a two-thirds probability we're at least somewhere inside that ellipsoid.
 the spkf enables the sigma points to evolve in a nonlinear fashion."""
