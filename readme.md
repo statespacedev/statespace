@@ -1,6 +1,6 @@
 <img src="./docs/images/pf2-small.png" alt=""/>
 
-230109 cleanup of docsascode - moving version up to 1.6.4.
+230109 cleanup of docsascode - moving version up to 1.6.5.
 
 221228 bringing various environmental factors as far forward as possible within the github context - poetry replacing venv and pip, docs publishing via github actions to github pages, package publishing to pypi via poetry and github actions.
 
