@@ -1,20 +1,20 @@
 [tool.poetry]
 name = "statespace"
-version = "1.6.3"
+version = "1.6.5"
 description = ""
 authors = ["noah smith <noah@statespace.dev>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
-numpy = "*"
-scipy = "*"
-matplotlib = "*"
-filterpy = "*"
+python = ">=3.8,<3.11"
+numpy = "^1.24"
+scipy = "^1.10"
+matplotlib = "^3.6"
+filterpy = "^1.4"
 
 [tool.poetry.dev-dependencies]
-pytest = "*"
-sphinx = "*"
-sphinx_rtd_theme = "*"
+pytest = "^7.2"
+#sphinx = "6.1.2" # does not work, use pip
+#sphinx_rtd_theme = "1.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
