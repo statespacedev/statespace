@@ -1,5 +1,7 @@
 <img src="./docs/images/pf2-small.png" alt=""/>
 
+230109 cleanup of docsascode - moving version up to 1.6.4.
+
 221228 bringing various environmental factors as far forward as possible within the github context - poetry replacing venv and pip, docs publishing via github actions to github pages, package publishing to pypi via poetry and github actions.
 
 221221 second thoughts about about cpp python extension here - let's leave that for project starid. in practical terms, project statespace is pure python and pycharm, project starid is cpp python extension and clion.

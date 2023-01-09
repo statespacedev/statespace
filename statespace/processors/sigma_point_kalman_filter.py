@@ -1,27 +1,25 @@
 """sigma-point sampling kalman filter, spkf - or 'modern' kalman filter. spkf's essentially the step in-between a
 classical kalman filter, where uncertainty is represented as gaussian, and a particle filter, where uncertainty has
 arbitrary shape. here uncertainty is deterministically sampled at a small number of points, the sigma points or sigma
-particles - later, when we jump up to the particle filter, the number, roles, and significance of the particles are
+particles - later, with the jump up to the particle filter, the number, roles, and significance of the particles are
 increased - spkf and particle are members of a broader group of 'sample-and-propagate' approaches.
 
-we're rolling up into the 70s and 80s - integrated circuits are entering their large scale and very large scale eras
-- flops are becoming relatively astronomical. what does this new-found computing power enable? well, implicit in our
-erstwhile covariance is the concept that our modeling is built on something at least related to gaussian normal
-distributions. the beautiful simplicity of gaussians is that they have only two parameters - mean and variance. we
-were asking for the bare minimum from late 50s hardware - with good reason. a lot of the effort went into evolving
-those values forward through time in a linear fashion - the infamous matrix riccati differential equation to evolve
-the covariance. now, with more flops, we can go beyond gaussians, ultimately to uncertainty distibutions with
-arbitrary shapes.
+rolling up into the 70s and 80s - integrated circuits are entering their large scale and very large scale eras -
+flops are becoming relatively astronomical. what does this new-found computing power enable? implicit in the
+erstwhile covariance is a concept that modeling is built on something at least related to gaussian normal
+distributions. the beautiful simplicity of gaussians is that they have only two parameters - mean and variance. this
+asks for the bare minimum from late 50s hardware - a lot of the effort went into evolving those values forward
+through time - the infamous matrix riccati differential equation to evolve the covariance. with more flops,
+things go beyond gaussians, ultimately to uncertainty distibutions with arbitrary shapes.
 
-from a geometric perspective - we need to evolve a group of points in our state space forward through time - a
-central point representing our state estimate, the 'mean point' - and a surrounding group of points representing the
+from a geometric perspective - the objective is to evolve a group of points in state space forward through time - a
+central point representing the state estimate, the 'mean point' - and a surrounding group of points representing the
 uncertainty, the 'sigma points'. the sigma points are more or less linked with 'sigmas', as in 'square-roots of
-variances', of our uncertainty model in our state space - that's what makes them deterministic for the spkf - given
-our uncertainty model, we deterministically have our sigma points. spkf is all about the trade-offs between flops and
-more realistic evolution of those sigma-points. picture a three dimensional state space in which our state is our
-estimated position. the sigma points form an ellipsoid of uncertainty around our position, representing a 'one-sigma
-surface' - we believe there's something like a two-thirds probability we're at least somewhere inside that ellipsoid.
-the spkf enables the sigma points to evolve in a nonlinear fashion."""
+variances', of the uncertainty model as represented in the state space - that's what makes them deterministic for the
+spkf - the uncertainty model deterministically leads to the sigma points. spkf is about the trade-offs between flops
+and more realistic evolution of those sigma-points. picture x, y, z position states - the sigma points form an
+ellipsoid of uncertainty around the position, representing a 'one-sigma surface' - the belief is that there's
+something like a two-thirds probability the true positions is at least somewhere inside that ellipsoid."""
 import math
 import numpy as np
 # noinspection PyProtectedMember
