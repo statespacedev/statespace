@@ -15,7 +15,7 @@ picture for diagnostics - but overall, simplex helped drive the early waves of w
 to explore this further, if good records are out there. not surprisingly, dantzig and von neumann did publish
 specifically on this topic, around 1950 - likely based on work underway on the eniac from 1946 forward. and a curious
 note - the term simplex reappears frequently once things into the sigma point kalman filter regions, in the context
-of sampling a state space - to be hopefully investigated eventually here as well."""
+of sampling a state space - to be hopefully investigated eventually here as well. """
 import numpy as np
 
 
