@@ -3,7 +3,7 @@ the candy and jazwinisky books. based on real world reentry vehicle tracking. ""
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from statespace.models.base_model import BaseModel, BaseEKF, BaseSPKF, BasePF, BaseEval, Autocorr, Log
+from statespace.base_model import BaseModel, BaseEKF, BaseSPKF, BasePF, BaseEval, Autocorr, Log
 from scipy.stats import norm
 # noinspection PyProtectedMember
 from filterpy.monte_carlo import systematic_resample

@@ -54,23 +54,23 @@ def process_model(conf):
     processor, model = None, None
     match conf.processor:
         case 'ekf':
-            from statespace.processors.extended_kalman_filter import Kalman
+            from statespace.extended_kalman_filter import Kalman
             processor = Kalman(conf)
         case 'spkf':
-            from statespace.processors.sigma_point_kalman_filter import SigmaPoint
+            from statespace.sigma_point_kalman_filter import SigmaPoint
             processor = SigmaPoint(conf)
         case 'pf':
-            from statespace.processors.particle_filter import Particle
+            from statespace.particle_filter import Particle
             processor = Particle(conf)
     match conf.model:
         case 'one':
-            from statespace.models.one_state import Onestate
+            from statespace.one_state import Onestate
             model = Onestate(conf)
         case 'three':
-            from statespace.models.three_state import Threestate
+            from statespace.three_state import Threestate
             model = Threestate(conf)
         case 'bearings':
-            from statespace.models.bearings_only import BearingsOnly
+            from statespace.bearings_only import BearingsOnly
             model = BearingsOnly(conf)
     processor.run(model)
     model.eval.estimate(processor.log)

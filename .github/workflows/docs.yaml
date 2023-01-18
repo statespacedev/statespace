@@ -12,7 +12,7 @@ jobs:
       - run: poetry install --no-interaction
       - run: pip install sphinx
       - run: pip install sphinx_rtd_theme
-      - run: sphinx-build docs docs/_build
+      - run: sphinx-build -a -E docs docs/_build
       - name: deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}

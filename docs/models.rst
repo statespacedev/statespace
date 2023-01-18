@@ -3,22 +3,22 @@ models
 
 base_model.py
 --------------
-.. automodule:: statespace.models.base_model
+.. automodule:: statespace.base_model
     :members:
 
 one_state.py
 --------------
-.. automodule:: statespace.models.one_state
+.. automodule:: statespace.one_state
     :members:
 
 three_state.py
 --------------
 
-.. automodule:: statespace.models.three_state
+.. automodule:: statespace.three_state
     :members:
 
 bearings_only.py
 ----------------
-.. automodule:: statespace.models.bearings_only
+.. automodule:: statespace.bearings_only
     :members:
 
