@@ -13,7 +13,6 @@ one_state.py
 
 three_state.py
 --------------
-
 .. automodule:: statespace.three_state
     :members:
 
