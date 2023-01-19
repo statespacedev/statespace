@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>processors &mdash; statespace  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="models" href="models.html" />
+    <link rel="prev" title="introduction" href="introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> statespace
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">processors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-statespace.simplex_linear_programming">simplex_linear_programming.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.simplex_linear_programming.simplex"><code class="docutils literal notranslate"><span class="pre">simplex()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-statespace.extended_kalman_filter">extended_kalman_filter.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.extended_kalman_filter.Kalman"><code class="docutils literal notranslate"><span class="pre">Kalman</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.extended_kalman_filter.Kalman.ekf"><code class="docutils literal notranslate"><span class="pre">Kalman.ekf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.extended_kalman_filter.Kalman.ekf_factorized"><code class="docutils literal notranslate"><span class="pre">Kalman.ekf_factorized()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.extended_kalman_filter.Kalman.ud_factorization"><code class="docutils literal notranslate"><span class="pre">Kalman.ud_factorization()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.extended_kalman_filter.Kalman.temporal"><code class="docutils literal notranslate"><span class="pre">Kalman.temporal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.extended_kalman_filter.Kalman.observational"><code class="docutils literal notranslate"><span class="pre">Kalman.observational()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-statespace.sigma_point_kalman_filter">sigma_point_kalman_filter.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.sigma_point_kalman_filter.SigmaPoint"><code class="docutils literal notranslate"><span class="pre">SigmaPoint</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.sigma_point_kalman_filter.SigmaPoint.spkf"><code class="docutils literal notranslate"><span class="pre">SigmaPoint.spkf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.sigma_point_kalman_filter.SigmaPoint.spkf_factorized"><code class="docutils literal notranslate"><span class="pre">SigmaPoint.spkf_factorized()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.sigma_point_kalman_filter.SigmaPoint.temporal"><code class="docutils literal notranslate"><span class="pre">SigmaPoint.temporal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.sigma_point_kalman_filter.SigmaPoint.observational"><code class="docutils literal notranslate"><span class="pre">SigmaPoint.observational()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.sigma_point_kalman_filter.SigmaPoint.cholesky_update"><code class="docutils literal notranslate"><span class="pre">SigmaPoint.cholesky_update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.sigma_point_kalman_filter.SigmaPoint.cholesky_downdate"><code class="docutils literal notranslate"><span class="pre">SigmaPoint.cholesky_downdate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-statespace.particle_filter">particle_filter.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.particle_filter.Particle"><code class="docutils literal notranslate"><span class="pre">Particle</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.particle_filter.Particle.run_model"><code class="docutils literal notranslate"><span class="pre">Particle.run_model()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notes.html">notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">statespace</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">processors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/processors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="processors">
+<h1>processors<a class="headerlink" href="#processors" title="Permalink to this heading"></a></h1>
+<section id="module-statespace.simplex_linear_programming">
+<span id="simplex-linear-programming-py"></span><h2>simplex_linear_programming.py<a class="headerlink" href="#module-statespace.simplex_linear_programming" title="Permalink to this heading"></a></h2>
+<p>linear programming using matrix and vector representation, as close to the literature as possible. besides being
+useful, it’s also lots of fun historically - and from an ‘aesthetic’ perspective. those latter two - history and
+aesthetics - are the main motivation here.</p>
+<p>with the first generations of hardware in the 50s, what were some of the commercial motivations to invest in
+computers? they could simulate, and played a critical role there, see enewetak atoll - and they could help with
+command and control, see the sage system. but what else could justify the big price tags? in a nutshell - resource
+allocation. possibly  sounds boring - but was more than enough motivation to help drive speedy commercialization
+across industries. there’s a reflection of all this in the growth of the cultural notion of ‘systems analysis’ -
+possibly more intriguing than ‘operations research’ - even a bit disreputable, given some of the better known
+practitioners and their results circa 1968?</p>
+<p>the main thing the simplex algorithm requires is matrix inversion. factorizations such as cholesky can also enter the
+picture for diagnostics - but overall, simplex helped drive the early waves of work on matrix inversion. would be great
+to explore this further, if good records are out there. not surprisingly, dantzig and von neumann did publish
+specifically on this topic, around 1950 - likely based on work underway on the eniac from 1946 forward. and a curious
+note - the term simplex reappears frequently once things into the sigma point kalman filter regions, in the context
+of sampling a state space - to be hopefully investigated eventually here as well.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="statespace.simplex_linear_programming.simplex">
+<span class="sig-prename descclassname"><span class="pre">statespace.simplex_linear_programming.</span></span><span class="sig-name descname"><span class="pre">simplex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.simplex_linear_programming.simplex" title="Permalink to this definition"></a></dt>
+<dd><p>revised simplex method.</p>
+</dd></dl>
+
+</section>
+<section id="module-statespace.extended_kalman_filter">
+<span id="extended-kalman-filter-py"></span><h2>extended_kalman_filter.py<a class="headerlink" href="#module-statespace.extended_kalman_filter" title="Permalink to this heading"></a></h2>
+<p>baseline extended kalman filters. both the standard textbook form, and the ud factorized form. 1957 - the space
+race was on for real - why? the ability to move roughly a ton from anywhere to anywhere on the globe in under thirty
+minutes. on top of that, add the capability to do it automatically, without human intervention - just in case - might
+not be anybody left around to do any intervening.</p>
+<p>a closed-loop system with its own internal sensors bringing data in from the outside world was needed - a black box -
+and it needed to make reasonable decisions based on its sensors, using a model of the sensor errors and the outside
+world. is a fully linear system going to work? no - it needs to adapt to nonlinearities in the models. a huge new
+thing here is representing the uncertainties - by simple analogy with ‘variance’ and its square-root ‘sigma’,
+at first, this is going to be a covariance matrix - a quadratic form ATAx with ‘squared units’ just like ‘variance’.
+the same idea appeared in finance via markowitz portfolio theory at exactly the same time - would be fascinating to
+know how much direct contact between kalman and markowitz took place at the time? and all of this is only a few years
+after dantzig and von neumann - how much direct contact did this whole group have?</p>
+<p>the link between ‘variance’ and its square-root ‘sigma’ has already been mentioned - is that concept useful here?
+over time, into the 60s and 70s, it very much was so - the ‘factorized’, ‘square-root’ forms appeared. they played a
+crucial role in adapting to the then current hardware - the 16-bit apollo guidance computer required the
+‘square-root’ ekf. this drove the applied mathematicians and electrical engineers onward from matrix inversion toward
+a whole zoo of matrix factorizations - lu, qr, ud, svd, cholesky, etc.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.extended_kalman_filter.Kalman">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.extended_kalman_filter.</span></span><span class="sig-name descname"><span class="pre">Kalman</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.extended_kalman_filter.Kalman" title="Permalink to this definition"></a></dt>
+<dd><p>classical extended kalman filter</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.extended_kalman_filter.Kalman.ekf">
+<span class="sig-name descname"><span class="pre">ekf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.extended_kalman_filter.Kalman.ekf" title="Permalink to this definition"></a></dt>
+<dd><p>basic form</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.extended_kalman_filter.Kalman.ekf_factorized">
+<span class="sig-name descname"><span class="pre">ekf_factorized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.extended_kalman_filter.Kalman.ekf_factorized" title="Permalink to this definition"></a></dt>
+<dd><p>ud factorized form</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.extended_kalman_filter.Kalman.ud_factorization">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ud_factorization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">M</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.extended_kalman_filter.Kalman.ud_factorization" title="Permalink to this definition"></a></dt>
+<dd><p>ud factorization</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.extended_kalman_filter.Kalman.temporal">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">temporal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Uin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Din</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Gin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Q</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.extended_kalman_filter.Kalman.temporal" title="Permalink to this definition"></a></dt>
+<dd><p>thornton temporal update</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.extended_kalman_filter.Kalman.observational">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">observational</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Uin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Din</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yhat</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.extended_kalman_filter.Kalman.observational" title="Permalink to this definition"></a></dt>
+<dd><p>bierman observation update</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-statespace.sigma_point_kalman_filter">
+<span id="sigma-point-kalman-filter-py"></span><h2>sigma_point_kalman_filter.py<a class="headerlink" href="#module-statespace.sigma_point_kalman_filter" title="Permalink to this heading"></a></h2>
+<p>sigma-point sampling kalman filter, spkf - or ‘modern’ kalman filter. spkf’s essentially the step in-between a
+classical kalman filter, where uncertainty is represented as gaussian, and a particle filter, where uncertainty has
+arbitrary shape. here uncertainty is deterministically sampled at a small number of points, the sigma points or sigma
+particles - later, with the jump up to the particle filter, the number, roles, and significance of the particles are
+increased - spkf and particle are members of a broader group of ‘sample-and-propagate’ approaches.</p>
+<p>rolling up into the 70s and 80s - integrated circuits are entering their large scale and very large scale eras -
+flops are becoming relatively astronomical. what does this new-found computing power enable? implicit in the
+erstwhile covariance is a concept that modeling is built on something at least related to gaussian normal
+distributions. the beautiful simplicity of gaussians is that they have only two parameters - mean and variance. this
+asks for the bare minimum from late 50s hardware - a lot of the effort went into evolving those values forward
+through time - the infamous matrix riccati differential equation to evolve the covariance. with more flops,
+things go beyond gaussians, ultimately to uncertainty distibutions with arbitrary shapes.</p>
+<p>from a geometric perspective - the objective is to evolve a group of points in state space forward through time - a
+central point representing the state estimate, the ‘mean point’ - and a surrounding group of points representing the
+uncertainty, the ‘sigma points’. the sigma points are more or less linked with ‘sigmas’, as in ‘square-roots of
+variances’, of the uncertainty model as represented in the state space - that’s what makes them deterministic for the
+spkf - the uncertainty model deterministically leads to the sigma points. spkf is about the trade-offs between flops
+and more realistic evolution of those sigma-points. picture x, y, z position states - the sigma points form an
+ellipsoid of uncertainty around the position, representing a ‘one-sigma surface’ - the belief is that there’s
+something like a two-thirds probability the true positions is at least somewhere inside that ellipsoid.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.sigma_point_kalman_filter.SigmaPoint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.sigma_point_kalman_filter.</span></span><span class="sig-name descname"><span class="pre">SigmaPoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.sigma_point_kalman_filter.SigmaPoint" title="Permalink to this definition"></a></dt>
+<dd><p>modern sigma-point deterministic sampling kalman filter</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.sigma_point_kalman_filter.SigmaPoint.spkf">
+<span class="sig-name descname"><span class="pre">spkf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.sigma_point_kalman_filter.SigmaPoint.spkf" title="Permalink to this definition"></a></dt>
+<dd><p>sigma-point deterministic sampling kalman filter</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.sigma_point_kalman_filter.SigmaPoint.spkf_factorized">
+<span class="sig-name descname"><span class="pre">spkf_factorized</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.sigma_point_kalman_filter.SigmaPoint.spkf_factorized" title="Permalink to this definition"></a></dt>
+<dd><p>cholesky factorized sigma-point sampling kalman filter</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.sigma_point_kalman_filter.SigmaPoint.temporal">
+<span class="sig-name descname"><span class="pre">temporal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">XY</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Xtil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sproc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.sigma_point_kalman_filter.SigmaPoint.temporal" title="Permalink to this definition"></a></dt>
+<dd><p>cholesky factorized temporal update</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.sigma_point_kalman_filter.SigmaPoint.observational">
+<span class="sig-name descname"><span class="pre">observational</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Xtil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ytil</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pxy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Sobs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.sigma_point_kalman_filter.SigmaPoint.observational" title="Permalink to this definition"></a></dt>
+<dd><p>cholesky factorized observational update</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.sigma_point_kalman_filter.SigmaPoint.cholesky_update">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cholesky_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.sigma_point_kalman_filter.SigmaPoint.cholesky_update" title="Permalink to this definition"></a></dt>
+<dd><p>cholesky update</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.sigma_point_kalman_filter.SigmaPoint.cholesky_downdate">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cholesky_downdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">R</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.sigma_point_kalman_filter.SigmaPoint.cholesky_downdate" title="Permalink to this definition"></a></dt>
+<dd><p>cholesky downdate</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-statespace.particle_filter">
+<span id="particle-filter-py"></span><h2>particle_filter.py<a class="headerlink" href="#module-statespace.particle_filter" title="Permalink to this heading"></a></h2>
+<p>particle filters, aka sequential monte carlo sampling processors. sampling here is random, not deterministic as in
+the sigma point kalman filter - and the idea of resampling and evolving newer, fitter particles comes to the fore.
+the particles are generated randomly and new ones are introduced freely, but generally guided by evolving beliefs
+around the model and external reality - things are at the least in the general regions of the ‘genetic algorithms’ -
+survival-of-the-fittest is a core concept, but the ‘genetic material’ concept is de-emphasized in favor of using
+sensors to bring in new additional data from the external world over time. everything here is about evolution of
+beliefs over time, rather than static optimizations at a single point in time - sensor-based closed-loop feedback
+estimation and control.</p>
+<p>the particles live, die, and are born via survival-of-the-fittest ‘resampling’ - new particles essentially kill old
+particles - things are quite red of tooth and claw. when new data comes in, some of the particles agree with the data
+better than other particles - the former are fitter, the latter are less fit. ‘resample’ the less fit particles -
+replace them with new random particles that are more fit - that agree with the data better - then life goes on until
+the next new data comes in, the endless cycle repeats - evolve, update, evolve, update.</p>
+<p>particles can soak up arbitrary amounts of hardware flops - just keep adding more particles. for a state vector with
+x components, spkf gives 2x + 1 particles - two sigma point particles for each state component, and one particle
+representing the estimated mean state. with sequential monte carlo, there’s simply a ‘cloud’ of particles swarming
+about over time - at any time, the cloud’s estimated mean state can be estimated using kernel density methods,
+likewise for the shape or scatter of the cloud and various measures of uncertainty.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.particle_filter.Particle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.particle_filter.</span></span><span class="sig-name descname"><span class="pre">Particle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.particle_filter.Particle" title="Permalink to this definition"></a></dt>
+<dd><p>particle filter, sequential monte carlo processor</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.particle_filter.Particle.run_model">
+<span class="sig-name descname"><span class="pre">run_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.particle_filter.Particle.run_model" title="Permalink to this definition"></a></dt>
+<dd><p>basic sampling-importance-resampling particle filter, bootstrap particle filter, condensation particle
+filter, survival of the fittest algorithm</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="introduction.html" class="btn btn-neutral float-left" title="introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="models.html" class="btn btn-neutral float-right" title="models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, noah smith.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

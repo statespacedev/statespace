@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>models &mdash; statespace  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="notes" href="notes.html" />
+    <link rel="prev" title="processors" href="processors.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> statespace
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="processors.html">processors</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-statespace.base_model">base_model.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.base_model.BaseModel"><code class="docutils literal notranslate"><span class="pre">BaseModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseModel.entities"><code class="docutils literal notranslate"><span class="pre">BaseModel.entities()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseModel.simulation"><code class="docutils literal notranslate"><span class="pre">BaseModel.simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseModel.f"><code class="docutils literal notranslate"><span class="pre">BaseModel.f()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseModel.h"><code class="docutils literal notranslate"><span class="pre">BaseModel.h()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.base_model.BaseEKF"><code class="docutils literal notranslate"><span class="pre">BaseEKF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseEKF.entities"><code class="docutils literal notranslate"><span class="pre">BaseEKF.entities()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseEKF.F"><code class="docutils literal notranslate"><span class="pre">BaseEKF.F()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseEKF.H"><code class="docutils literal notranslate"><span class="pre">BaseEKF.H()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.base_model.BaseSPKF"><code class="docutils literal notranslate"><span class="pre">BaseSPKF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseSPKF.entities"><code class="docutils literal notranslate"><span class="pre">BaseSPKF.entities()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseSPKF.entities_cholesky"><code class="docutils literal notranslate"><span class="pre">BaseSPKF.entities_cholesky()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseSPKF.XY"><code class="docutils literal notranslate"><span class="pre">BaseSPKF.XY()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseSPKF.XYcho"><code class="docutils literal notranslate"><span class="pre">BaseSPKF.XYcho()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.base_model.BasePF"><code class="docutils literal notranslate"><span class="pre">BasePF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BasePF.entities"><code class="docutils literal notranslate"><span class="pre">BasePF.entities()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BasePF.X0"><code class="docutils literal notranslate"><span class="pre">BasePF.X0()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BasePF.predict"><code class="docutils literal notranslate"><span class="pre">BasePF.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BasePF.update"><code class="docutils literal notranslate"><span class="pre">BasePF.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BasePF.resample"><code class="docutils literal notranslate"><span class="pre">BasePF.resample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.base_model.BaseEval"><code class="docutils literal notranslate"><span class="pre">BaseEval</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseEval.model"><code class="docutils literal notranslate"><span class="pre">BaseEval.model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseEval.estimate"><code class="docutils literal notranslate"><span class="pre">BaseEval.estimate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.BaseEval.show"><code class="docutils literal notranslate"><span class="pre">BaseEval.show()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.base_model.Log"><code class="docutils literal notranslate"><span class="pre">Log</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.base_model.Autocorr"><code class="docutils literal notranslate"><span class="pre">Autocorr</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.Autocorr.run"><code class="docutils literal notranslate"><span class="pre">Autocorr.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.Autocorr.plot"><code class="docutils literal notranslate"><span class="pre">Autocorr.plot()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.Autocorr.autocorr1"><code class="docutils literal notranslate"><span class="pre">Autocorr.autocorr1()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.base_model.Autocorr.autocorr2"><code class="docutils literal notranslate"><span class="pre">Autocorr.autocorr2()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-statespace.one_state">one_state.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.one_state.Onestate"><code class="docutils literal notranslate"><span class="pre">Onestate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.Onestate.simulation"><code class="docutils literal notranslate"><span class="pre">Onestate.simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.Onestate.f"><code class="docutils literal notranslate"><span class="pre">Onestate.f()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.Onestate.h"><code class="docutils literal notranslate"><span class="pre">Onestate.h()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.one_state.EKF"><code class="docutils literal notranslate"><span class="pre">EKF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.EKF.F"><code class="docutils literal notranslate"><span class="pre">EKF.F()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.EKF.H"><code class="docutils literal notranslate"><span class="pre">EKF.H()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.one_state.SPKF"><code class="docutils literal notranslate"><span class="pre">SPKF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.SPKF.XY"><code class="docutils literal notranslate"><span class="pre">SPKF.XY()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.SPKF.XYcho"><code class="docutils literal notranslate"><span class="pre">SPKF.XYcho()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.one_state.PF"><code class="docutils literal notranslate"><span class="pre">PF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.PF.X0"><code class="docutils literal notranslate"><span class="pre">PF.X0()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.PF.predict"><code class="docutils literal notranslate"><span class="pre">PF.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.PF.update"><code class="docutils literal notranslate"><span class="pre">PF.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.PF.resample"><code class="docutils literal notranslate"><span class="pre">PF.resample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.one_state.Eval"><code class="docutils literal notranslate"><span class="pre">Eval</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.one_state.Eval.estimate"><code class="docutils literal notranslate"><span class="pre">Eval.estimate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-statespace.three_state">three_state.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.three_state.Threestate"><code class="docutils literal notranslate"><span class="pre">Threestate</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.Threestate.simulation"><code class="docutils literal notranslate"><span class="pre">Threestate.simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.Threestate.f"><code class="docutils literal notranslate"><span class="pre">Threestate.f()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.Threestate.h"><code class="docutils literal notranslate"><span class="pre">Threestate.h()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.three_state.EKF"><code class="docutils literal notranslate"><span class="pre">EKF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.EKF.F"><code class="docutils literal notranslate"><span class="pre">EKF.F()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.EKF.H"><code class="docutils literal notranslate"><span class="pre">EKF.H()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.three_state.SPKF"><code class="docutils literal notranslate"><span class="pre">SPKF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.SPKF.XY"><code class="docutils literal notranslate"><span class="pre">SPKF.XY()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.SPKF.XYcho"><code class="docutils literal notranslate"><span class="pre">SPKF.XYcho()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.three_state.PF"><code class="docutils literal notranslate"><span class="pre">PF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.PF.X0"><code class="docutils literal notranslate"><span class="pre">PF.X0()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.PF.predict"><code class="docutils literal notranslate"><span class="pre">PF.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.PF.update"><code class="docutils literal notranslate"><span class="pre">PF.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.PF.resample"><code class="docutils literal notranslate"><span class="pre">PF.resample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.three_state.Eval"><code class="docutils literal notranslate"><span class="pre">Eval</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.three_state.Eval.estimate"><code class="docutils literal notranslate"><span class="pre">Eval.estimate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-statespace.bearings_only">bearings_only.py</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.bearings_only.BearingsOnly"><code class="docutils literal notranslate"><span class="pre">BearingsOnly</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.BearingsOnly.simulation"><code class="docutils literal notranslate"><span class="pre">BearingsOnly.simulation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.BearingsOnly.f"><code class="docutils literal notranslate"><span class="pre">BearingsOnly.f()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.BearingsOnly.h"><code class="docutils literal notranslate"><span class="pre">BearingsOnly.h()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.bearings_only.EKF"><code class="docutils literal notranslate"><span class="pre">EKF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.EKF.F"><code class="docutils literal notranslate"><span class="pre">EKF.F()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.EKF.H"><code class="docutils literal notranslate"><span class="pre">EKF.H()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.bearings_only.SPKF"><code class="docutils literal notranslate"><span class="pre">SPKF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.SPKF.XY"><code class="docutils literal notranslate"><span class="pre">SPKF.XY()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.bearings_only.PF"><code class="docutils literal notranslate"><span class="pre">PF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.PF.X0"><code class="docutils literal notranslate"><span class="pre">PF.X0()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.PF.predict"><code class="docutils literal notranslate"><span class="pre">PF.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.PF.update"><code class="docutils literal notranslate"><span class="pre">PF.update()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.PF.resample"><code class="docutils literal notranslate"><span class="pre">PF.resample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#statespace.bearings_only.Eval"><code class="docutils literal notranslate"><span class="pre">Eval</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.Eval.model"><code class="docutils literal notranslate"><span class="pre">Eval.model()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#statespace.bearings_only.Eval.estimate"><code class="docutils literal notranslate"><span class="pre">Eval.estimate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notes.html">notes</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">statespace</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li class="breadcrumb-item active">models</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/models.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="models">
+<h1>models<a class="headerlink" href="#models" title="Permalink to this heading"></a></h1>
+<section id="module-statespace.base_model">
+<span id="base-model-py"></span><h2>base_model.py<a class="headerlink" href="#module-statespace.base_model" title="Permalink to this heading"></a></h2>
+<p>placeholder for what could grow to become a higher-level statespace model - with individual models inheriting and
+overriding. for now it’s mostly acting as a skelton to sketch out what such a beast could potentially look like -
+what entities and activities make sense here?</p>
+<p>if a particular model doesn’t need something sketched out here, don’t override it. if something’s needed,
+override it.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.base_model.BaseModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.base_model.</span></span><span class="sig-name descname"><span class="pre">BaseModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseModel" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common for the model across various processors? in short, a simulation of states and observations over
+some time period - a simulation time series. the sim is driven by vector valued functions - generally non-linear
+- a state evolution equation f, and an observation equation h.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseModel.entities">
+<span class="sig-name descname"><span class="pre">entities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseModel.entities" title="Permalink to this definition"></a></dt>
+<dd><p>entities needed for a processor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseModel.simulation">
+<span class="sig-name descname"><span class="pre">simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseModel.simulation" title="Permalink to this definition"></a></dt>
+<dd><p>time series of states x, inputs u, and obs y.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseModel.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseModel.f" title="Permalink to this definition"></a></dt>
+<dd><p>state evolution equation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseModel.h">
+<span class="sig-name descname"><span class="pre">h</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseModel.h" title="Permalink to this definition"></a></dt>
+<dd><p>observation equation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.base_model.BaseEKF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.base_model.</span></span><span class="sig-name descname"><span class="pre">BaseEKF</span></span><a class="headerlink" href="#statespace.base_model.BaseEKF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across kalman filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseEKF.entities">
+<span class="sig-name descname"><span class="pre">entities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseEKF.entities" title="Permalink to this definition"></a></dt>
+<dd><p>entities needed for an extended kalman filter processor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseEKF.F">
+<span class="sig-name descname"><span class="pre">F</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseEKF.F" title="Permalink to this definition"></a></dt>
+<dd><p>state evolution matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseEKF.H">
+<span class="sig-name descname"><span class="pre">H</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseEKF.H" title="Permalink to this definition"></a></dt>
+<dd><p>observation sensitivity matrix.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.base_model.BaseSPKF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.base_model.</span></span><span class="sig-name descname"><span class="pre">BaseSPKF</span></span><a class="headerlink" href="#statespace.base_model.BaseSPKF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across sigma point kalman filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseSPKF.entities">
+<span class="sig-name descname"><span class="pre">entities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseSPKF.entities" title="Permalink to this definition"></a></dt>
+<dd><p>entities needed for a sigma point kalman filter processor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseSPKF.entities_cholesky">
+<span class="sig-name descname"><span class="pre">entities_cholesky</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseSPKF.entities_cholesky" title="Permalink to this definition"></a></dt>
+<dd><p>entities needed for cholesky factorization sigma point kalman filter processor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseSPKF.XY">
+<span class="sig-name descname"><span class="pre">XY</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseSPKF.XY" title="Permalink to this definition"></a></dt>
+<dd><p>sigma points update.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseSPKF.XYcho">
+<span class="sig-name descname"><span class="pre">XYcho</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseSPKF.XYcho" title="Permalink to this definition"></a></dt>
+<dd><p>cholesky sigma points update.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.base_model.BasePF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.base_model.</span></span><span class="sig-name descname"><span class="pre">BasePF</span></span><a class="headerlink" href="#statespace.base_model.BasePF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across particle filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BasePF.entities">
+<span class="sig-name descname"><span class="pre">entities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BasePF.entities" title="Permalink to this definition"></a></dt>
+<dd><p>entities needed for a particle filter processor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BasePF.X0">
+<span class="sig-name descname"><span class="pre">X0</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BasePF.X0" title="Permalink to this definition"></a></dt>
+<dd><p>initial particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BasePF.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BasePF.predict" title="Permalink to this definition"></a></dt>
+<dd><p>evolution forward in time of particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BasePF.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BasePF.update" title="Permalink to this definition"></a></dt>
+<dd><p>observational update of particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BasePF.resample">
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BasePF.resample" title="Permalink to this definition"></a></dt>
+<dd><p>resampling of particles.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.base_model.BaseEval">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.base_model.</span></span><span class="sig-name descname"><span class="pre">BaseEval</span></span><a class="headerlink" href="#statespace.base_model.BaseEval" title="Permalink to this definition"></a></dt>
+<dd><p>evaluating processor results.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseEval.model">
+<span class="sig-name descname"><span class="pre">model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseEval.model" title="Permalink to this definition"></a></dt>
+<dd><p>plot true timeseries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseEval.estimate">
+<span class="sig-name descname"><span class="pre">estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proclog</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseEval.estimate" title="Permalink to this definition"></a></dt>
+<dd><p>plot estimated results.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.BaseEval.show">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.BaseEval.show" title="Permalink to this definition"></a></dt>
+<dd><p>show the plots.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.base_model.Log">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.base_model.</span></span><span class="sig-name descname"><span class="pre">Log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.Log" title="Permalink to this definition"></a></dt>
+<dd><p>logging of the results timeseries.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.base_model.Autocorr">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.base_model.</span></span><span class="sig-name descname"><span class="pre">Autocorr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.Autocorr" title="Permalink to this definition"></a></dt>
+<dd><p>auto correlation of results with themselves.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.Autocorr.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proclog</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.Autocorr.run" title="Permalink to this definition"></a></dt>
+<dd><p>run autocorrelation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.Autocorr.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.Autocorr.plot" title="Permalink to this definition"></a></dt>
+<dd><p>show the plot.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.Autocorr.autocorr1">
+<span class="sig-name descname"><span class="pre">autocorr1</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.Autocorr.autocorr1" title="Permalink to this definition"></a></dt>
+<dd><p>calculation version one.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.base_model.Autocorr.autocorr2">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">autocorr2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.base_model.Autocorr.autocorr2" title="Permalink to this definition"></a></dt>
+<dd><p>calculation version two.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-statespace.one_state">
+<span id="one-state-py"></span><h2>one_state.py<a class="headerlink" href="#module-statespace.one_state" title="Permalink to this heading"></a></h2>
+<p>a simple as possible one-state example with non linear temporal and observation updates. it’s a common example in
+the candy and jazwinisky books. based on real world reentry vehicle tracking.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.one_state.Onestate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.one_state.</span></span><span class="sig-name descname"><span class="pre">Onestate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.Onestate" title="Permalink to this definition"></a></dt>
+<dd><p>one-state reference model</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.Onestate.simulation">
+<span class="sig-name descname"><span class="pre">simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.Onestate.simulation" title="Permalink to this definition"></a></dt>
+<dd><p>time series of states x, inputs u, and obs y.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.Onestate.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.Onestate.f" title="Permalink to this definition"></a></dt>
+<dd><p>state evolution equation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.Onestate.h">
+<span class="sig-name descname"><span class="pre">h</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.Onestate.h" title="Permalink to this definition"></a></dt>
+<dd><p>observation equation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.one_state.EKF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.one_state.</span></span><span class="sig-name descname"><span class="pre">EKF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.EKF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across kalman filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.EKF.F">
+<span class="sig-name descname"><span class="pre">F</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.EKF.F" title="Permalink to this definition"></a></dt>
+<dd><p>state evolution matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.EKF.H">
+<span class="sig-name descname"><span class="pre">H</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.EKF.H" title="Permalink to this definition"></a></dt>
+<dd><p>observation sensitivity matrix.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.one_state.SPKF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.one_state.</span></span><span class="sig-name descname"><span class="pre">SPKF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.SPKF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across sigma point kalman filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.SPKF.XY">
+<span class="sig-name descname"><span class="pre">XY</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.SPKF.XY" title="Permalink to this definition"></a></dt>
+<dd><p>sigma points update.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.SPKF.XYcho">
+<span class="sig-name descname"><span class="pre">XYcho</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.SPKF.XYcho" title="Permalink to this definition"></a></dt>
+<dd><p>cholesky sigma points update.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.one_state.PF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.one_state.</span></span><span class="sig-name descname"><span class="pre">PF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.PF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across particle filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.PF.X0">
+<span class="sig-name descname"><span class="pre">X0</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.PF.X0" title="Permalink to this definition"></a></dt>
+<dd><p>initial particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.PF.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.PF.predict" title="Permalink to this definition"></a></dt>
+<dd><p>evolution forward in time of particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.PF.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.PF.update" title="Permalink to this definition"></a></dt>
+<dd><p>observational update of particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.PF.resample">
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.PF.resample" title="Permalink to this definition"></a></dt>
+<dd><p>resampling of particles.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.one_state.Eval">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.one_state.</span></span><span class="sig-name descname"><span class="pre">Eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.Eval" title="Permalink to this definition"></a></dt>
+<dd><p>evaluating processor results.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.one_state.Eval.estimate">
+<span class="sig-name descname"><span class="pre">estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proclog</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.one_state.Eval.estimate" title="Permalink to this definition"></a></dt>
+<dd><p>plot estimated results.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-statespace.three_state">
+<span id="three-state-py"></span><h2>three_state.py<a class="headerlink" href="#module-statespace.three_state" title="Permalink to this heading"></a></h2>
+<p>three-state extension of the the one-state model. non linear temporal and observation updates.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.three_state.Threestate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.three_state.</span></span><span class="sig-name descname"><span class="pre">Threestate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.Threestate" title="Permalink to this definition"></a></dt>
+<dd><p>three-state reference model</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.Threestate.simulation">
+<span class="sig-name descname"><span class="pre">simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.Threestate.simulation" title="Permalink to this definition"></a></dt>
+<dd><p>time series of states x, inputs u, and obs y.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.Threestate.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.Threestate.f" title="Permalink to this definition"></a></dt>
+<dd><p>state evolution equation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.Threestate.h">
+<span class="sig-name descname"><span class="pre">h</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.Threestate.h" title="Permalink to this definition"></a></dt>
+<dd><p>observation equation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.three_state.EKF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.three_state.</span></span><span class="sig-name descname"><span class="pre">EKF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.EKF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across kalman filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.EKF.F">
+<span class="sig-name descname"><span class="pre">F</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.EKF.F" title="Permalink to this definition"></a></dt>
+<dd><p>state evolution matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.EKF.H">
+<span class="sig-name descname"><span class="pre">H</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.EKF.H" title="Permalink to this definition"></a></dt>
+<dd><p>observation sensitivity matrix.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.three_state.SPKF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.three_state.</span></span><span class="sig-name descname"><span class="pre">SPKF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.SPKF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across sigma point kalman filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.SPKF.XY">
+<span class="sig-name descname"><span class="pre">XY</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.SPKF.XY" title="Permalink to this definition"></a></dt>
+<dd><p>sigma points update.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.SPKF.XYcho">
+<span class="sig-name descname"><span class="pre">XYcho</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.SPKF.XYcho" title="Permalink to this definition"></a></dt>
+<dd><p>cholesky sigma points update.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.three_state.PF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.three_state.</span></span><span class="sig-name descname"><span class="pre">PF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.PF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across particle filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.PF.X0">
+<span class="sig-name descname"><span class="pre">X0</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.PF.X0" title="Permalink to this definition"></a></dt>
+<dd><p>initial particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.PF.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.PF.predict" title="Permalink to this definition"></a></dt>
+<dd><p>evolution forward in time of particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.PF.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.PF.update" title="Permalink to this definition"></a></dt>
+<dd><p>observational update of particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.PF.resample">
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.PF.resample" title="Permalink to this definition"></a></dt>
+<dd><p>resampling of particles.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.three_state.Eval">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.three_state.</span></span><span class="sig-name descname"><span class="pre">Eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.Eval" title="Permalink to this definition"></a></dt>
+<dd><p>evaluating processor results.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.three_state.Eval.estimate">
+<span class="sig-name descname"><span class="pre">estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proclog</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.three_state.Eval.estimate" title="Permalink to this definition"></a></dt>
+<dd><p>plot estimated results.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-statespace.bearings_only">
+<span id="bearings-only-py"></span><h2>bearings_only.py<a class="headerlink" href="#module-statespace.bearings_only" title="Permalink to this heading"></a></h2>
+<p>the bearings only problem has some interesting history. it’s basically about being on a sub. your sub is
+travelling along steadily and you begin hearing the sound of a ship at some bearing. over time and as the bearing
+changes, you can estimate the relative position and velocity of the ship. at some point you make a course change for
+your sub to pursue the ship.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.bearings_only.BearingsOnly">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.bearings_only.</span></span><span class="sig-name descname"><span class="pre">BearingsOnly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.BearingsOnly" title="Permalink to this definition"></a></dt>
+<dd><p>bearings-only tracking problem</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.BearingsOnly.simulation">
+<span class="sig-name descname"><span class="pre">simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.BearingsOnly.simulation" title="Permalink to this definition"></a></dt>
+<dd><p>time series of states x, inputs u, and obs y.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.BearingsOnly.f">
+<span class="sig-name descname"><span class="pre">f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.BearingsOnly.f" title="Permalink to this definition"></a></dt>
+<dd><p>state evolution equation.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.BearingsOnly.h">
+<span class="sig-name descname"><span class="pre">h</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.BearingsOnly.h" title="Permalink to this definition"></a></dt>
+<dd><p>observation equation.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.bearings_only.EKF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.bearings_only.</span></span><span class="sig-name descname"><span class="pre">EKF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.EKF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across kalman filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.EKF.F">
+<span class="sig-name descname"><span class="pre">F</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.EKF.F" title="Permalink to this definition"></a></dt>
+<dd><p>state evolution matrix.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.EKF.H">
+<span class="sig-name descname"><span class="pre">H</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.EKF.H" title="Permalink to this definition"></a></dt>
+<dd><p>observation sensitivity matrix.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.bearings_only.SPKF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.bearings_only.</span></span><span class="sig-name descname"><span class="pre">SPKF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.SPKF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across sigma point kalman filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.SPKF.XY">
+<span class="sig-name descname"><span class="pre">XY</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.SPKF.XY" title="Permalink to this definition"></a></dt>
+<dd><p>sigma points update.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.bearings_only.PF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.bearings_only.</span></span><span class="sig-name descname"><span class="pre">PF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.PF" title="Permalink to this definition"></a></dt>
+<dd><p>what’s common across particle filter models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.PF.X0">
+<span class="sig-name descname"><span class="pre">X0</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.PF.X0" title="Permalink to this definition"></a></dt>
+<dd><p>initial particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.PF.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">u</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.PF.predict" title="Permalink to this definition"></a></dt>
+<dd><p>evolution forward in time of particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.PF.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.PF.update" title="Permalink to this definition"></a></dt>
+<dd><p>observational update of particles.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.PF.resample">
+<span class="sig-name descname"><span class="pre">resample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.PF.resample" title="Permalink to this definition"></a></dt>
+<dd><p>resampling of particles.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="statespace.bearings_only.Eval">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">statespace.bearings_only.</span></span><span class="sig-name descname"><span class="pre">Eval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.Eval" title="Permalink to this definition"></a></dt>
+<dd><p>evaluating processor results.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.Eval.model">
+<span class="sig-name descname"><span class="pre">model</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.Eval.model" title="Permalink to this definition"></a></dt>
+<dd><p>plot true timeseries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="statespace.bearings_only.Eval.estimate">
+<span class="sig-name descname"><span class="pre">estimate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proclog</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#statespace.bearings_only.Eval.estimate" title="Permalink to this definition"></a></dt>
+<dd><p>plot estimated results.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="processors.html" class="btn btn-neutral float-left" title="processors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="notes.html" class="btn btn-neutral float-right" title="notes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, noah smith.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
