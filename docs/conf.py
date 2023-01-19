@@ -58,3 +58,4 @@ html_theme = "sphinx_rtd_theme"
 # html_static_path = ["_static"]
 
 autodoc_member_order = "bysource"
+autodoc_mock_imports = ["numpy", "scipy", "matplotlib", "filterpy"]
