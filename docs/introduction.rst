@@ -1,9 +1,9 @@
 introduction
 ==============
 
-__main__.py
+entrypoint.py
 -----------------
-.. automodule:: statespace.__main__
+.. automodule:: statespace.entrypoint
     :members:
 
 

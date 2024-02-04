@@ -1,21 +1,22 @@
-[tool.poetry]
-name = "statespace"
-version = "1.6.6"
-description = ""
-authors = ["noah smith <noah@statespace.dev>"]
-
-[tool.poetry.dependencies]
-python = ">=3.8,<3.11"
-numpy = "^1.24"
-scipy = "^1.10"
-matplotlib = "^3.6"
-filterpy = "^1.4"
-
-[tool.poetry.dev-dependencies]
-pytest = "^7.2"
-#sphinx = "*" # does not work, use pip
-#sphinx_rtd_theme = "*"
-
+# setuptools via pyproject, https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "statespace"
+version = "1.6.7"
+readme = "readme.md"
+requires-python = ">=3.10.0"
+dependencies = ["numpy==1.24", "scipy==1.10", "matplotlib==3.6", "filterpy==1.4"]
+
+[project.optional-dependencies]
+api = ["flask==2.3.3", "flask-restx==1.1.0"]
+docs = ["sphinx==7.1.2", "sphinx-rtd-theme==1.3.0"]
+test = ["pytest==7.2"]
+
+[tool.setuptools]
+packages = ['statespace']
+
+# ... other project metadata fields as specified in:
+#     https://packaging.python.org/en/latest/specifications/declaring-project-metadata/
