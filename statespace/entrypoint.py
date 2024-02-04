@@ -42,6 +42,7 @@ def main():
         conf.model = 'one'
         conf.factorized = False
     process_model(conf)
+    return
 
 
 def process_model(conf):
