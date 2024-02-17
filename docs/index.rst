@@ -1,11 +1,11 @@
 .. toctree::
-   :maxdepth: 2
-   :hidden:
+  :maxdepth: 2
+  :hidden:
 
-   introduction
-   processors
-   models
-   notes
+  introduction
+  processors
+  models
+  notes
 
 statespace
 =============

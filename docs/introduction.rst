@@ -3,7 +3,7 @@ introduction
 
 entrypoint.py
 -----------------
-.. automodule:: statespace.entrypoint
-    :members:
+.. automodule:: statespace.entrypoint_main
+  :members:
 
 
